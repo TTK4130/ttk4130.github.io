@@ -3,7 +3,7 @@
 SPHINXOPTS    =
 SPHINXBUILD   = python3 -msphinx
 SOURCEDIR     = .
-BUILDDIR      = _build
+BUILDDIR      = ..
 
 default: html
 
