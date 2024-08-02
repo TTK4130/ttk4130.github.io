@@ -14,15 +14,20 @@ release = '0.0.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = [
+    'sphinx.ext.githubpages'
+]
 
+master_doc = 'index'
 templates_path = ['_templates']
-exclude_patterns = []
-
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
+html_theme = 'fuoroi'
 html_static_path = ['_static']
+html_theme_options = {
+    "source_directory": "docs/",
+}
