@@ -29,5 +29,11 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'fuoroi'
 html_static_path = ['_static']
 html_theme_options = {
+    "source_repository": "https://github.com/TTK4130/ttk4130.github.io",
+    "source_branch": "master",
     "source_directory": "docs/",
 }
+
+# The URL which points to the root of the HTML documentation.
+# It is used to indicate the location of document like canonical_url
+html_baseurl = 'https://ttk4130.github.io'
