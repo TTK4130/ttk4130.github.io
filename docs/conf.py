@@ -7,7 +7,6 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'ttk4130'
-copyright = '2024, Tord Natlandsmyr'
 author = 'Tord Natlandsmyr'
 release = '0.0.0'
 
