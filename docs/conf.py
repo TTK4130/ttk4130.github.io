@@ -9,6 +9,7 @@
 project = 'ttk4130'
 author = 'Tord Natlandsmyr'
 release = '0.0.0'
+html_show_sphinx = False
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
