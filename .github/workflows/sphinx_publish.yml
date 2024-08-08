@@ -21,22 +21,6 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Install Conda environment with Micromamba
-        uses: mamba-org/setup-micromamba@v1
-        with:
-          environment-file: deps.yml
-          environment-name: multibody-book
-          cache-environment: true
-          cache-downloads: true
-
-      - name: Initialize Conda
-        run: echo ". $CONDA/bin/activate" >> $GITHUB_ENV
-
-      - name: Activate Conda environment
-      
       - id: deployment
         uses: sphinx-notes/pages@v3
-        run: source $CONDA/etc/profile.d/conda.sh && conda activate multibody-book     
-
+        cache: true

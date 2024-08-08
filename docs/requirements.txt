@@ -1,0 +1,3 @@
+furo
+jupyter-sphinx >=0.4.0
+sympy
