@@ -3,14 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ttk4130's documentation!
+Welcome to Modelling and Simulation TTK4130!
 ===================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-
+Introduction
+==================
+This site will introduce you to tools for simulation in Python etc....
 
 Indices and tables
 ==================
