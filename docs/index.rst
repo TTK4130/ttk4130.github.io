@@ -14,6 +14,10 @@ Introduction
 ==================
 This site will introduce you to tools for simulation in Python etc....
 
+Why Python?
+==================
+Open source, widely supported
+
 Indices and tables
 ==================
 
