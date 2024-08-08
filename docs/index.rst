@@ -22,10 +22,13 @@ Open source, widely supported
 
     print("Hello world!")
 
+And it supports useful tools...
 
 .. jupyter-execute::
 
    import sympy as sm
+   sm.init_printing(use_latex='mathjax')
+   
    b, t, phi = sm.symbols('b, t, phi')
    b, t, phi
 
