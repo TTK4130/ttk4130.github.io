@@ -21,5 +21,13 @@ jobs:
       pages: write
       id-token: write
     steps:
+    - name: Install Conda environment with Micromamba
+      uses: mamba-org/setup-micromamba@v1
+      with:
+        environment-file: deps.yml
+        environment-name: multibody-book
+        cache-environment: true
+        cache-downloads: true
+
     - id: deployment
       uses: sphinx-notes/pages@v3

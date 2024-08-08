@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to Modelling and Simulation TTK4130!
-===================================
+============================================
 
 .. toctree::
    :maxdepth: 2
@@ -17,6 +17,11 @@ This site will introduce you to tools for simulation in Python etc....
 Why Python?
 ==================
 Open source, widely supported
+
+.. jupyter-execute::
+
+    print("Hello world!")
+
 
 Indices and tables
 ==================
