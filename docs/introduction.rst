@@ -1,5 +1,3 @@
-.. _Introduction:
-
 ============
 Introduction
 ============

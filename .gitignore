@@ -1,3 +1,4 @@
 env/
 docs/_build
 docs/doctree
+.DS_Store
