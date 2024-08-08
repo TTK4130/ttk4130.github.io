@@ -30,6 +30,6 @@ jobs:
           environment-name: multibody-book
           cache-environment: true
           cache-downloads: true
-
-    - id: deployment
-      uses: sphinx-notes/pages@v3
+      
+      - id: deployment
+        uses: sphinx-notes/pages@v3
