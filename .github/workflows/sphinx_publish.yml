@@ -21,7 +21,8 @@ jobs:
       pages: write
       id-token: write
     steps:
-    - name: Install Conda environment with Micromamba
+      - uses: actions/checkout@v4
+      - name: Install Conda environment with Micromamba
       uses: mamba-org/setup-micromamba@v1
       with:
         environment-file: deps.yml
