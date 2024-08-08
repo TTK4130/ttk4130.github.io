@@ -9,6 +9,8 @@ Welcome to Modelling and Simulation TTK4130!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+   
+   introduction
 
 Introduction
 ==================
