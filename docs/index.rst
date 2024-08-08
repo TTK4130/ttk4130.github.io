@@ -23,6 +23,12 @@ Open source, widely supported
     print("Hello world!")
 
 
+.. jupyter-execute::
+
+   import sympy as sm
+   b, t, phi = sm.symbols('b, t, phi')
+   b, t, phi
+
 Indices and tables
 ==================
 
