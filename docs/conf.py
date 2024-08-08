@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'ttk4130'
+project = 'TTK4130'
 author = 'Tord Natlandsmyr'
 release = '0.0.0'
 html_show_sphinx = False
