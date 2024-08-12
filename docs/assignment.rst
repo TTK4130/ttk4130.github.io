@@ -15,9 +15,12 @@ We consider here a mass-damper-spring system as shown in the figure below.
 
 
 .. hint::
+   :class: dropdown
+   
    Have you watched lecture 2?
 
 .. admonition:: Exercise b)
+   :class: dropdown
 
    Transform the second order equation into a set of two first order equations.
 
