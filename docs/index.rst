@@ -7,7 +7,7 @@ Welcome to Modelling and Simulation TTK4130!
    :caption: Contents:
 
    introduction
-   assignment
+   assignment-1
    quaternions
 
 Learning outcome

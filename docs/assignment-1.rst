@@ -1,6 +1,6 @@
-============
-Assignment
-============
+=============
+Assignment 1
+=============
 
 We consider here a mass-damper-spring system as shown in the figure below.
 

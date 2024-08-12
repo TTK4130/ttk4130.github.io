@@ -37,6 +37,17 @@ html_theme_options = {
     "source_directory": "docs/",
 }
 
+html_sidebars = {
+    "**": [
+        "sidebar/scroll-start.html",
+        "sidebar/brand.html",
+        "sidebar/search.html",
+        "sidebar/navigation.html",
+        "sidebar/ethical-ads.html",
+        "sidebar/scroll-end.html",
+    ]
+}
+
 # The URL which points to the root of the HTML documentation.
 # It is used to indicate the location of document like canonical_url
 html_baseurl = 'https://ttk4130.github.io'
