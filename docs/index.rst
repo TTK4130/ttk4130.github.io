@@ -17,7 +17,7 @@ This site will introduce you to tools for simulation in Python etc....
 Prerequisites
 ===============
 - Basic programming knowledge
-- Familiariy with Python (from TDT4110 Information Technology, Introduction or similar)
+- Familiarity with Python (from TDT4110 Information Technology, Introduction or similar)
 - Basic Linear Algebra
 
 Why Python?
