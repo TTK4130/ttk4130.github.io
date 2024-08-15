@@ -1,7 +1,15 @@
 furo
-jupyter-sphinx >=0.4.0
-sympy
-graphviz
+graphviz ==0.11.*
 imagemagic
-sphinx-togglebutton
+ipython ==8.25.*
+jupyter-sphinx  >=0.4.0
+matplotlib ==3.8.*
+notebook ==7.2.*
+numpy ==1.26.*
+pythreejs ==2.4.2
+scipy ==1.14.*
+sphinx
+sphinx-autobuild
 sphinx-material
+sphinx-togglebutton
+sympy ==1.12.*
