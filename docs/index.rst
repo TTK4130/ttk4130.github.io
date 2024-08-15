@@ -7,6 +7,7 @@ Welcome to Modelling and Simulation TTK4130!
    :caption: Contents:
 
    introduction
+   installation
    assignment-1
    quaternions
 
