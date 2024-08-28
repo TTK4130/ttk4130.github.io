@@ -5,9 +5,38 @@ Installation
 Alternative 1: Miniconda / Anaconda
 ====================================
 
+.. tabs::
+
+   .. group-tab:: Linux
+
+      Linux Line 1
+
+   .. group-tab:: Mac OSX
+
+      Mac OSX Line 1
+
+   .. group-tab:: Windows
+
+      Windows Line 1
+
 
 Alternative 2: Manual Installation
 ====================================
+
+.. tabs::
+
+   .. group-tab:: Linux
+
+      Linux Line 1
+
+   .. group-tab:: Mac OSX
+
+      Mac OSX Line 1
+
+   .. group-tab:: Windows
+
+      Windows Line 1
+
 
 Versions
 =========
@@ -78,6 +107,11 @@ This website was built with the following software versions:
 
    import sphinx_togglebutton
    sphinx_togglebutton.__version__
+
+.. jupyter-execute::
+
+   import sphinx_tabs
+   sphinx_tabs.__version__
 
 .. jupyter-execute::
 

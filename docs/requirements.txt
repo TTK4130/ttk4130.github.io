@@ -12,4 +12,5 @@ sphinx
 sphinx-autobuild
 sphinx-material
 sphinx-togglebutton
+sphinx-tabs
 sympy ==1.12.*

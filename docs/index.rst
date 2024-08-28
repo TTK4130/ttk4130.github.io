@@ -8,6 +8,7 @@ Welcome to Modelling and Simulation TTK4130!
 
    introduction
    installation
+   sympy-and-cas
    assignment-1
    quaternions
 

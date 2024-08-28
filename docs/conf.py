@@ -16,6 +16,7 @@ html_show_sphinx = False
 
 extensions = [
     'sphinx_togglebutton',
+    'sphinx_tabs.tabs',
     'sphinx.ext.githubpages',
     'jupyter_sphinx'
 ]
