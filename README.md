@@ -75,6 +75,56 @@ To install Python follow [this guide](https://learn.microsoft.com/en-us/windows/
 
 The site is written in RetructuredText.
 
+### Tabs and grouped tabs
+
+Tabs can easily be created by:
+
+```
+.. tabs::
+
+   .. tab:: Apples
+
+      Apples are green, or sometimes red.
+
+   .. tab:: Pears
+
+      Pears are green.
+
+   .. tab:: Oranges
+
+      Oranges are orange.
+```
+
+They can also be grouped with
+```
+.. tabs::
+
+   .. group-tab:: Linux
+
+      Linux Line 1
+
+   .. group-tab:: Mac OSX
+
+      Mac OSX Line 1
+
+   .. group-tab:: Windows
+
+      Windows Line 1
+
+.. tabs::
+
+   .. group-tab:: Linux
+
+      Linux Line 1
+
+   .. group-tab:: Mac OSX
+
+      Mac OSX Line 1
+
+   .. group-tab:: Windows
+
+      Windows Line 1
+```
 
 ## How to build the site
 
