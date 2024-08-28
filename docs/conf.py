@@ -9,7 +9,6 @@
 project = 'TTK4130'
 author = 'Tord Natlandsmyr'
 release = '0.0.0'
-html_show_sphinx = False
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -32,6 +31,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'sphinx_book_theme'
 html_title = 'Modelling and Simulation TTK4130'
 html_static_path = ['_static']
+html_favicon = "_static/lorenz.png"
 html_theme_options = {
     "repository_url": "https://github.com/TTK4130/ttk4130.github.io",
     "repository_branch": "main",

@@ -2,6 +2,10 @@
 Welcome to Modelling and Simulation TTK4130!
 ============================================
 
+.. figure:: _static/lorenz.png
+  :align: center
+
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
