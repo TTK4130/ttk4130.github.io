@@ -80,51 +80,23 @@ The site is written in RetructuredText.
 Tabs can easily be created by:
 
 ```
-.. tabs::
+.. tab-set::
 
-   .. tab:: Apples
+      .. tab-item:: Windows
+      
+         Something is here 
 
-      Apples are green, or sometimes red.
+      .. tab-item:: Mac OSX
+    
+         Something is here 
 
-   .. tab:: Pears
+      .. tab-item:: GNU/Linux
+         
+         Something is here 
 
-      Pears are green.
-
-   .. tab:: Oranges
-
-      Oranges are orange.
 ```
 
-They can also be grouped with
-```
-.. tabs::
 
-   .. group-tab:: Linux
-
-      Linux Line 1
-
-   .. group-tab:: Mac OSX
-
-      Mac OSX Line 1
-
-   .. group-tab:: Windows
-
-      Windows Line 1
-
-.. tabs::
-
-   .. group-tab:: Linux
-
-      Linux Line 1
-
-   .. group-tab:: Mac OSX
-
-      Mac OSX Line 1
-
-   .. group-tab:: Windows
-
-      Windows Line 1
-```
 
 ## How to build the site
 
