@@ -8,9 +8,17 @@ Welcome to Modelling and Simulation TTK4130!
 
    introduction
    installation
+   jupyter-notebooks
    sympy-and-cas
+   explicit-euler
+   implicit-euler
+   runge-kutta-methods
+   simulation
+   reference-frames
    assignment-1
    quaternions
+   notation
+   references
 
 Learning outcome
 ==================
