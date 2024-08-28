@@ -2,19 +2,19 @@
 Sympy and CAS
 ==============
 
-.. tabs::
+.. tab-set::
 
-   .. code-tab:: py
+      .. tab-item:: Python
+         
+         .. code-block:: Python
 
-         def main():
-             return
-             
-   .. code-tab:: matlab
+            print("something")
 
-      function [avg, med] = mystats(x)
-      n = length(x);
-      avg = mymean(x,n);
-      med = mymedian(x,n);
-      end
+      .. tab-item:: Matlab
+
+         .. code-block::
+
+            A = [12,13; 14,15]
+
 
 

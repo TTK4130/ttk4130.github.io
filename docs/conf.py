@@ -16,8 +16,8 @@ html_show_sphinx = False
 
 extensions = [
     'sphinx_togglebutton',
-    'sphinx_tabs.tabs',
     'sphinx.ext.githubpages',
+    'sphinx_design',
     'jupyter_sphinx'
 ]
 
@@ -29,24 +29,12 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'furo'
+html_theme = 'sphinx_book_theme'
 html_title = 'Modelling and Simulation TTK4130'
 html_static_path = ['_static']
 html_theme_options = {
-    "source_repository": "https://github.com/TTK4130/ttk4130.github.io",
-    "source_branch": "master",
-    "source_directory": "docs/",
-}
-
-html_sidebars = {
-    "**": [
-        "sidebar/scroll-start.html",
-        "sidebar/brand.html",
-        "sidebar/search.html",
-        "sidebar/navigation.html",
-        "sidebar/ethical-ads.html",
-        "sidebar/scroll-end.html",
-    ]
+    "repository_url": "https://github.com/TTK4130/ttk4130.github.io",
+    "repository_branch": "main",
 }
 
 # The URL which points to the root of the HTML documentation.

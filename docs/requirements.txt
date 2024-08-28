@@ -1,4 +1,4 @@
-furo
+sphinx-book-theme
 graphviz ==0.11.*
 imagemagic
 ipython ==8.25.*
@@ -12,5 +12,5 @@ sphinx
 sphinx-autobuild
 sphinx-material
 sphinx-togglebutton
-sphinx-tabs
+sphinx-design
 sympy ==1.12.*

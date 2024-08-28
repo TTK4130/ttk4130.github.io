@@ -5,37 +5,25 @@ Installation
 Alternative 1: Miniconda / Anaconda
 ====================================
 
-.. tabs::
+.. tab-set::
 
-   .. group-tab:: Linux
+      .. tab-item:: Windows
+      
+         Something is here 
 
-      Linux Line 1
+      .. tab-item:: Mac OSX
+    
+         Something is here 
 
-   .. group-tab:: Mac OSX
+      .. tab-item:: GNU/Linux
+         
+         Something is here 
 
-      Mac OSX Line 1
-
-   .. group-tab:: Windows
-
-      Windows Line 1
 
 
 Alternative 2: Manual Installation
 ====================================
 
-.. tabs::
-
-   .. group-tab:: Linux
-
-      Linux Line 1
-
-   .. group-tab:: Mac OSX
-
-      Mac OSX Line 1
-
-   .. group-tab:: Windows
-
-      Windows Line 1
 
 
 Versions
@@ -85,8 +73,8 @@ This website was built with the following software versions:
 
 .. jupyter-execute::
 
-   import furo
-   furo.__version__
+   import sphinx_book_theme
+   sphinx_book_theme.__version__
 
 .. jupyter-execute::
 
@@ -110,8 +98,8 @@ This website was built with the following software versions:
 
 .. jupyter-execute::
 
-   import sphinx_tabs
-   sphinx_tabs.__version__
+   import sphinx_design
+   sphinx_design.__version__
 
 .. jupyter-execute::
 
