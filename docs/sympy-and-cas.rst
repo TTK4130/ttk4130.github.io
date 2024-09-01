@@ -10,7 +10,7 @@ Sympy and CAS
 
             print("something")
 
-      .. tab-item:: Matlab
+      .. tab-item:: Matlab/Octave
 
          .. code-block::
 
