@@ -55,25 +55,32 @@ Using plotly we can animate the trajectory and display it in a Javascript player
 .. jupyter-execute:: 
     
     import plotly.graph_objects as go
+    animation_time = 10
 
-    # Create animation frames, adding the trajectory up to the current time in each frame
+    # Create animation frames
     frames = [
-        go.Frame(data=[go.Scatter(x=df['time'][:i+1], y=df['displacement'][:i+1], mode='lines+markers', marker=dict(size=10))],
-                name=str(df['time'][i]))
+        go.Frame(data=[
+            go.Scatter(x=df['time'][:i+1], y=df['displacement'][:i+1], mode='lines', name='trajectory'),  # Line showing trajectory
+            go.Scatter(x=[df['time'][i]], y=[df['displacement'][i]], mode='markers', marker=dict(size=10, color='red'), name='current point')  # Marker for current point
+        ],
+        name=str(df['time'][i]))
         for i in range(len(df))
     ]
 
-    # Create the figure with time on the y-axis and displacement on the x-axis
+    # Create the figure
     fig = go.Figure(
-        data=[go.Scatter(x=[df['displacement'][0]], y=[df['time'][0]], mode='lines+markers', marker=dict(size=10))],
+        data=[
+            go.Scatter(x=[df['time'][0]], y=[df['displacement'][0]], mode='lines', name='trajectory'),  # Initial empty line
+            go.Scatter(x=[df['time'][0]], y=[df['displacement'][0]], mode='markers', marker=dict(size=10, color='red'), name='current point') # Initial marker
+        ],
         layout=go.Layout(
             xaxis=dict(range=t_span, autorange=False, title='Time'),
-            yaxis=dict(autorange=True, title='displacement'),
+            yaxis=dict(range=[-1,1], autorange=False, title='Displacement'),
             title="Mass-Spring-Damper System Animation",
             updatemenus=[dict(type="buttons",
                             buttons=[dict(label="Play",
                                             method="animate",
-                                            args=[None, {"frame": {"duration": 10, "redraw": False},
+                                            args=[None, {"frame": {"duration": animation_time, "redraw": False},
                                                         "fromcurrent": True}])])]),
         frames=frames
     )
