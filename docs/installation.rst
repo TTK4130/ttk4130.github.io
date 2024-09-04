@@ -68,6 +68,12 @@ This website was built with the following software versions:
 
 .. jupyter-execute::
 
+   import plotly
+   plotly.__version__
+
+
+.. jupyter-execute::
+
    import pythreejs._version
    pythreejs._version.__version__
 
