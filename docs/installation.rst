@@ -38,6 +38,11 @@ This website was built with the following software versions:
 
 .. jupyter-execute::
 
+   import platform
+   platform.python_version()
+   
+.. jupyter-execute::
+
    import IPython
    IPython.__version__
 
@@ -60,11 +65,6 @@ This website was built with the following software versions:
 
    import numpy
    numpy.__version__
-
-.. jupyter-execute::
-
-   import platform
-   platform.python_version()
 
 .. jupyter-execute::
 
