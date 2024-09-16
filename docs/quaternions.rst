@@ -2,9 +2,9 @@
 Quaternions
 ============
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+
+The problem with Euler angles
+=============================
 
 Intuition
 ==========
