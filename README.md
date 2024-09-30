@@ -1,6 +1,6 @@
 # TTK4130 Course Book
 
-To read the course content and installation guide go to [the deployment of this website](https://ttk4130.github.io). This documentation relates to editing the webpage and not the course work.
+To read the course content and installation guide go to [the deployment of this website](https://ttk4130.github.io). This README relates to developing and building the page.
 
 # Website How-to's
 
