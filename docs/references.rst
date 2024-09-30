@@ -2,7 +2,7 @@
 References
 ==================
 
-Moore, J. K., “Learn Multibody Dynamics”, 2022, https://moorepants.github.io/learn-multibody-dynamics/
+Moore, J. K. (2022). Learn Multibody Dynamics. https://moorepants.github.io/learn-multibody-dynamics/
 
 Egeland, O., & Gravdahl, J. T. (2002). Modeling and simulation for automatic control.
 

@@ -18,6 +18,7 @@ Welcome to Modelling and Simulation TTK4130!
    implicit-euler
    runge-kutta-methods
    simulation
+   rotations
    reference-frames
    assignment-1
    quaternions
