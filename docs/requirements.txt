@@ -15,3 +15,5 @@ sphinx-material
 sphinx-togglebutton
 sphinx-design
 sympy ==1.12.*
+jupyterlite-pyodide-kernel ==0.4.*
+jupyterlite-sphinx ==0.16.*

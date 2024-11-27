@@ -111,3 +111,13 @@ This website was built with the following software versions:
 
    import sympy
    sympy.__version__
+
+.. jupyter-execute::
+
+   import jupyterlite_sphinx
+   jupyterlite_sphinx.__version__
+
+.. jupyter-execute::
+
+   import jupyterlite_pyodide_kernel
+   jupyterlite_pyodide_kernel.__version__
