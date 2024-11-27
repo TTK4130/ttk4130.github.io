@@ -17,11 +17,13 @@ Welcome to Modelling and Simulation TTK4130!
    explicit-euler
    implicit-euler
    runge-kutta-methods
+   numerical-instability
    simulation
    rotations
    reference-frames
    assignment-1
    quaternions
+   sympy-live
    notation
    references
 

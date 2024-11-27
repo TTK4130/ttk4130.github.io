@@ -17,7 +17,8 @@ extensions = [
     'sphinx_togglebutton',
     'sphinx.ext.githubpages',
     'sphinx_design',
-    'jupyter_sphinx'
+    'jupyter_sphinx',
+    'jupyterlite_sphinx'
 ]
 
 master_doc = 'index'
