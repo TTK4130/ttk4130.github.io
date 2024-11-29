@@ -1,19 +1,21 @@
-sphinx-book-theme
 graphviz ==0.11.*
 imagemagic
 ipython ==8.25.*
-jupyter-sphinx  >=0.4.0
 matplotlib ==3.8.*
 notebook ==7.2.*
 numpy ==1.26.*
 pythreejs ==2.4.2
 plotly >=5.24.0
 scipy ==1.14.*
+sympy ==1.12.*
 sphinx
+jupyter-sphinx  >=0.4.0
+jupyterlite-pyodide-kernel ==0.4.*
+jupyterlite-sphinx ==0.16.*
+sphinx-book-theme
 sphinx-autobuild
 sphinx-material
 sphinx-togglebutton
 sphinx-design
-sympy ==1.12.*
-jupyterlite-pyodide-kernel ==0.4.*
-jupyterlite-sphinx ==0.16.*
+sphinxcontrib-bibtex
+

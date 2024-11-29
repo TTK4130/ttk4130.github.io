@@ -7,16 +7,14 @@ Welcome to Modelling and Simulation TTK4130!
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    introduction
    installation
    jupyter-notebooks
    sympy-and-cas
-   explicit-euler
-   implicit-euler
-   runge-kutta-methods
+   numerical-methods-for-odes
    numerical-instability
    simulation
    rotations

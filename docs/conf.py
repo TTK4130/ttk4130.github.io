@@ -18,13 +18,14 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx_design',
     'jupyter_sphinx',
-    'jupyterlite_sphinx'
+    'jupyterlite_sphinx',
+    'sphinxcontrib.bibtex'
 ]
 
 master_doc = 'index'
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
+bibtex_bibfiles = ['refs.bib']
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
