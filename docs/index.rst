@@ -23,7 +23,7 @@ Welcome to Modelling and Simulation TTK4130!
    quaternions
    sympy-live
    notation
-   references
+   bibliography
 
 Learning outcome
 ==================
