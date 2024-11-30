@@ -2,6 +2,9 @@
 Sympy and CAS
 ==============
 
+.. note::
+
+    If you don't have SymPy installed you can try it in your browser with the :ref:`SymPy Live` page
 
 Introduction
 =============
