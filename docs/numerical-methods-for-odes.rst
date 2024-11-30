@@ -48,9 +48,7 @@ We can use the SymPy method :code:`dsolve`
    import sympy as sm
    sm.init_printing(use_latex='mathjax')
    x = sm.Function('x')
-   a = sm.Symbol('a')
-   t = sm.Symbol('t')
-
+   a, t = sm.symbols('a t')
    lhs = x(t).diff(t) + a*x(t) # Define left-hand side
    result = sm.dsolve(lhs)
    result
@@ -59,13 +57,7 @@ We can also specify the the initial conditions with the argument :code:`ics` (in
 
 .. jupyter-execute::
 
-   import sympy as sm
-   sm.init_printing(use_latex='mathjax')
-   x = sm.Function('x')
-   a = sm.Symbol('a')
-   t = sm.Symbol('t')
-   x0 = sm.Symbol('x0')
-   lhs = x(t).diff(t) + a*x(t) # Define left-hand side
+   x0 = sm.symbols('x0')
    result = sm.dsolve(lhs, ics={x(t).subs(t, 0): x0})
    result
 
@@ -87,8 +79,7 @@ We can also specify the the initial conditions with the argument :code:`ics` (in
        import sympy as sm
        sm.init_printing(use_latex='mathjax')
        x = sm.Function('x')
-       t = sm.Symbol('t')
-       x0 = sm.Symbol('x0')
+       t, x0= sm.symbols('t x0')
        lhs = sm.Derivative(x(t), t, 2) + x(t).diff(t) + x(t) # Define left-hand side
        result = sm.dsolve(lhs, ics={x(t).diff(t).subs(t,0): -x0/2, x(t).subs(t, 0): x0})
        result = result.simplify() #This is fine, but we can simplify it further
@@ -159,7 +150,7 @@ By solving this algebraically with SymPy we can examine the error:
 .. jupyter-execute::
 
     z = sm.Function('z')
-    k = sm.Symbol('k')
+    k = sm.symbols('k')
     lhs = sm.Derivative(z(k), k,2) + 9*z(k)
     result = sm.dsolve(lhs, ics={z(k).diff(k).subs(k, 0): x0[1], z(k).subs(k, 0): x0[0]})
     result
