@@ -73,4 +73,3 @@ Did you know Python can do symbolic math?
    
    b, t, phi = sm.symbols('b, t, phi')
    b, t, phi
-
