@@ -1,5 +1,5 @@
 ==============
-Sympy and CAS
+SymPy and CAS
 ==============
 
 .. tab-set::

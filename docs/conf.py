@@ -19,7 +19,8 @@ extensions = [
     'sphinx_design',
     'jupyter_sphinx',
     'jupyterlite_sphinx',
-    'sphinxcontrib.bibtex'
+    'sphinxcontrib.bibtex',
+    'sphinx.ext.autosectionlabel'
 ]
 
 master_doc = 'index'

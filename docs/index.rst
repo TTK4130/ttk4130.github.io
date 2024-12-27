@@ -10,7 +10,6 @@ Welcome to Modelling and Simulation TTK4130!
    :maxdepth: 1
    :caption: Contents:
 
-   introduction
    installation
    jupyter-notebooks
    sympy-and-cas
