@@ -9,6 +9,280 @@ SymPy and CAS
 Introduction
 =============
 
+This page aims to introduce you to the wonderful world of SymPy and CAS (Computer Algebra System). The code examples are based on the SciPy 2016 Conference SymPy tutorial (see :ref:`More resources on SymPy`) and the `official documentation for SymPy <https://docs.sympy.org/latest/index.html>`_. The page partly written as an interactive tutorial and you're encouraged to code along with the provide examples.
+
+
+SymPy is a Python library for symbolic mathematics. Some of you may have worked with similar programs such as GeoGebra CAS, Maple, Matlab Symbolic Math Toolbox, Mathematica etc.. These type of programs are often categorized as Computer Algebra Systems or CAS. In general terms, a Computer Algebra System is any software that can manipulate mathematical expressions symbolically. This means that it manipulates expressions similar to how we do.
+One of the main benefits of this is that there is no loss of precision. An example of this is irrational numbers. Any computer can evaluate the square root of two, but only with limited precision due to hardware constraints. A CAS would express the square root of two as the relationship between the operation "square root" and the integer two. By representing a mathematical expressions as the relationship between operators and numbers we don't sacrifice any precision.
+
+SymPy Basics
+=============
+
+Importing SymPy
+----------------
+
+We can import SymPy using the following convention
+
+.. jupyter-execute::
+
+    import sympy as sm
+
+Since SymPy objects are a bit difficult to interpret we have methods of printing out mathematical expressions similar to math in a textbook.
+SymPy supports several printers to output expressions. Using  :external:py:func:`~sympy.interactive.printing.init_printing` will automatically enable the best printer
+in your environment. This will usually generate an image of the expression you are printing. This webpage, which is based on Jupyter notebooks, uses MathJax (a JavaScript library for rendering mathematical notation) to print SymPy expressions.
+
+.. jupyter-execute::
+
+    sm.init_printing(use_latex='mathjax')
+    x = sm.symbols('x')
+    x**2
+
+SymPy Symbols
+---------------
+
+Demonstrating the example above, we see that the square root of two has limited precision when using the :code:`math.sqrt`.
+
+.. jupyter-execute::
+
+    import math
+    math.sqrt(2)
+
+Using SymPy we see that the square root of two is expressed symbolically
+
+.. jupyter-execute::
+
+    sm.sqrt(2)
+
+Computing the square root of 8 demonstrates the real power of SymPy, namely simplification.
+
+.. jupyter-execute::
+
+    sm.sqrt(8)
+
+Mathematical symbols are created with the :external:py:func:`~sympy.core.symbol.symbols` function
+
+.. jupyter-execute::
+
+    x = sm.symbols('x')
+    x
+
+which creates a symbols object of the :external:py:class:`~sympy.core.symbol.Symbol` type
+
+.. jupyter-execute::
+
+    type(x)
+
+We can create multiple symbols in one go with ``symbols()``, and Greek symbols spelled out are automatically recognized
+
+.. jupyter-execute::
+
+    alpha, beta, Alpha, Beta = sm.symbols('alpha beta Alpha Beta')
+    alpha, beta, Alpha, Beta
+
+The argument in ``symbols()`` doesn't need to match the Python variable name. We can use this to make out Python code more (or less) readable
+
+.. jupyter-execute::
+
+    unrelated = sm.symbols('nonsense')
+    flywheel_ang_vel, flywheel_inertia = sm.symbols('omega1, I1')
+    unrelated, flywheel_ang_vel, flywheel_inertia
+
+SymPy has a compact function call to create many similar symbols
+
+.. jupyter-execute::
+
+    sm.symbols('x1:21')
+
+
+Functions
+------------
+
+We can also define functions in addition to symbols. These are vital when setting up differential equations, where you don't know the definition of a function, but only its derivative.
+Using ``Function()`` will create a function of the type ``UndefinedFunction``
+
+.. jupyter-execute::
+
+    x = sm.Function('x')
+    type(x)
+
+We can create a function of one of many variables
+
+.. jupyter-execute::
+
+    t = sm.symbols('t')
+    x(t)
+
+Using the same function...
+
+.. jupyter-execute::
+
+    x(t, alpha, beta)
+
+
+.. admonition:: Exercise
+
+    Create a function :math:`F(t, u)`
+
+.. dropdown:: Solution
+    :color: success
+
+    .. jupyter-execute::
+
+        t, u = sm.symbols('t, u')
+        F = sm.Function('F')
+        F(t, u)
+
+
+
+Symbolic Expressions and Expression Trees
+-----------------------------------------
+
+Using symbolic functions and variables we can construct expressions using mathematical operators.
+
+.. jupyter-execute::
+
+    t, theta = sm.symbols('t, Theta')
+    x = sm.Function('x')
+    expr = x(t) - (t**2)/theta
+    expr
+
+Expressions will have a type ``Add, Mul or Pow``. This is because expressions are represented as trees in SymPy. This is important to know
+when working with SymPy as the internal tree-structure is the reason that SymPy sometimes prints expressions in unusual ways. By using
+:code:`srepr` we can see whet an expression looks like internally and verify our expressions.
+
+.. jupyter-execute::
+
+    x, y, z = sm.symbols('x, y, z')
+    expr = x**2  - 2*x*y
+    sm.srepr(expr)
+
+We can also draw a diagram of the expression tree
+
+.. graphviz::
+    :align: center
+
+    digraph{
+
+    # Graph style
+    "ordering"="out"
+    "rankdir"="TD"
+
+    #########
+    # Nodes #
+    #########
+
+    "Add(Pow(Symbol('x'), Integer(2)), Mul(Integer(-2), Symbol('x'), Symbol('y')))_()" ["color"="black", "label"="Add", "shape"="ellipse"];
+    "Pow(Symbol('x'), Integer(2))_(0,)" ["color"="black", "label"="Pow", "shape"="ellipse"];
+    "Symbol('x')_(0, 0)" ["color"="black", "label"="x", "shape"="ellipse"];
+    "Integer(2)_(0, 1)" ["color"="black", "label"="2", "shape"="ellipse"];
+    "Mul(Integer(-2), Symbol('x'), Symbol('y'))_(1,)" ["color"="black", "label"="Mul", "shape"="ellipse"];
+    "Integer(-2)_(1, 0)" ["color"="black", "label"="-2", "shape"="ellipse"];
+    "Symbol('x')_(1, 1)" ["color"="black", "label"="x", "shape"="ellipse"];
+    "Symbol('y')_(1, 2)" ["color"="black", "label"="y", "shape"="ellipse"];
+
+    #########
+    # Edges #
+    #########
+
+    "Add(Pow(Symbol('x'), Integer(2)), Mul(Integer(-2), Symbol('x'), Symbol('y')))_()" -> "Pow(Symbol('x'), Integer(2))_(0,)";
+    "Add(Pow(Symbol('x'), Integer(2)), Mul(Integer(-2), Symbol('x'), Symbol('y')))_()" -> "Mul(Integer(-2), Symbol('x'), Symbol('y'))_(1,)";
+    "Pow(Symbol('x'), Integer(2))_(0,)" -> "Symbol('x')_(0, 0)";
+    "Pow(Symbol('x'), Integer(2))_(0,)" -> "Integer(2)_(0, 1)";
+    "Mul(Integer(-2), Symbol('x'), Symbol('y'))_(1,)" -> "Integer(-2)_(1, 0)";
+    "Mul(Integer(-2), Symbol('x'), Symbol('y'))_(1,)" -> "Symbol('x')_(1, 1)";
+    "Mul(Integer(-2), Symbol('x'), Symbol('y'))_(1,)" -> "Symbol('y')_(1, 2)";
+    }
+
+.. note::
+
+    The diagram above was generated by using Graphviz and ``dotprint``
+
+Notice how the nodes in the tree are structured according to the order of operations. The operations are defined as classes in SymPy, and we could just as easily
+define our expressions using ``Add, Mul, Pow, Symbol`` (Add, Multipy, Power, Symbol). Let's look at a simpler expression: :math:`x^2`
+
+.. jupyter-execute::
+
+    x = sm.symbols('x')
+    expr = x**2
+    sm.srepr(expr)
+
+.. graphviz::
+    :align: center
+
+    digraph{
+
+    # Graph style
+    "ordering"="out"
+    "rankdir"="TD"
+
+    #########
+    # Nodes #
+    #########
+
+    "Pow(Symbol('x'), Integer(2))_()" ["color"="black", "label"="Pow", "shape"="ellipse"];
+    "Symbol('x')_(0,)" ["color"="black", "label"="x", "shape"="ellipse"];
+    "Integer(2)_(1,)" ["color"="black", "label"="2", "shape"="ellipse"];
+
+    #########
+    # Edges #
+    #########
+
+    "Pow(Symbol('x'), Integer(2))_()" -> "Symbol('x')_(0,)";
+    "Pow(Symbol('x'), Integer(2))_()" -> "Integer(2)_(1,)";
+    }
+
+By using the same operators in the graph we can create the same object.
+
+.. jupyter-execute::
+
+    expr = sm.Pow(sm.Symbol('x'), sm.Integer(2))
+    expr
+
+See the manipulation section of the `official SymPy tutorial <https://docs.sympy.org/latest/tutorials/intro-tutorial/manipulation.html>`_ for more information on this topic.
+
+SymPy has a comprehensive library of functions, all of which are documented in the official documentation.
+
+.. jupyter-execute::
+
+    expr2 = sm.sqrt(x)*sm.sin(x) + sm.Abs(z)/y
+    expr2
+
+.. admonition:: Exercise
+
+    Create a SymPy expression for the normal distribution function
+
+    .. math::
+
+        \frac{1}{\sqrt{2\pi\sigma}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}
+
+.. dropdown:: Solution
+    :color: success
+
+    .. jupyter-execute::
+
+        x, mu, sigma = sm.symbols('x mu sigma')
+        normal = 1/sm.sqrt(2 * sm.pi * sigma**2)* sm.exp(-(x - mu)**2/(2*sigma**2))
+        normal
+
+Substitution
+-------------
+
+
+
+.. admonition:: Exercise
+
+    Use the :code:`latex` method demonstrated in th `SymPy documentation <https://docs.sympy.org/latest/tutorials/intro-tutorial/printing.html>`_ to generate a LaTex expression for the normal distribution.
+
+.. dropdown:: Solution
+    :color: success
+
+    .. jupyter-execute::
+
+        print(sm.latex(normal))
+
+
+SymPy Advanced Topics
+=========================
 
 
 
