@@ -247,6 +247,18 @@ SymPy has a comprehensive library of functions, all of which are documented in t
     expr2 = sm.sqrt(x)*sm.sin(x) + sm.Abs(z)/y
     expr2
 
+
+When working with fractions, keep in mind that SymPy may evaluate the expression. We can get around this by using ``S()``
+to sympify numbers. This is especially useful when working with irrational numbers
+
+.. jupyter-execute::
+
+    1/3 * x
+
+.. jupyter-execute::
+
+    sm.S(1)/3 * x
+
 .. admonition:: Exercise
 
     Create a SymPy expression for the normal distribution function
@@ -264,14 +276,54 @@ SymPy has a comprehensive library of functions, all of which are documented in t
         normal = 1/sm.sqrt(2 * sm.pi * sigma**2)* sm.exp(-(x - mu)**2/(2*sigma**2))
         normal
 
-Substitution
--------------
 
 
+Printing and Sympification
+--------------------------
+
+As illustrated with ``srepr()`` above, expressions in SymPy can have many representations. The most standard representation
+is ``str()``, which gives a representation similar to what you would code
+
+.. jupyter-execute::
+
+    expr3 = x*sm.cos(x)**2/sm.Abs(sm.Symbol('omega'))
+    str(expr3)
+
+SymPy also has a pretty printer :external:py:func:`pprint() <sympy.printing.pretty.pretty.pretty_print>` that prints unicode symbols more similar to the typesetting we are used to
+
+.. jupyter-execute::
+
+    sm.pprint(expr3)
+
+Additionally, SymPy can also generate LaTeX representations of SymPy expressions using the :external:py:func:`sympy.printing.latex.latex` function
+
+.. jupyter-execute::
+
+    print(sm.latex(expr3))
+
+
+SymPy can also interpret and convert strings into SymPy expressions
+
+.. jupyter-execute::
+
+    s = sm.sympify('x*cos(x)/omega')
+    s
+
+It's also worth noting that SymPy can generate expressions in many different programming languages. This allows us to use SymPy to solve/find the expressions we want,
+which we then implement in our programs
+
+.. jupyter-execute::
+
+    print(sm.ccode(expr3))          # C
+    print(sm.fcode(expr3))          # Fortran
+    print(sm.rust_code(expr3))      # Rust
+    print(sm.octave_code(expr3))    # Matlab / Octave
+    print(sm.julia_code(expr3))     # Julia
+    # LLVM etc ...
 
 .. admonition:: Exercise
 
-    Use the :code:`latex` method demonstrated in th `SymPy documentation <https://docs.sympy.org/latest/tutorials/intro-tutorial/printing.html>`_ to generate a LaTex expression for the normal distribution.
+    Use the :code:`latex` method demonstrated in the `SymPy documentation <https://docs.sympy.org/latest/tutorials/intro-tutorial/printing.html>`_ to generate a LaTex expression for the normal distribution.
 
 .. dropdown:: Solution
     :color: success
@@ -281,9 +333,166 @@ Substitution
         print(sm.latex(normal))
 
 
-SymPy Advanced Topics
-=========================
+Differentiation
+-----------------
 
+.. note::
+
+    SymPy has several methods for computing an integral. Since most of the systems we'll work with in the course don't have analytical solutions, we won't
+    introduce them here. See the the `calculus section of the official SymPy tutorial <https://docs.sympy.org/latest/tutorials/intro-tutorial/calculus.html#integrals>`_ if you want to learn more.
+
+Computing derivatives of complex trigonometric expressions by hand can be very tedious and prone to errors. With SymPy we can calculate derivatives with ease.
+All functions and expressions have a ``.diff()`` method which can be used to differentiate. There is also a standalone function :external:py:func:`~sympy.core.function.diff` which takes
+a undefined function or an expression and differentiates it with respect to the second argument. This works irrespective of dimension, given that the corresponding arguments are correct.
+
+
+.. jupyter-execute::
+
+    f = sm.Function('f')
+    f(t).diff(t)
+
+.. jupyter-execute::
+
+    sm.diff(f(x), x)
+
+Let's say we have some complicated expression
+
+.. jupyter-execute::
+
+    expr4 = sm.Abs(x)*sm.sin(t)**2/x
+    expr4
+
+We can express the derivative of ``expr4`` with respect to :math:`x` and then :math:`t` by using ``Derivative()``
+
+.. jupyter-execute::
+
+    sm.Derivative(expr4, x, t)
+
+We can compute the derivative with the method ``doit()``, which is the  as ``expr4.diff(args)``
+
+.. jupyter-execute::
+
+    sm.Derivative(expr4, x, t).doit()
+
+.. jupyter-execute::
+
+    expr4.diff(x, t)
+
+Note that the derivative includes both real and imaginary components. This is intentional.
+
+.. warning::
+
+    SymPy assumes that all symbols are complex-valued unless it is given additional assumptions. We can attach assumptions
+    to a symbol or function to specify if they are real, positive, negative etc.
+
+    .. jupyter-execute::
+
+        s = sm.symbols('s')
+        H = sm.Function('H')
+        sm.Abs(H(s)).diff(s)
+
+    .. jupyter-execute::
+
+        H = sm.Function('H', real=True)
+        sm.Abs(H(s)).diff(s)
+
+    .. jupyter-execute::
+
+        H = sm.Function('H', real=True, positive=True)
+        sm.Abs(H(s)).diff(s)
+
+    In most cases, adding assumptions to variables isn't necessary, but it can be useful when you encounter unexpected components in your solutions.
+
+.. admonition:: Exercise
+
+    Demonstrate the chain rule by differentiating :math:`f(g(x))` with respect to :math:`x` using SymPy
+
+.. dropdown:: Solution
+    :color: success
+
+    .. jupyter-execute::
+
+        f(sm.Function('g')(x)).diff(x)
+
+
+Substitution and Evaluation
+----------------------------
+
+SymPy has many methods for evaluating expressions numerically, and :external:py:meth:`~sympy.core.basic.Basic.replace` is often used.
+In this course we prefer :external:py:meth:`~sympy.core.basic.Basic.xreplace` for its verbosity. We first create a dictionary to map
+the symbols or expressions we want to substitute, and then pass it to ``xreplace()``
+
+.. jupyter-execute::
+
+    repl = {x: sm.sqrt(2), t: sm.pi/7}
+    expr4.xreplace(repl)
+
+SymPy doesn't evaluate the expression automatically after substituting. We can use the :external:py:meth:`~sympy.core.evalf.EvalfMixin.evalf` method to
+evaluate the expression to a specified number of decimal points given a dictionary with substitutions.
+
+.. jupyter-execute::
+
+    expr4.evalf(n = 10, subs = repl)
+
+We can do this because ``evalf()`` returns a special SymPy :external:py:class:`~sympy.core.numbers.Float` object which can have an arbitrary number of decimal places.
+Here we evaluate pi at 1000 decimal places
+
+.. jupyter-execute::
+
+    pi_e3 =  sm.pi.evalf(n = 1000)
+    pi_e3
+
+If you want a regular machine precision floating point value you can easily convert a SymPy float to a Python float
+
+.. jupyter-execute::
+
+    type(float(pi_e3))
+
+When we want to evaluate an expression with machine precision directly, we prefer to use :external:py:func:`~sympy.utilities.lambdify.lambdify` to
+convert the expression into a Python function. We can convert an expression by providing the symbols that should be converted
+into numbers as a tuple. We can then use ``help()`` to inspect our lambdified expression.
+
+.. jupyter-execute::
+
+    eval_expr4 = sm.lambdify((x, t), expr4)
+    help(eval_expr4)
+
+The lambdified function works as any other Python function. Note that it returns NumPy floats instead of Python floats.
+These can be used with Python floats interchangeably, but neither should be mixed with SymPy floats. We prefer the much faster NumPy floats
+since the arbitrary precision of a Python float isn't required. We will almost always want machine precision floats, so ``lambdify()`` is your friend.
+
+.. jupyter-execute::
+
+    type(eval_expr4(1,2))
+
+If you want a quick plot without evaluating your expression, you can use ``plot()``
+
+.. jupyter-execute::
+
+    sm.plot(sm.sin(x)**2)
+
+
+Matrices
+---------
+
+Matrices can be creating by passing a nested list to the ``Matrix()`` object
+
+.. jupyter-execute::
+
+    A = sm.Matrix([[0.2, - 1], [0, 0.9]])
+    A
+
+.. jupyter-execute::
+
+    a, b, c, d = sm.symbols('a, b, c, d')
+    B = sm.Matrix([[1/b, 1/b], [c/d, 1/a]])
+    B
+
+Linear Systems
+---------------
+
+Simplification
+---------------
 
 
 More resources on SymPy
@@ -291,7 +500,7 @@ More resources on SymPy
 
 It's highly recommended that you familiarize yourself with the SymPy documentation, available though `this link here <https://docs.sympy.org/latest/index.html>`_.
 The documentation page on `common mistakes and "gochas" <https://docs.sympy.org/latest/tutorials/intro-tutorial/gotchas.html>`_ is particularty useful.
-An older version of this SymPy tutorial is available on YouTube.
+An older long-form version of this SymPy tutorial is available on YouTube.
 
 .. raw:: html
 

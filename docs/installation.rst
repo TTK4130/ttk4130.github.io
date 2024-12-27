@@ -24,12 +24,23 @@ Alternative 1: Miniconda / Anaconda
 Alternative 2: Manual Installation
 ====================================
 
+.. tab-set::
+
+      .. tab-item:: Windows
+
+         Something is here
+
+      .. tab-item:: Mac OSX
+
+         Something is here
+
+      .. tab-item:: GNU/Linux
+
+         Something is here
 
 
-Versions
-=========
 
-This website is built with the following package versions
+
 
 Software Versions
 =================

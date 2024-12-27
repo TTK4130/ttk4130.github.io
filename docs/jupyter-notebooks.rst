@@ -1,4 +1,4 @@
 =======================================
-Quick introduction to Jupyter Notebooks
+Quick intro to Jupyter Notebooks
 =======================================
 
