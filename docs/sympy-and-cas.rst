@@ -157,6 +157,7 @@ when working with SymPy. The internal tree-structure is the reason that SymPy so
     expr
 
 Internal representation:
+
 .. jupyter-execute::
 
     print(sm.srepr(expr))
