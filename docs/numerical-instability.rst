@@ -1,6 +1,6 @@
-----------------------
-Numerical Instability
-----------------------
+===========================
+Numerical Instability (WIP)
+===========================
 
 When solving differential equations we have to be careful with which solver we use.
 

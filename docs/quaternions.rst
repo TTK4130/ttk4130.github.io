@@ -1,6 +1,6 @@
-============
-Quaternions
-============
+=================
+Quaternions (WIP)
+=================
 
 
 The problem with Euler angles

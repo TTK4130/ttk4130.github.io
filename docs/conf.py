@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'TTK4130'
-author = 'Tord Natlandsmyr'
+author = 'Tord Natlandsmyr & Børge Rokseth'
 release = '0.0.0'
 
 # -- General configuration ---------------------------------------------------
@@ -24,7 +24,8 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.graphviz',
-    'sphinx.ext.imgconverter'
+    'sphinx.ext.imgconverter',
+    'sphinx.ext.todo'
 ]
 
 master_doc = 'index'

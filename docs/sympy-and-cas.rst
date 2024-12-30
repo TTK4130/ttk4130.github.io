@@ -6,13 +6,13 @@ SymPy and CAS
 
     If you don't have SymPy installed you can try it in your browser with the :ref:`SymPy Live` page
 
-Introduction
-=============
+SymPy Introduction
+==================
 
 This page aims to introduce you to the wonderful world of SymPy and CAS (Computer Algebra System). The code examples are based on the SciPy 2016 Conference SymPy tutorial (see :ref:`More resources on SymPy`) and the `official documentation for SymPy <https://docs.sympy.org/latest/index.html>`_. The page partly written as an interactive tutorial and you're encouraged to code along with the provide examples.
 
 
-SymPy is a Python library for symbolic mathematics. Some of you may have worked with similar programs such as GeoGebra CAS, Maple, Matlab Symbolic Math Toolbox, Mathematica etc.. These type of programs are often categorized as Computer Algebra Systems or CAS. In general terms, a Computer Algebra System is any software that can manipulate mathematical expressions symbolically. This means that it manipulates expressions similar to how we do.
+SymPy is a Python library for symbolic mathematics :cite:`Sympy2017`. Some of you may have worked with similar programs such as GeoGebra CAS, Maple, Matlab Symbolic Math Toolbox, Mathematica etc.. These type of programs are often categorized as Computer Algebra Systems or CAS. In general terms, a Computer Algebra System is any software that can manipulate mathematical expressions symbolically. This means that it manipulates expressions similar to how we do.
 One of the main benefits of this is that there is no loss of precision. An example of this is irrational numbers. Any computer can evaluate the square root of two, but only with limited precision due to hardware constraints. A CAS would express the square root of two as the relationship between the operation "square root" and the integer two. By representing a mathematical expressions as the relationship between operators and numbers we don't sacrifice any precision.
 
 SymPy Basics
@@ -27,9 +27,9 @@ We can import SymPy using the following convention
 
     import sympy as sm
 
-Since SymPy objects are a bit difficult to interpret we have methods of printing out mathematical expressions similar to math in a textbook.
+Since SymPy objects are a bit difficult to interpret, we have methods of printing out mathematical expressions similar to math in a textbook.
 SymPy supports several printers to output expressions. Using  :external:py:func:`~sympy.interactive.printing.init_printing` will automatically enable the best printer
-in your environment. This will usually generate an image of the expression you are printing. This webpage, which is based on Jupyter notebooks, uses MathJax (a JavaScript library for rendering mathematical notation) to print SymPy expressions.
+in your environment. This will usually generate an image of the expression you are printing. This webpage, which uses Jupyter notebooks, uses MathJax (a JavaScript library for rendering mathematical notation) to print SymPy expressions.
 
 .. jupyter-execute::
 
@@ -147,14 +147,20 @@ Using symbolic functions and variables we can construct expressions using mathem
     expr
 
 Expressions will have a type ``Add, Mul or Pow``. This is because expressions are represented as trees in SymPy. This is important to know
-when working with SymPy as the internal tree-structure is the reason that SymPy sometimes prints expressions in unusual ways. By using
-:code:`srepr` we can see whet an expression looks like internally and verify our expressions.
+when working with SymPy. The internal tree-structure is the reason that SymPy sometimes prints expressions in unusual ways. By using
+:code:`srepr` we can see what an expression looks like internally and verify our expressions.
 
 .. jupyter-execute::
 
     x, y, z = sm.symbols('x, y, z')
     expr = x**2  - 2*x*y
-    sm.srepr(expr)
+    expr
+
+Internal representation:
+.. jupyter-execute::
+
+    print(sm.srepr(expr))
+
 
 We can also draw a diagram of the expression tree
 
@@ -341,7 +347,7 @@ Differentiation
     SymPy has several methods for computing an integral. Since most of the systems we'll work with in the course don't have analytical solutions, we won't
     introduce them here. See the the `calculus section of the official SymPy tutorial <https://docs.sympy.org/latest/tutorials/intro-tutorial/calculus.html#integrals>`_ if you want to learn more.
 
-Computing derivatives of complex trigonometric expressions by hand can be very tedious and prone to errors. With SymPy we can calculate derivatives with ease.
+Computing derivatives of complex expressions by hand can be very tedious process prone to errors. With SymPy we can calculate derivatives with ease.
 All functions and expressions have a ``.diff()`` method which can be used to differentiate. There is also a standalone function :external:py:func:`~sympy.core.function.diff` which takes
 a undefined function or an expression and differentiates it with respect to the second argument. This works irrespective of dimension, given that the corresponding arguments are correct.
 
@@ -488,12 +494,231 @@ Matrices can be creating by passing a nested list to the ``Matrix()`` object
     B = sm.Matrix([[1/b, 1/b], [c/d, 1/a]])
     B
 
+We can access individual elements of a matrix with square brackets
+
+.. jupyter-execute::
+
+    B[1,0]
+
+We can also use slice notation to extract rows or columns
+
+.. jupyter-execute::
+
+    B[0:2, 1]
+
+.. jupyter-execute::
+
+    B[0, 0:2]
+
+A list of elements is interpreted as a column vector
+
+.. jupyter-execute::
+
+    C = sm.Matrix([a, b])
+
+We can get the shape of a matrix by using the ``shape()`` function or the ``shape`` attribute
+
+.. jupyter-execute::
+
+    print(sm.shape(C))
+    print(C.shape)
+
+There are many methods for creating common matrices
+
+.. jupyter-execute::
+
+    sm.eye(4,4)
+
+.. jupyter-execute::
+
+    sm.zeros(3,1)
+
+.. jupyter-execute::
+
+    sm.ones(6,4)
+
+For creating matrices with elements or matrices on the diagonal we use ``diag()``
+
+.. jupyter-execute::
+
+    sm.diag(a, b, c, sm.ones(6,4))
+
+To transpose a matrix we can use the attribute ``.T``
+
+.. jupyter-execute::
+
+    sm.diag(a, b, c, sm.ones(6,4)).T
+
+We can easily perform matrix algebra
+
+.. jupyter-execute::
+
+    B + B
+
+We can use both ``*`` and ``@`` to perform matrix multiplication. Since NumPy uses ``*`` for element-wise multiplication
+and ``@`` for matrix multiplication, it's best to use ``@`` for SymPy matrix multiplication to avoid any confusion
+
+.. jupyter-execute::
+
+    B*C
+
+.. jupyter-execute::
+
+    B@C
+
+For element-wise multiplication:
+
+.. jupyter-execute::
+
+    sm.hadamard_product(B,B)
+
+Useful attributes, such as the determinant, eigenvalues, eigenvectors and singular values are implemented as matrix methods
+
+.. jupyter-execute::
+
+    r, theta = sm.symbols('r, theta', real=True)
+    rot = sm.Matrix([[r*sm.cos(theta), -r * sm.sin(theta)],[r*sm.sin(theta), r*sm.cos(theta)]])
+    rot
+
+.. jupyter-execute::
+
+    rot.det()
+
+.. jupyter-execute::
+
+    rot.singular_values()
+
+.. jupyter-execute::
+
+    D = sm.Matrix([[1, x], [y, 1]])
+    D
+
+.. jupyter-execute::
+
+    D.eigenvals()
+
+.. jupyter-execute::
+
+    D.eigenvects()
+
+
+Matrices are mutable, meaning that you can change them in place. This means they cannot be used inside other SymPy
+expressions or as keys to dictionaries. If needed, there is an immutable version of a matrix in SymPy called ``ImmutableMatrix``
+
+.. jupyter-execute::
+
+    C *=2
+    C += sm.Matrix([0, 1])
+    C[0] = b
+    C
+
+We can differentiate a matrix by ``.diff()``
+
+.. jupyter-execute::
+
+    C.diff(b)
+
+We can also calculate the `Jacobian <https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant>`_ of a vector with ``jacobian()``
+
+.. jupyter-execute::
+
+    C.jacobian([a, b])
+
+
+.. admonition:: Exercise
+
+    The nonlinear state space model for an inverted pendulum is given below. Use the ``jacobian()`` message to linearize
+    the system around the equilibrium :math:`x_0 = \begin{bmatrix} 0 \\ 0 \end{bmatrix}`
+
+    .. jupyter-execute::
+
+        import sympy as sm
+
+        x1, x2 = sm.symbols('x1 x2')
+        u = sm.symbols('u')
+        g, l, m = sm.symbols('g l m')
+
+        x = sm.Matrix([x1, x2])
+
+        f1 = x2
+        f2 = -(g/l)*sm.sin(x1) + (1/(m*l**2))*u
+        f = sm.Matrix([f1, f2])
+        f
+
+.. dropdown:: Solution
+    :color: success
+
+    .. jupyter-execute::
+
+        A = f.jacobian(x)
+        B = f.jacobian(sm.Matrix([u]))
+
+        # Define the linearization point around equilibrium
+        x_eq = sm.Matrix([0, 0])
+        u_eq = 0
+
+        subs = {x1: x_eq[0], x2: x_eq[1], u: u_eq}
+
+        A_lin = A.xreplace(subs)
+        B_lin = B.xreplace(subs)
+
+        A_lin@x + B_lin*u
+
+    Alternatively, the small-angle approximation will yield the same result.
+
 Linear Systems
 ---------------
+
+SymPy has `many ways <https://docs.sympy.org/latest/guides/solving/solve-matrix-equation.html#methods-for-solving-matrix-equations>`_ of solving Matrix equations on the form :math:`\bf{A}x = b`.
+The best method depends on the nature of the matrix. By default, Gauss-Jordan elimination will be used, which can be quite inefficient for large matrices.
+If you repeatedly need to solve matrix equations with the same matrix, it is usually faster to use LU decomposition via the ``LUsolve`` method
+
+.. jupyter-execute::
+
+    A = sm.Matrix([[c, d],[1, -a]])
+    b = sm.Matrix([3, 0])
+    solution = A.LUsolve(b)
+    solution
+
+We can verify the solution
+
+.. jupyter-execute::
+
+    sm.simplify(A@solution)
+
+We could also find the inverse of the matrix :math:`A`, but this is usually significantly slower, especially with large matrices.
+
+.. jupyter-execute::
+
+    A_inv = A.inv()
+    solution = A_inv@b
+    solution
+
+Equations with no solution will return an error
 
 Simplification
 ---------------
 
+When working with dynamical systems the computation of Jacobians and matrix inversion will inevitably lead to large and complicated expressions.
+Luckily, SymPy has a function for automatically simplifying symbolic expressions, namely :external:py:func:`~sympy.simplify.simplify.simplify`.
+
+.. jupyter-execute::
+
+    a, t = sm.symbols('a t')
+    expr6 = sm.Matrix([sm.cos(a)/t + t*sm.sin(t) + 100, sm.cos(a) + t*a])
+    A = expr6.jacobian([a, t]).inv()
+    sm.simplify(A)
+
+Simplifying very large expressions usually won't give you a better result. Simplifying specific parts of your expressions can
+sometimes yield better results. The ``trigsimp()`` function tries to find a simpler trigonometric expression
+
+.. jupyter-execute::
+
+    sm.trigsimp(sm.cos(t)**2 + sm.sin(t)**2)
+
+
+
+--------------
 
 More resources on SymPy
 ========================
