@@ -7,22 +7,23 @@ Welcome to Modelling and Simulation!
 
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Contents:
+    :maxdepth: 1
+    :caption: Contents:
 
-   installation
-   jupyter-notebooks
-   sympy-and-cas
-   numerical-methods-for-odes
-   numerical-instability
-   simulation
-   rotations
-   reference-frames
-   assignment-1
-   quaternions
-   sympy-live
-   notation
-   bibliography
+    installation
+    jupyter-notebook
+    sympy-and-cas
+    numerical-methods-for-odes
+    numerical-instability
+    simulation
+    rotations
+    reference-frames
+    quaternions
+    assignments/index
+    lecture-notes/index
+    sympy-live
+    notation
+    bibliography
 
 About this website
 ===================

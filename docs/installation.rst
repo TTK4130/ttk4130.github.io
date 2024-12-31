@@ -47,7 +47,7 @@ Alternative 1: Miniconda
             3. Install Visual Studio Code (VSCode) via `the download page <https://code.visualstudio.com/download>`_
             4. Start VSCode and activate your newly created Python environment, ``ttk4130`` (See `this guide on python environments <https://code.visualstudio.com/docs/python/environments>`_)
             5. Install the following list of VSCode extensions (See `this guide on managing VSCode extensions <https://code.visualstudio.com/docs/editor/extension-marketplace>`_): `Jupyter Extension <https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter>`_, `Python Extension <https://marketplace.visualstudio.com/items?itemName=ms-python.python>`_
-            6. Open or create a notebook file by opening the Command Palette (Ctrl+Shift+P) and select Jupyter: Create New Jupyter Notebook.
+            6. Open or create a notebook file by opening the Command Palette (Command+Shift+P) and select Jupyter: Create New Jupyter Notebook.
 
         .. tab-item:: GNU/Linux
             :sync: linux
@@ -64,7 +64,7 @@ Alternative 1: Miniconda
             3. Install Visual Studio Code (VSCode) via `the download page <https://code.visualstudio.com/download>`_
             4. Start VSCode and activate your newly created Python environment, ``ttk4130`` (See `this guide on python environments <https://code.visualstudio.com/docs/python/environments>`_)
             5. Install the following list of VSCode extensions (See `this guide on managing VSCode extensions <https://code.visualstudio.com/docs/editor/extension-marketplace>`_): `Jupyter Extension <https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter>`_, `Python Extension <https://marketplace.visualstudio.com/items?itemName=ms-python.python>`_
-            6. Open or create a notebook file by opening the Command Palette (Command+Shift+P) and select Jupyter: Create New Jupyter Notebook.
+            6. Open or create a notebook file by opening the Command Palette (Ctrl+Shift+P) and select Jupyter: Create New Jupyter Notebook.
 
 Troubleshooting
 ----------------

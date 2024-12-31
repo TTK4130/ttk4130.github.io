@@ -4,7 +4,7 @@ Assignment 1
 
 We consider here a mass-damper-spring system as shown in the figure below.
 
-.. figure:: figures/mass_damper_spring.svg
+.. figure:: ../figures/mass_damper_spring.svg
   :align: center
 
   Schematic of the mass-damper-spring system.
