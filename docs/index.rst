@@ -11,7 +11,7 @@ Welcome to Modelling and Simulation!
     :caption: Contents:
 
     installation
-    jupyter-notebooks
+    jupyter-notebook
     sympy-and-cas
     numerical-methods-for-odes
     numerical-instability

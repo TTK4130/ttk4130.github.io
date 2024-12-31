@@ -1,5 +1,5 @@
 =======================================
-Quick intro to Jupyter Notebooks
+Quick intro to Jupyter Notebook
 =======================================
 
 .. note::
@@ -74,7 +74,7 @@ There are special commands that only work in a Jupyter notebook environment. Mag
 
     %lsmagic
 
-You can list a cheat sheet with :code`quickref`
+You can list a cheat sheet with :code:`quickref`
 
 .. jupyter-execute::
 
