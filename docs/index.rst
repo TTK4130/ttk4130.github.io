@@ -14,9 +14,6 @@ Welcome to Modelling and Simulation!
     jupyter-notebook
     sympy-and-cas
     numerical-methods-for-odes
-    numerical-instability
-    simulation
-    rotations
     reference-frames
     quaternions
     assignments/index
