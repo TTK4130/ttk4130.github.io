@@ -1,10 +1,10 @@
-=============
-Assignment 1
-=============
+================================
+Assignment 1 - Numerical Methods
+================================
 
 .. note::
 
-    Submit your delivery as a single PDF.
+    Submit your assignment as a single PDF.
     We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
     This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
 
@@ -51,12 +51,12 @@ Problem 2 - Numerical Integration
 
 .. admonition:: b)
 
-    Write a code for simulating the system equations from problem 1 using the Euler forward integration method with a step size of :math:`\Delta t = 0.01`.
+    Write a code for simulating the system equations from Problem 1 using the Euler forward integration method with a step size of :math:`\Delta t = 0.01` and plot the results.
 
 
 .. admonition:: c)
 
-    Compare the analytical solution from 1d) with the numerical method in 2d) by plotting the integration error and comment the result. Is the error acceptable? If not, how can we improve our simulation?
+    Compare the analytical solution from 1d) with the numerical method in 2d) by plotting the integration error and comment the result. Is the error acceptable?
 
 .. admonition:: d)
 
@@ -64,7 +64,7 @@ Problem 2 - Numerical Integration
 
     .. note::
 
-        Make sure you have the right analytical solution if you choose critical damping, over damped or under damped system
+        Make sure you have the right analytical solution if you choose a critically damped, overdamped or underdamped system
 
 
 Problem 3 - Limits of Numerical Integration
@@ -72,11 +72,19 @@ Problem 3 - Limits of Numerical Integration
 
 .. admonition:: a)
 
-     Oppgave om stiff systems og at man ikke alltid kan bruke ERK
+    List and explain at least three important factors that must be taken into account when selecting or implementing a numerical integration method.
 
 .. admonition:: b)
 
-     Oppgave om floating point aritmetikk -> også kilde til feil
+    Identify and elaborate on at least two common sources of error in numerical integration.
+
+.. admonition:: c)
+
+    Propose at least two specific changes to the integration method used in Problem 2 that could reduce errors.
+
+.. admonition:: d)
+
+    Why might an implicit method be preferable for stiff equations, even if it is more computationally expensive?
 
 
 
