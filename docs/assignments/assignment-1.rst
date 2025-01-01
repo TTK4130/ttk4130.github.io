@@ -10,7 +10,7 @@ Assignment 1 - Numerical Methods
 
 In this assignment we will consider the mass-damper-spring system as shown in the figure below.
 
-.. figure:: figures/mass_damper_spring.svg
+.. figure:: ../figures/mass_damper_spring.svg
   :align: center
 
   Schematic of the mass-damper-spring system.

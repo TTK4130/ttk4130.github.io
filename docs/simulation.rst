@@ -1,10 +1,10 @@
-===========
-Simulation
-===========
+================
+Simulation (WIP)
+================
 
 
-Plotting
-========
+Plotting (old)
+==============
 
 We'll examine how to plot a simple mass-spring-damper system. We'll first define the system
 

@@ -20,13 +20,29 @@ extensions = [
     'jupyter_sphinx',
     'jupyterlite_sphinx',
     'sphinxcontrib.bibtex',
-    'sphinx.ext.autosectionlabel'
+    'sphinx.ext.autosectionlabel',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.graphviz',
+    'sphinx.ext.imgconverter',
+    'sphinx.ext.todo'
 ]
 
 master_doc = 'index'
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 bibtex_bibfiles = ['refs.bib']
+
+graphviz_output_format = 'svg'
+math_number_all = True
+
+intersphinx_mapping = {
+    'sympy': ('https://docs.sympy.org/latest/', None),
+    'matplotlib': ('https://matplotlib.org/stable/', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/', None),
+    'py3js': ('https://pythreejs.readthedocs.io/en/stable', None)
+}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
