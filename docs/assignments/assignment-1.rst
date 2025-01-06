@@ -1,5 +1,5 @@
 ================================
-Assignment 1 - Numerical Methods
+Assignment 1 - Modelling and Simulation Overview
 ================================
 
 .. note::
@@ -27,7 +27,7 @@ Problem 1 - Mass-Damper-Spring
 
 .. admonition:: a)
 
-  Write the system equation of the mass-spring-damper as a second order differential equation. The spring is relaxed when the wagon is at the position :math:`x=0`. You can ignore friction.
+  Write the system equation of the mass-spring-damper as a second order differential equation. The spring is relaxed when the wagon is at the position :math:`x=0`.
 
 .. admonition:: b)
 
@@ -35,7 +35,7 @@ Problem 1 - Mass-Damper-Spring
 
 .. admonition:: c)
 
-    Solve the initial value problem of the system described in 1b) by hand and verify your answer by using SymPy.
+    Solve the initial value problem of the system described in 1b) by hand and verify your answer by using SymPy. For this task set the friction coefficient to zero.
 
 .. admonition:: d)
 
@@ -51,40 +51,16 @@ Problem 2 - Numerical Integration
 
 .. admonition:: b)
 
-    Write a code for simulating the system equations from Problem 1 using the Euler forward integration method with a step size of :math:`\Delta t = 0.01` and plot the results.
+    Write a code for simulating the system equations from Problem 1 using the Euler forward integration method with a step size of :math:`\Delta t = 0.01` and plot the results. Let the friction coefficient remain zero. Compare the analytical solution from 1d) with the numerical method in 2d) by plotting the integration error and comment the result. Is the error acceptable?
 
 
 .. admonition:: c)
 
-    Compare the analytical solution from 1d) with the numerical method in 2d) by plotting the integration error and comment the result. Is the error acceptable?
-
-.. admonition:: d)
-
-    Test different values of the spring and damper coefficients for at least three different step sizes. Which coefficient affects the integration error the most? Justify your answer.
+    Investigate the impact of the spring and damper coefficients on the integration error. Determine which coefficient has the greatest influence. To estimate the error in cases where the damper coefficient is non-zero, you can either derive the analytical solution or use a very small time step as the baseline for comparison. Test various combinations of spring and damper coefficient values across three different step sizes, and justify your conclusions.
 
     .. note::
 
-        Make sure you have the right analytical solution if you choose a critically damped, overdamped or underdamped system
-
-
-Problem 3 - Limits of Numerical Integration
-==============================================
-
-.. admonition:: a)
-
-    List and explain at least three important factors that must be taken into account when selecting or implementing a numerical integration method.
-
-.. admonition:: b)
-
-    Identify and elaborate on at least two common sources of error in numerical integration.
-
-.. admonition:: c)
-
-    Propose at least two specific changes to the integration method used in Problem 2 that could reduce errors.
-
-.. admonition:: d)
-
-    Why might an implicit method be preferable for stiff equations, even if it is more computationally expensive?
+        If you use the analytical solution for calculating the integration error also in the cases with non-zero damping coefficient, make sure you have the right analytical solution (as there are different solutions for critically damped, overdamped and underdamped system)
 
 
 
