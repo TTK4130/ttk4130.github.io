@@ -19,6 +19,7 @@ extensions = [
     'sphinx_design',
     'jupyter_sphinx',
     'jupyterlite_sphinx',
+    'nbsphinx',
     'sphinxcontrib.bibtex',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.intersphinx',
@@ -34,6 +35,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 bibtex_bibfiles = ['refs.bib']
 
 jupyterlite_dir = "jupyterlite-deps/"
+jupyterlite_bind_ipynb_suffix = False
 
 graphviz_output_format = 'svg'
 math_number_all = True

@@ -18,3 +18,4 @@ sphinx-material
 sphinx-togglebutton
 sphinx-design
 sphinxcontrib-bibtex
+nbsphinx
