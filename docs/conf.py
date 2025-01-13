@@ -33,6 +33,8 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 bibtex_bibfiles = ['refs.bib']
 
+jupyterlite_dir = "jupyterlite-deps/"
+
 graphviz_output_format = 'svg'
 math_number_all = True
 
