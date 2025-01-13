@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v2
+      - name: Setup Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
       - id: deployment
         uses: sphinx-notes/pages@v3
         with:
