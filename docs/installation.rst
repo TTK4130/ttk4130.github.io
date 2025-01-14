@@ -25,7 +25,7 @@ Alternative 1: Miniconda
 
                 conda init
                 conda update -y conda
-                conda create -y --name ttk4130 python=3.11 sympy numpy scipy matplotlib ipython jupyter pythreejs
+                conda create -y --name ttk4130 python=3.11 sympy numpy scipy matplotlib ipython jupyter
 
             3. Install Visual Studio Code (VSCode) via `the download page <https://code.visualstudio.com/download>`_
             4. Start VSCode and activate your newly created Python environment, ``ttk4130`` (See `this guide on python environments <https://code.visualstudio.com/docs/python/environments>`_)
@@ -42,7 +42,7 @@ Alternative 1: Miniconda
 
                 conda init
                 conda update -y conda
-                conda create -y --name ttk4130 python=3.11 sympy numpy scipy matplotlib ipython jupyter pythreejs
+                conda create -y --name ttk4130 python=3.11 sympy numpy scipy matplotlib ipython jupyter
 
             3. Install Visual Studio Code (VSCode) via `the download page <https://code.visualstudio.com/download>`_
             4. Start VSCode and activate your newly created Python environment, ``ttk4130`` (See `this guide on python environments <https://code.visualstudio.com/docs/python/environments>`_)
@@ -59,7 +59,7 @@ Alternative 1: Miniconda
 
                 conda init
                 conda update -y conda
-                conda create -y --name ttk4130 python=3.11 sympy numpy scipy matplotlib ipython jupyter pythreejs
+                conda create -y --name ttk4130 python=3.11 sympy numpy scipy matplotlib ipython jupyter
 
             3. Install Visual Studio Code (VSCode) via `the download page <https://code.visualstudio.com/download>`_
             4. Start VSCode and activate your newly created Python environment, ``ttk4130`` (See `this guide on python environments <https://code.visualstudio.com/docs/python/environments>`_)
