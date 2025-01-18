@@ -39,6 +39,7 @@ jupyterlite_bind_ipynb_suffix = False
 
 graphviz_output_format = 'svg'
 math_number_all = True
+numfig = True
 
 intersphinx_mapping = {
     'sympy': ('https://docs.sympy.org/latest/', None),
