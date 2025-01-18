@@ -1,12 +1,13 @@
 ========================================
-Assignment 2 - 2D Kinetics
+Assignment 2 - Kinematics Part 1
 ========================================
 
 .. note::
 
-    Submit your assignment as a single PDF.
+    Submit your assignment as a single PDF, including plots and source code (if any).
     We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
     This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
+
 
 
 Problem 1 - Rotation transformations in 2D

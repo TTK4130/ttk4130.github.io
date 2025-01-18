@@ -4,9 +4,10 @@ Assignment 1 - Modelling and Simulation Overview
 
 .. note::
 
-    Submit your assignment as a single PDF.
+    Submit your assignment as a single PDF, including plots and source code (if any).
     We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
     This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
+
 
 In this assignment we will consider the mass-damper-spring system as shown in the figure below.
 
