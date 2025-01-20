@@ -50,7 +50,7 @@ Problem 2 - Barge with crane
 
 .. _fig:lekter:
 
-.. figure:: figures/lekter.pdf
+.. figure:: figures/lekter.png
    :width: 50%
    :align: center
 
