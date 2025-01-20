@@ -1,5 +1,5 @@
 ========================================
-Assignment 3 - Kinetics Part 2
+Assignment 3 - Kinematics Part 2
 ========================================
 
 .. note::
