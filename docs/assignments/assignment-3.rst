@@ -17,15 +17,15 @@ Problem 1 - Parameterizations of Rotations
     :name: zyx-euler
     :align: center
 
-    ZYX Euler Angles as three successive rotations around the intermediate z, y and x axes.
+    ZYX Euler Angles as three successive rotations around the intermediate :math:`z`, :math:`y` and :math:`x` axes.
 
-The ZYX Euler Angles is a parameterization of a rotation using three successive transformations around the intermediate z, y, and x axes (see :numref:`zyx-euler`). That is, the rotation matrix is given by
+The ZYX Euler Angles is a parameterization of a rotation using three successive transformations around the intermediate :math:`z`, :math:`y` and :math:`x` axes (see :numref:`zyx-euler`). That is, the rotation matrix is given by
 
 .. math::
 
    \mathbf{R}_{\mathcal{B}}^{\mathcal{A}}(\theta,\phi,\psi) = \mathbf{R}_z(\psi) \mathbf{R}_y(\phi) \mathbf{R}_x(\theta)
 
-where :math:`\mathbf{R}_x`, :math:`\mathbf{R}_y`, and :math:`\mathbf{R}_z` represent the rotation matrix of the principal rotations around the x, y, and z axes, respectively.
+where :math:`\mathbf{R}_x`, :math:`\mathbf{R}_y`, and :math:`\mathbf{R}_z` represent the rotation matrix of the principal rotations around the :math:`z`, :math:`y` and :math:`x` axes, respectively.
 
 .. math::
 
@@ -74,18 +74,18 @@ Problem 2 - Pendulum on rotating disk
 
 The pendulum system shown in :numref:`Pendulum on a rotating disk` consists of a flat surface, a disk that can roll on the surface, and a pendulum attached to the rim of the disk.
 
-We have attached an inertial reference frame 0 such that the x0-axis is aligned with the surface. We also have a moving reference frame at the center of the wheel. This reference frame will rotate with the wheel. Finally, we have attached a third reference frame to the hinge point of the pendulum such that the y3-axis always remains aligned with the pendulum rod. Note that the angle θ of the pendulum rod is given in terms of an axis that remains horizontal. You can assume no slip between the rim and the surface.
+We have attached an inertial reference frame :math:`\theta` such that the :math:`x_0`-axis is aligned with the surface. We also have a moving reference frame at the center of the wheel. This reference frame will rotate with the wheel. Finally, we have attached a third reference frame to the hinge point of the pendulum such that the :math:`y_3`-axis always remains aligned with the pendulum rod. Note that the angle :math:`\theta` of the pendulum rod is given in terms of an axis that remains horizontal. You can assume no slip between the rim and the surface.
 
 .. hint::
     :class: dropdown
 
-    Equations 6.409 and 6.410 at page 261 in the book, or Equations 60 and 77 in the kinematics lecture notes, might be useful.
+    Equations 6.409 and 6.410 at page 261 in :cite:t:`Egeland2002`, or Equations 60 and 77 in :cite:t:`lect2024`, might be useful.
 
 .. admonition:: Tasks
 
-    a) Find the linear (translational) velocity of point A. Your answer should be expressed in terms of the parameters of the system, and the variables φ and θ and their time derivatives.
+    a) Find the linear (translational) velocity of point A. Your answer should be expressed in terms of the parameters of the system, and the variables :math:`\phi` and :math:`\theta` and their time derivatives.
 
-    b) Find the linear acceleration of the point A of the parameters of the system, and the variables φ and θ and their first and second order time derivatives.
+    b) Find the linear acceleration of the point A of the parameters of the system, and the variables :math:`\phi` and :math:`\theta` and their first and second order time derivatives.
 
 
 Problem 3 - Linked Mechanism

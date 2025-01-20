@@ -2,13 +2,17 @@
 Assignment 4 - Newton-Euler
 =============================
 
+.. warning::
+
+    The accompanying code for problem 1 is under development and will be released in time.
+
 .. note::
 
     Submit your assignment as a single PDF, including plots and source code (if any).
     We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
     This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
 
-This assignment is about the Newton-Euler method for developing a dynamic model of a mechanical system. This topic is treated in the course book from chapter 6.13 to 7.3.
+This assignment is about the Newton-Euler method for developing a dynamic model of a mechanical system. This topic is treated in :cite:t:`Egeland2002` from chapter 6.13 to 7.3.
 
 Problem 1 - Satellite
 ===========================
@@ -145,9 +149,9 @@ The oscillating mass is connected to a stationary construction through a spring 
 
     .. math::
 
-       \mathbf{r}_{2/1} \times m_2 \mathbf{a}_2 = \mathbf{\tau}_{g2}
+       \mathbf{r}_{2/1} \times m_2 \mathbf{a}_2 = \boldsymbol{\tau}_{g2}
 
-    Where :math:`\mathbf{F}_{\text{spring}}` is the force acting from the spring, :math:`\mathbf{F}_{g1}` and :math:`\mathbf{F}_{g2}` are the gravitational forces acting on mass 1 and 2, :math:`\mathbf{\tau}_{g2}` is the torque induced by :math:`\mathbf{F}_{g2}` acting around the origin of frame 1, and :math:`\mathbf{F}_{\text{joint}}` is the joint force keeping the two bodies together.
+    Where :math:`\mathbf{F}_{\text{spring}}` is the force acting from the spring, :math:`\mathbf{F}_{g1}` and :math:`\mathbf{F}_{g2}` are the gravitational forces acting on mass 1 and 2, :math:`\boldsymbol{\tau}_{g2}` is the torque induced by :math:`\mathbf{F}_{g2}` acting around the origin of frame 1, and :math:`\mathbf{F}_{\text{joint}}` is the joint force keeping the two bodies together.
 
     **c. Equation of motion**
 
