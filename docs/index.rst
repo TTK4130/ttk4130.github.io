@@ -13,9 +13,12 @@ Welcome to Modelling and Simulation!
     installation
     jupyter-notebook
     sympy-and-cas
-    numerical-methods-for-odes
     reference-frames
+    vector-kinematics
+    mass-and-inertia
+    force-and-torque
     quaternions
+    numerical-methods-for-odes
     assignments/index
     lecture-notes/index
     sympy-live

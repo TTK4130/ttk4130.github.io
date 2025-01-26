@@ -3,3 +3,6 @@ docs/_build
 docs/doctree
 .DS_Store
 .idea
+.ipynb_checkpoints/
+ttk4130-env/
+
