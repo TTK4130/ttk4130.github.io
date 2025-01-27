@@ -2,10 +2,6 @@
 Assignment 4 - Newton-Euler
 =============================
 
-.. warning::
-
-    The accompanying code for problem 1 is under development and will be released in time.
-
 .. note::
 
     Submit your assignment as a single PDF, including plots and source code (if any).
@@ -90,7 +86,8 @@ Where :math:`\mathbf{v}_c^i` is the velocity of the center of mass given in the 
 .. hint::
     :class: dropdown
 
-    You will find Python code templates / examples on Blackboard to help you get started. Further hints are provided therein. You have to edit `Satellite3DTemplate.py` and `SatelliteDynamics.py` in order for the code to run. The entry point of the code is the former file.
+    You will find the Python code template in :ref:`Code handout - Assignment 4 - Satellite` or on Blackboard.
+    It can be downloaded from the website as a Jupyter notebook, further hints are given there.
 
 .. admonition:: Tasks
 
