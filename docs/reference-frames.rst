@@ -17,7 +17,7 @@ Unit Vectors
 
 Vectors have both a magnitude and a direction. Unit vectors are vectors with a magnitude of *one* oriented parallel to a direction (or dimension) in the reference frame they span.
 We can think of a reference frame as a box in 3D. A unit vector points along the side of the box. For convenience, we often like to imagine the unit vectors being aligned in a corner of a "box" pointing along the edges of the box.
-A unit vector follows the right-hand rule. In a reference system :math:`A` defined by the orthogonal unit vectors :math:`\hat{a}_x`, :math:`\hat{a}_y`, :math:`\hat{a}_z`, the following cross-products hold
+A unit vector follows the right-hand rule. This means that a reference system :math:`A` defined by the orthogonal unit vectors :math:`\hat{a}_x`, :math:`\hat{a}_y`, :math:`\hat{a}_z`, the following cross-products hold
 
 .. math::
 
