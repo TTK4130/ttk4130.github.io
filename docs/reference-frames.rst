@@ -1,5 +1,5 @@
 ============================
-Reference frames (WIP)
+Reference frames
 ============================
 
 
@@ -351,6 +351,10 @@ ZYX Euler Angles
 SymPy Example: Drone with Gimbal
 ---------------------------------
 
+.. figure:: figures/skydio_drone.jpg
+    :name: skydio-drone
+
+    Image copyright Vox Media, used under fair use for educational purposes.
 
 Further reading
 ===============
