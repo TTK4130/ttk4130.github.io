@@ -2,7 +2,13 @@
 Assignment 5 - Lagrange
 =========================
 
-.. _ball_on_beam:
+.. note::
+
+    Submit your assignment as a single PDF, including plots and source code (if any).
+    We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
+    This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
+
+In this assignment we will study the modeling of complex mechanical systems based on the Lagrange approach.
 
 Problem 1 - Ball on a Beam
 ==========================
