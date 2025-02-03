@@ -10,5 +10,6 @@ Assignments
     assignment-2
     assignment-3
     assignment-4
+    assignment-5
     assignment-6
     code/index

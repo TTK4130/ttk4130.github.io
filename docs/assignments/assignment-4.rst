@@ -175,5 +175,5 @@ The oscillating mass is connected to a stationary construction through a spring 
 
     In some cases, when dealing with moment balances of rigid bodies that are rotating about some point that is not their center of gravity, we may modify the moment of inertia expression by employing the parallel axis theorem. This adjustment allows us to simplify the modeling of motion as a pure rotation.
 
-    Why can we not simply use the parallel axis theorem in Task b) above, and model the pendulum as a pure rotation about the hinge point of the rod? What term would be missing in the model you derived in Task b)?
+    Why can we not simply use the parallel axis theorem in Task d) above, and model the pendulum as a pure rotation about the hinge point of the rod? What term would be missing in the model you derived in Task d)?
 
