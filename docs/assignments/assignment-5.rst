@@ -48,7 +48,7 @@ Here, we will use the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T
 
        What is the expression for the kinetic energy of the beam?
 
-    e) Complete the Jupyter notebook `assignment-5-ball-and-beam.ipynb` by doing the following tasks:
+    e) Complete the Jupyter notebook :ref:`Code handout - Assignment 5 - Ball and Beam` by doing the following tasks:
 
        - Define the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T` as a symbolic variable.
        - Define a symbolic variable for the derivative of the generalized coordinates.
@@ -75,7 +75,7 @@ Here, we will use the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T
 
             T = 200 (x-\theta) + 70 (\dot{x} - \dot{\theta})
 
-       Write a function that gives the dynamics of the state-space model :eq:`ODE` by using the `INSERT FUNCTION!!` and the PD control law.
+       Write a function that gives the dynamics of the state-space model :eq:`ODE` by using the `get_W` and `get_RHS` functions and the PD control law.
        In other words, this function should return the value of the right-hand side of :eq:`ODE` as a function of the states and the parameters.
 
     g) **(Optional task)** Complete the delivered Jupyter notebook in order to make an animation of the simulation results.
