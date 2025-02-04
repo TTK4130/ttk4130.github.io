@@ -15,6 +15,12 @@ Since the calculations of the partial derivatives of the Lagrangian can be invol
 Problem 1 - Hovering Mass
 --------------------------
 
+.. note::
+
+    This problem contains a programming exercise.
+    Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
+    The relevant notebook is `assingment-6-hovering-mass.ipynb`.
+
 We consider a helicopter lifting a mass. We model this system as two point masses coupled by a rigid link with length :math:`L`. The masses are :math:`m_1` and :math:`m_2`, and their positions in space are given by :math:`\mathbf{p}_1 \in \mathbb{R}^3` and :math:`\mathbf{p}_2 \in \mathbb{R}^3`. We assume that an external force :math:`\mathbf{u} \in \mathbb{R}^3` is applied to :math:`m_1` (helicopter).
 
 
@@ -33,7 +39,7 @@ We consider a helicopter lifting a mass. We model this system as two point masse
             M(\mathbf{q})\dot{\mathbf{v}} &= \mathbf{b}(\mathbf{q},\dot{\mathbf{q}},\mathbf{u}).
         \end{aligned}
 
-    Complete the template `hovering_mass.ipynb` !!!!REPLACE THIS!!!!!! by performing the following tasks:
+    Complete the template `assingment-6-hovering-mass.ipynb` (found in the `code handout repository <https://github.com/TTK4130/code-handouts>`_) by performing the following tasks:
 
     1. Write the expression for the position :math:`\mathbf{p}_2` of mass :math:`m_2` from :math:`\mathbf{q}`.
     2. Write the expression for the generalized forces.
