@@ -91,9 +91,9 @@ Where :math:`\mathbf{v}_c^i` is the velocity of the center of mass given in the 
 
 .. admonition:: Tasks
 
-    a) Consider the satellite without the added mass. Use the Newton-Euler equations to derive the dynamics of the satellite, i.e., find expressions for :math:`\mathbf{v}_c^i` and :math:`\boldsymbol{\omega}_b^i`.
+    a) Consider the satellite without the added mass. Use the Newton-Euler equations to derive the dynamics of the satellite, i.e., find expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
 
-    b) Now consider the added mass (case 2 above). The added mass will shift the center of mass of the system. Calculate the inertia matrix around this new center of mass and find the updated expressions for :math:`\mathbf{v}_c^i` and :math:`\boldsymbol{\omega}_b^i`.
+    b) Now consider the added mass (case 2 above). The added mass will shift the center of mass of the system. Calculate the inertia matrix around this new center of mass and find the updated expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
 
     .. hint::
 
