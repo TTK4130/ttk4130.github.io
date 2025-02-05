@@ -74,7 +74,7 @@ Problem 2 - Pendulum on rotating disk
 
 The pendulum system shown in :numref:`Pendulum on a rotating disk` consists of a flat surface, a disk that can roll on the surface, and a pendulum attached to the rim of the disk.
 
-We have attached an inertial reference frame :math:`\theta` such that the :math:`x_0`-axis is aligned with the surface. We also have a moving reference frame at the center of the wheel. This reference frame will rotate with the wheel. Finally, we have attached a third reference frame to the hinge point of the pendulum such that the :math:`y_3`-axis always remains aligned with the pendulum rod. Note that the angle :math:`\theta` of the pendulum rod is given in terms of an axis that remains horizontal. You can assume no slip between the rim and the surface.
+We have attached an inertial reference frame :math:`\theta` such that the :math:`x_0`-axis is aligned with the surface. We also have a moving reference frame at the center of the wheel. This reference frame will rotate with the wheel. Finally, we have attached a third reference frame to the hinge point of the pendulum such that the :math:`y_2`-axis always remains aligned with the pendulum rod. Note that the angle :math:`\theta` of the pendulum rod is given in terms of an axis that remains horizontal. You can assume no slip between the rim and the surface.
 
 .. hint::
     :class: dropdown
