@@ -13,6 +13,12 @@ In this assignment we will study the modeling of complex mechanical systems base
 Problem 1 - Ball on a Beam
 ==========================
 
+.. note::
+
+    This problem contains a programming exercise.
+    Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
+    The relevant notebook is `assingment-5-ball-and-beam.ipynb`.
+
 We consider here a solid ball on a beam system as depicted in :numref:`bob`.
 The ball rolls without slipping (pure rotation) on a beam that is articulated without friction in the middle.
 A torque :math:`T` acts on the beam joint.
@@ -48,7 +54,7 @@ Here, we will use the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T
 
        What is the expression for the kinetic energy of the beam?
 
-    e) Complete the Jupyter notebook :ref:`Code handout - Assignment 5 - Ball and Beam` by doing the following tasks:
+    e) Complete the Jupyter notebook `assingment-5-ball-and-beam.ipynb` (found in the `code handout repository <https://github.com/TTK4130/code-handouts>`_) by doing the following tasks:
 
        - Define the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T` as a symbolic variable.
        - Define a symbolic variable for the derivative of the generalized coordinates.

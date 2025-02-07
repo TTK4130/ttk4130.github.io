@@ -13,6 +13,12 @@ This assignment is about the Newton-Euler method for developing a dynamic model 
 Problem 1 - Satellite
 ===========================
 
+.. note::
+
+    This problem contains a programming exercise.
+    Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
+    The relevant notebook is `assingment-4-satellite.ipynb`.
+
 In this task, we will consider a satellite orbiting Earth. We define an inertial reference frame with its origin at Earth's center and with an arbitrary and fixed orientation.
 
 We will consider two cases:
@@ -86,8 +92,7 @@ Where :math:`\mathbf{v}_c^i` is the velocity of the center of mass given in the 
 .. hint::
     :class: dropdown
 
-    You will find the Python code template in :ref:`Code handout - Assignment 4 - Satellite` or on Blackboard.
-    It can be downloaded from the website as a Jupyter notebook, further hints are given there.
+    You will find the Python code template in the `code handout repository <https://github.com/TTK4130/code-handouts>`_ or on Blackboard.
 
 .. admonition:: Tasks
 
