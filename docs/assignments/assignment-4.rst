@@ -17,7 +17,7 @@ Problem 1 - Satellite
 
     This problem contains a programming exercise.
     Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
-    The relevant notebook is `assingment-4-satellite.ipynb`.
+    The relevant notebook is `assignment-4-satellite.ipynb`.
 
 In this task, we will consider a satellite orbiting Earth. We define an inertial reference frame with its origin at Earth's center and with an arbitrary and fixed orientation.
 
