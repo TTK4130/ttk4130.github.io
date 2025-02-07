@@ -323,8 +323,7 @@ Euler angles
 
 .. warning::
 
-    Rotations in 3D space can often be confusing. This confusion arises from all the different convention used, or rather the lack thereof. Students
-    are often told to "think opposite" or just simply memorize one convention of rotation. **There is logic to this madness**, so just hold on tight and
+    Rotations in 3D space can often be confusing. This confusion arises from all the different convention used, or rather the lack thereof. **There is logic to rotations**, so just hold on tight and
     pay attention to the following subsections.
 
 In three dimensional space we can transform to any orientation we wish by applying three separate rotations. The most intuitive way to visualize such a sequence of rotation
