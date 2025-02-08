@@ -326,34 +326,116 @@ Euler angles
     Rotations in 3D space can often be confusing. This confusion arises from all the different convention used, or rather the lack thereof. **There is logic to rotations**, so just hold on tight and
     pay attention to the following subsections.
 
-In three dimensional space we can transform to any orientation we wish by applying three separate rotations. The most intuitive way to visualize such a sequence of rotation
-is first rotating your reference frame :math:`A` about the :math:`\hat{a}_z`-axis, rotating the newly rotated reference frame :math:`A'` about :math:`\hat{a'}_y`-axis and finally
-rotating the new coordinate system :math:`A''` about :math:`\hat{a''}_x`.
-
-.. figure:: https://upload.wikimedia.org/wikipedia/commons/8/85/Euler2a.gif
-    :align: center
-
-    Euler2.gif by Juansempere. Derivative work: Xavax - Euler2.gif:, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=24338647
-
-This type of rotation with mobile axes is called an *intrinsic* sequence of rotation. During each rotation the axes are also rotated.
-
-Proper Euler Angles vs Tait-Bryan
----------------------------------
+In three dimensional space we can transform to any orientation we wish by applying three separate rotations. The rotations can be performed around each axis once (e.g. X -> Y -> Z) which are referred to as `Tait-Bryan angles <https://en.wikipedia.org/wiki/Euler_angles#Tait-Bryan_angles>`_, or with one axis repeated once (e.g. X -> Y -> X), which are referred to as `proper (or classical) Euler angles <https://en.wikipedia.org/wiki/Euler_angles#Classic_Euler_angles>`_ :cite:t:`sensorbook`. Tait-Bryan angles are the most intuitive way to visualize such a sequence of rotation because they can be
+interpreted as *roll, pitch and yaw*. We can imagine such a sequence of rotation by first rotating your reference frame :math:`A` about the :math:`\hat{a}_z`-axis, rotating the newly rotated reference frame :math:`A'` about :math:`\hat{a'}_y`-axis and finally
+rotating the new coordinate system :math:`A''` about :math:`\hat{a''}_x`. This type of rotation with mobile axes is called an *intrinsic* sequence of rotation.
 
 Intrinsic and Extrinsic Rotations
 ---------------------------------
 
+Rotations of Euler angles can be done in an *intrinsic* or *extrinsic* manner. Intrinsic rotation means that the axes are mobile, such as in the example in the example above.
+During each rotation the the axes are rotated. The next rotation is then carried out around the axis rotated by the previous rotations. Extrinsic rotations means that all the rotations
+are applied around the original fixed axes of the original frame.
 
-ZYX Euler Angles
+An intrinsic sequence of rotation can be written as
+
+.. math::
+
+    \begin{align*}
+    \{a'_x, a'_y, a'_z\} &= R_{z, \psi} \{a_x, a_y, a_z\}, \\[1mm]
+    \{a''_x, a''_y, a''_z\} &= R_{y', \theta} \{a'_x, a'_y, a'_z\}, \\[1mm]
+    \{a'''_x, a'''_y, a'''_z\} &= R_{x'', \phi} \{a''_x, a''_y, a''_z\}.
+    \end{align*}
+
+(Derived from :cite:t:`sensorbook`)
+
+The example above implements:
+
+1. First rotation: Z-axis of initial frame A by angle :math:`\psi`
+2. Second rotation: Y-axis of the rotated frame A' by angle :math:`\theta`
+3. Third rotation: X-axis of the new rotated frame A'' by angle :math:`\phi`
+
+An extrinsic rotation sequence means that we transform around the same axes:
+
+.. math::
+
+    \{a'''_x, a'''_y, a'''_z\} = R_{z, \psi} R_{y, \theta} R_{x, \phi} \{a_x, a_y, a_z\}.
+
+(Derived from :cite:t:`sensorbook`)
+
+The example above implements:
+
+1. First rotation: Fixed X-axis of A by psi
+2. Second rotation: Fixed Y-axis of A by theta
+3. Third rotation: Fixed Z-axis of A by phi
+
+Intrinsic-extrinsic equivalence
+-------------------------------
+
+We have now seen the difference between extrinsic and intrinsic rotations. Intrinsic rotations are easier to visualize, but harder to compute by hand
+since you have to keep track of the intermediary axes. Extrinsic rotations are much easier to compute from a mathematical perspective since you always rotate relative to the same frame.
+Luckily, there we can replace intrinsic rotations with equivalent extrinsic rotations and vise versa. Intrinsic rotations yield the same result as extrinsic
+rotations carried out in the opposite sequence :cite:t:`sensorbook`.
+
+.. math::
+
+    \begin{align*}
+    \{a'''_x, a'''_y, a'''_z\} &= R_{x'', \phi} R_{y', \theta} R_{z, \psi} \{a_x, a_y, a_z\} \\[1mm]
+    &= R_{z, \psi} R_{y, \theta} R_{x, \phi} \{a_x, a_y, a_z\}.
+    \end{align*}
+
+We can now relate this to the ZYX convention often used in navigation. It's common to use the intrinsic sequence of rotation yaw-pitch-roll (Z -> Y -> X), which
+we now know is equivalent to the extrinsic sequence of rotation roll-pitch-yaw (X -> Y -> Z): :math:`R (\phi, \theta, \psi) = R_{a_z, \psi}R_{a_y, \theta}R_{a_x, \phi}`
+
+
+.. math::
+    \begin{align*}
+    R_{a_x,\phi} &= \begin{bmatrix} 1 & 0 & 0 \\ 0 & c\phi & -s\phi \\ 0 & s\phi & c\phi \end{bmatrix} \\
+    R_{a_y,\theta} &= \begin{bmatrix} c\theta & 0 & s\theta \\ 0 & 1 & 0 \\ -s\theta & 0 & c\theta \end{bmatrix} \\
+    R_{a_z,\psi} &= \begin{bmatrix} c\psi & -s\psi & 0 \\ s\psi & c\psi & 0 \\ 0 & 0 & 1 \end{bmatrix} \\
+    R(\phi, \theta, \psi)
+    &= \begin{bmatrix} c\psi c\theta & -s\psi c\phi + c\psi s\theta s\phi & s\psi s\phi + c\psi s\theta c\phi \\ s\psi c\theta & c\psi c\phi + s\psi s\theta s\phi & -c\psi s\phi + s\psi s\theta c\phi \\ -s\theta & c\theta s\phi & c\theta c\phi \end{bmatrix}
+    \end{align*}
+
+.. note::
+
+    c = cos, s = sin
+
+**Why bring this up? I'm more confused now...**
+
+The reason we bring this up is to stress the importance of being explicit about the conventions and definitions you use when
+working with rotations. If you don't, it will inevitable lead to even more confusion.
+
+SymPy 3D rotations
 ----------------------------
 
-SymPy Example: Drone with Gimbal
----------------------------------
+The sympy method :external:py:obj:`~sympy.physics.vector.frame.ReferenceFrame.orient_body_fixed` implements three successive body fixed simple axis right-hand rotations.
+We can orient a new reference frame by providing the parent frame, three angles and the order of rotation. The example below orients a new frame :math:`B` relative to frame :math:`A` by an intrinsic ZYX sequence of rotations (or XYZ extrinsic sequence of rotation).
 
-.. figure:: figures/skydio_drone.jpg
-    :name: skydio-drone
+.. jupyter-execute::
 
-    Image copyright Vox Media, used under fair use for educational purposes.
+    A = ReferenceFrame('A')
+    B = ReferenceFrame('B')
+
+    phi, theta, psi = symbols('phi, theta, psi')
+
+    B.orient_body_fixed(A, (psi, theta, phi), 'ZYX') # Tait-Bryan intrinsic ZYX rotation
+    A_to_B = B.dcm(A).T
+    A_to_B
+
+As we can see, this agrees with our definitions in the previous subsection. Simply putting our arguments in the wrong order would have given a different result.
+The reason we go into such detail is to make it very clear that you need to know how rotations are implemented when using a library. If you're not sure how they are implemented
+it's often better to implement them yourself.
+
+.. admonition:: Exercise: Skydio drone
+
+    The drone illustrated in the picture below is oriented relative to the inertial frame :math:`N`. Use Euler angles ZXY convention to find the orientation of the camera relative to frame :math:`N` by using the intermediary frames :math:`BODY` and :math:`CAM`.
+    Take both the drone orientation and the camera gimbal orientation into account.
+
+    .. figure:: figures/skydio_drone.jpg
+        :name: skydio-drone
+
+        Image copyright Vox Media, used under fair use for educational purposes.
 
 Further reading
 ===============
