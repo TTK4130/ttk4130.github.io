@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 159.06 174.04">
+  <defs>
+    <style>
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5 {
+        fill: none;
+      }
+
+      .cls-6 {
+        fill: #3953a4;
+      }
+
+      .cls-7 {
+        font-size: 7px;
+      }
+
+      .cls-7, .cls-8 {
+        font-family: MyriadPro-Regular, 'Myriad Pro';
+      }
+
+      .cls-7, .cls-8, .cls-9 {
+        fill: #231f20;
+      }
+
+      .cls-2 {
+        stroke: #ed2024;
+      }
+
+      .cls-8 {
+        font-size: 12px;
+      }
+
+      .cls-10 {
+        fill: #ed2024;
+      }
+
+      .cls-9 {
+        fill-rule: evenodd;
+      }
+
+      .cls-3 {
+        stroke-width: .51px;
+      }
+
+      .cls-3, .cls-4 {
+        stroke: #231f20;
+      }
+
+      .cls-4 {
+        stroke-width: .95px;
+      }
+
+      .cls-5 {
+        stroke: #3953a4;
+      }
+
+      .cls-11 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-1" x="17.53" y="34.04" width="124" height="118" transform="translate(-38.25 126.34) rotate(-65.26)"/>
+    </clipPath>
+  </defs>
+  <g class="cls-11">
+    <line class="cls-5" x1="62.18" y1="18.5" x2="124.35" y2="100.1"/>
+    <path class="cls-6" d="M70.14,21.03c-.09.26-.38.39-.64.3l-7.18-2.64.64,7.62c.02.28-.18.52-.46.54-.27.02-.52-.18-.54-.46l-.71-8.41c-.01-.17.06-.34.2-.44s.32-.13.48-.07l7.92,2.91c.09.03.17.09.22.17.1.13.13.31.07.48Z"/>
+  </g>
+  <line class="cls-5" x1="129.02" y1="69.92" x2="46.84" y2="131.98"/>
+  <path class="cls-6" d="M55.19,131.69c-.02-.27-.26-.48-.54-.46l-7.63.61,2.67-7.17c.1-.26-.03-.55-.29-.64-.26-.1-.55.04-.64.29l-2.95,7.9c-.06.16-.03.34.07.48.1.14.27.21.44.2l8.41-.67.26-.1c.13-.1.21-.26.2-.44Z"/>
+  <line class="cls-2" x1="112.23" y1="1.72" x2="111.16" y2="104.31"/>
+  <path class="cls-10" d="M116.96,8.61c-.23.15-.54.07-.69-.16l-4.04-6.49-4.18,6.41c-.15.23-.46.3-.69.15-.23-.15-.29-.46-.15-.69l4.61-7.07c.09-.14.25-.23.42-.23.17,0,.33.09.42.24l4.46,7.16c.05.08.08.18.08.27,0,.17-.09.33-.24.42Z"/>
+  <path class="cls-4" d="M74.53,108.2c-2.73-8-3.97-16.42-3.67-24.83"/>
+  <polygon class="cls-9" points="73.3 104.58 70.87 103.39 74.84 109.1 74.49 102.16 73.3 104.58"/>
+  <polygon class="cls-3" points="73.3 104.58 70.87 103.39 74.84 109.1 74.49 102.16 73.3 104.58"/>
+  <text class="cls-8" transform="translate(120.96 10.04)"><tspan x="0" y="0">a</tspan></text>
+  <text class="cls-7" transform="translate(126.75 14.04)"><tspan x="0" y="0">z</tspan></text>
+  <text class="cls-8" transform="translate(71.11 19.8)"><tspan x="0" y="0">b</tspan></text>
+  <text class="cls-7" transform="translate(77.94 23.8)"><tspan x="0" y="0">z</tspan></text>
+  <text class="cls-8" transform="translate(57.2 139.53)"><tspan x="0" y="0">b</tspan></text>
+  <text class="cls-7" transform="translate(64.03 143.53)"><tspan x="0" y="0">y</tspan></text>
+  <text class="cls-8" transform="translate(39.82 93.78) rotate(.08)"><tspan x="0" y="0">a</tspan></text>
+  <text class="cls-7" transform="translate(45.61 97.78)"><tspan x="0" y="0">y</tspan></text>
+  <line class="cls-2" x1="133.4" y1="82.61" x2="30.42" y2="82.57"/>
+  <path class="cls-10" d="M37.26,87.37c.15-.23.08-.54-.15-.69l-6.45-4.11,6.45-4.11c.23-.15.3-.46.15-.69-.15-.23-.46-.3-.69-.15l-7.12,4.53c-.14.09-.23.25-.23.42s.09.33.23.42l7.11,4.53c.08.05.18.08.27.08.17,0,.33-.08.42-.23Z"/>
+  <text class="cls-8" transform="translate(60.16 100.17)"><tspan x="0" y="0">θ</tspan></text>
+</svg>
