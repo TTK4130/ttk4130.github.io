@@ -365,9 +365,9 @@ An extrinsic rotation sequence means that we transform around the same axes:
 
 The example above implements:
 
-1. First rotation: Fixed X-axis of A by psi
+1. First rotation: Fixed Z-axis of A by psi
 2. Second rotation: Fixed Y-axis of A by theta
-3. Third rotation: Fixed Z-axis of A by phi
+3. Third rotation: Fixed X-axis of A by phi
 
 Intrinsic-extrinsic equivalence
 -------------------------------
@@ -404,7 +404,7 @@ we now know is equivalent to the extrinsic sequence of rotation roll-pitch-yaw (
 **Why bring this up? I'm more confused now...**
 
 The reason we bring this up is to stress the importance of being explicit about the conventions and definitions you use when
-working with rotations. If you don't, it will inevitable lead to even more confusion.
+working with rotations. If you don't, it will inevitably lead to even more confusion.
 
 SymPy 3D rotations
 ----------------------------
@@ -426,6 +426,27 @@ We can orient a new reference frame by providing the parent frame, three angles 
 As we can see, this agrees with our definitions in the previous subsection. Simply putting our arguments in the wrong order would have given a different result.
 The reason we go into such detail is to make it very clear that you need to know how rotations are implemented when using a library. If you're not sure how they are implemented
 it's often better to implement them yourself.
+
+SymPy's `orient_explicit()` method implements a way of orienting frames explicitly with direction cosine matrices. This way of orienting frames is prone to mistakes if you've defined your dcm incorrectly, so use it with caution.
+
+.. jupyter-execute::
+
+    from sympy import Matrix, cos, sin
+
+    N = ReferenceFrame('N')
+    A = ReferenceFrame('A')
+    theta = symbols('theta')
+
+    # DCM for rotating about z-axis
+    dcm = Matrix([
+        [cos(theta), -sin(theta), 0],
+        [sin(theta), cos(theta), 0],
+        [0, 0, 1]
+    ])
+
+    A.orient_explicit(N, dcm) # Orient frame A w.r.t. to frame N
+    A_to_N = A.dcm(N)
+    A_to_N
 
 .. admonition:: Exercise: Skydio drone
 
