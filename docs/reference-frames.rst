@@ -46,7 +46,7 @@ Simple Rotation Example
 
     Box with sides :math:`d` with rotating lid
 
-The figure :numref:`fig:box` depics a box with sides :math:`d` and a rotating square lid with sides :math:`d`. The lid is rotated
+The figure :numref:`fig:box` depicts a box with sides :math:`d` and a rotating square lid with sides :math:`d`. The lid is rotated
 by an angle :math:`\theta` relative to the box. If we want to find some vector :math:`\vec{p}` represented in terms of reference frame :math:`A`, we simply find and substitute its elements in frame :math:`B`.
 
 .. _fig:box_w_vector:
@@ -57,8 +57,7 @@ by an angle :math:`\theta` relative to the box. If we want to find some vector :
 
     Box with sides :math:`d` with rotating lid and vector :math:`\vec{p}`
 
-
-Using the unit vectors we see that :math:`\vec{p} = d \hat{a}_y + d \hat{a}_z + d \hat{b}_x + d \hat{b}_z`. By looking at the hinge we can find the relationship between the unit vectors frame :math:`A` and frame :math:`B`.
+Using the unit vectors, we see that :math:`\vec{p} = d \hat{a}_y + d \hat{a}_z + d \hat{b}_x - d \hat{b}_y`. By looking at the hinge, we can find the relationship between the unit vectors of frame :math:`A` and frame :math:`B`.
 
 .. _fig:box2d:
 
@@ -68,33 +67,33 @@ Using the unit vectors we see that :math:`\vec{p} = d \hat{a}_y + d \hat{a}_z + 
 
     2D representation of :numref:`fig:box` rotating lid
 
-Looking at the hinge in :numref:`fig:box2d` we use trigonometry to find
+Looking at the hinge in :numref:`fig:box2d`, we use trigonometry to find
 
 .. math::
     :label: x-rotation-example
 
     \hat{b}_x = \hat{a}_x
 
-    \hat{b}_y = cos(\theta) \hat{a}_y + sin(\theta) \hat{a}_z
+    \hat{b}_y = \cos(\theta) \hat{a}_y + \sin(\theta) \hat{a}_z
 
-    \hat{b}_z = -sin(\theta) \hat{a}_y + cos(\theta) \hat{a}_z
+    \hat{b}_z = -\sin(\theta) \hat{a}_y + \cos(\theta) \hat{a}_z
 
 We can then substitute the unit vectors in frame :math:`B`
 
 .. math::
 
-    \vec{p} = d \hat{a}_y + d \hat{a}_z + d \hat{b}_x + d \hat{b}_z
+    \vec{p} = d \hat{a}_y + d \hat{a}_z + d \hat{b}_x - d \hat{b}_y
 
-    \vec{p} = d \hat{a}_y + d \hat{a}_z + d \hat{a}_x + d(-sin(\theta) \hat{a}_y + cos(\theta) \hat{a}_z)
+    \vec{p} = d \hat{a}_y + d \hat{a}_z + d \hat{a}_x - d (\cos(\theta) \hat{a}_y + \sin(\theta) \hat{a}_z)
 
     p^A =
     \begin{bmatrix}
     d \\
-    d - d sin(\theta) \\
-    d + d cos(\theta)
+    d - d \cos(\theta) \\
+    d - d \sin(\theta)
     \end{bmatrix}
 
-We can generalize this  by a matrix product in :eq:`x-rotation-example`
+We can generalize this by a matrix product in :eq:`x-rotation-example`
 
 .. math::
 
@@ -123,7 +122,7 @@ We can generalize this  by a matrix product in :eq:`x-rotation-example`
     \end{bmatrix}
 
 This matrix is the transformation matrix **from** :math:`A` **to** :math:`B`, :math:`{\bf R}_A^B(\theta)`, which means we can transform any vector in frame :math:`A` to its representation in frame :math:`B` by means of matrix multiplication.
-This kind of transformation matrix is belongs to a group we call rotation matrices. More specifically, it belongs to the `special orthogonal group 3 (SO(3)) <https://en.wikipedia.org/wiki/3D_rotation_group>`_. This means that
+This kind of transformation matrix belongs to a group we call rotation matrices. More specifically, it belongs to the `special orthogonal group 3 (SO(3)) <https://en.wikipedia.org/wiki/3D_rotation_group>`_. This means that
 it has useful properties such that its inverse is equal to its transpose, meaning :math:`{{\bf R}_A^B}^T(\theta) = {{\bf R}_A^B}^{-1}(\theta) = {\bf R}_B^A(\theta)`, thus
 
 .. math::
@@ -132,7 +131,7 @@ it has useful properties such that its inverse is equal to its transpose, meanin
 
     {\bf v}^A = {{\bf R}_B^A}^T(\theta) {\bf v}^B = {{\bf R}_B^A} (\theta){\bf v}^B
 
-Instead of looking at unit vectors to find :math:`p^A`, we can simply transform the components of :math:`\vec{p}` in the :math:`B`-frame **from** :math:`B` **to** :math:`A`
+Instead of looking at unit vectors to find :math:`p^A`, we can simply transform the components of :math:`\vec{p}` in the :math:`B`-frame **from** :math:`B` **to** :math:`A`.
 
 .. note::
 
@@ -151,8 +150,8 @@ Instead of looking at unit vectors to find :math:`p^A`, we can simply transform 
     {\bf R}_B^A
         \begin{bmatrix}
     d \\
-    0  \\
-    d
+    -d  \\
+    0
     \end{bmatrix}
 
 calculating that
@@ -196,19 +195,17 @@ We insert and get
     \end{bmatrix}
     \begin{bmatrix}
     d \\
-    0\\
-    d
+    -d\\
+    0
     \end{bmatrix}
     =
     \begin{bmatrix}
     d \\
-    d - d sin(\theta) \\
-    d + d cos(\theta)
+    d - d \cos(\theta) \\
+    d - d \sin(\theta)
     \end{bmatrix} \  \ \blacksquare.
 
-
 We can easily implement this in SymPy
-
 
 .. jupyter-execute::
 
@@ -224,8 +221,9 @@ We can easily implement this in SymPy
 
 .. jupyter-execute::
 
-    v_A = sm.Matrix([0, d, d]) + R_b_to_a @ sm.Matrix([d, 0, d])
+    v_A = sm.Matrix([0, d, d]) + R_b_to_a @ sm.Matrix([d, -d, 0])
     v_A
+
 
 SymPy Reference Frames
 ======================
@@ -257,7 +255,7 @@ We can orient a new reference :math:`B` relative to our frame :math:`A` with an 
 
     B = A.orientnew('B', 'Axis', [theta, A.x]) # x-axis rotation from box example
 
-If we want the rotation matrix between two frames, we can call the *direct cosine matrix* or `dcm` method
+If we want the rotation matrix between two frames, we can call the *direction cosine matrix* or `dcm` method
 
 .. jupyter-execute::
 
@@ -268,7 +266,7 @@ SymPy makes it trivial to solve the simple example in :numref:`fig:box_w_vector`
 
 .. jupyter-execute::
 
-    b = d*B.x + d*B.z
+    b = d*B.x - d*B.y
     p = a + b
     p
 
@@ -277,7 +275,7 @@ in a vector, SymPy will be able to automatically calculate the vector relative t
 
 .. jupyter-execute::
 
-    p.express(A)
+    p.to_matrix(A) # Print as matrix relative to frame A
 
 
 Implementation Details
@@ -445,8 +443,8 @@ SymPy's `orient_explicit()` method implements a way of orienting frames explicit
     ])
 
     A.orient_explicit(N, dcm) # Orient frame A w.r.t. to frame N
-    A_to_N = A.dcm(N)
-    A_to_N
+    N_to_A = N.dcm(A)
+    N_to_A
 
 .. admonition:: Exercise: Skydio drone
 
