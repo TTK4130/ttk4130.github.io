@@ -74,9 +74,9 @@ Looking at the hinge in :numref:`fig:box2d`, we use trigonometry to find
 
     \hat{b}_x = \hat{a}_x
 
-    \hat{b}_y = \cos(\theta) \hat{a}_y + \sin(\theta) \hat{a}_z
+    \hat{b}_y = \cos(\theta) \hat{a}_y - \sin(\theta) \hat{a}_z
 
-    \hat{b}_z = -\sin(\theta) \hat{a}_y + \cos(\theta) \hat{a}_z
+    \hat{b}_z = \sin(\theta) \hat{a}_y + \cos(\theta) \hat{a}_z
 
 We can then substitute the unit vectors in frame :math:`B`
 
@@ -84,14 +84,18 @@ We can then substitute the unit vectors in frame :math:`B`
 
     \vec{p} = d \hat{a}_y + d \hat{a}_z + d \hat{b}_x - d \hat{b}_y
 
-    \vec{p} = d \hat{a}_y + d \hat{a}_z + d \hat{a}_x - d (\cos(\theta) \hat{a}_y + \sin(\theta) \hat{a}_z)
+    \vec{p} = d \hat{a}_y + d \hat{a}_z + d \hat{a}_x - d (\cos(\theta) \hat{a}_y - \sin(\theta) \hat{a}_z)
 
     p^A =
     \begin{bmatrix}
     d \\
     d - d \cos(\theta) \\
-    d - d \sin(\theta)
+    d + d \sin(\theta)
     \end{bmatrix}
+
+
+Intuitively, we know this to be the case, since we know that when the lid is closed (:math:`\theta = 0`) :math:`\vec{p} = d \hat{a}_x + d \hat{a}_z`, and
+when the lid is open (:math:`\theta = \frac{\pi}{2}`) :math:`\vec{p} = d \hat{a}_x + d \hat{a}_y + 2d \hat{a}_z`.
 
 We can generalize this by a matrix product in :eq:`x-rotation-example`
 
@@ -105,8 +109,8 @@ We can generalize this by a matrix product in :eq:`x-rotation-example`
     =
     \begin{bmatrix}
     1 & 0 & 0 \\
-    0 & \cos(\theta) & \sin(\theta) \\
-    0 & -\sin(\theta) & \cos(\theta)
+    0 & \cos(\theta) & -\sin(\theta) \\
+    0 & \sin(\theta) & \cos(\theta)
     \end{bmatrix}
     \begin{bmatrix}
     \hat{a}_x \\
@@ -165,15 +169,15 @@ calculating that
     {
     \begin{bmatrix}
     1 & 0 & 0 \\
-    0 & \cos(\theta) & \sin(\theta) \\
-    0 & -\sin(\theta) & \cos(\theta)
+    0 & \cos(\theta) & -\sin(\theta) \\
+    0 & \sin(\theta) & \cos(\theta)
     \end{bmatrix}
     }^T
     =
     \begin{bmatrix}
     1 & 0 & 0 \\
-    0 & \cos(\theta) & -\sin(\theta) \\
-    0 & \sin(\theta) & \cos(\theta)
+    0 & \cos(\theta) & \sin(\theta) \\
+    0 & -\sin(\theta) & \cos(\theta)
     \end{bmatrix}
 
 We insert and get
@@ -190,8 +194,8 @@ We insert and get
     +
     \begin{bmatrix}
     1 & 0 & 0 \\
-    0 & \cos(\theta) & -\sin(\theta) \\
-    0 & \sin(\theta) & \cos(\theta)
+    0 & \cos(\theta) & \sin(\theta) \\
+    0 & -\sin(\theta) & \cos(\theta)
     \end{bmatrix}
     \begin{bmatrix}
     d \\
@@ -202,7 +206,7 @@ We insert and get
     \begin{bmatrix}
     d \\
     d - d \cos(\theta) \\
-    d - d \sin(\theta)
+    d + d \sin(\theta)
     \end{bmatrix} \  \ \blacksquare.
 
 We can easily implement this in SymPy
@@ -215,8 +219,8 @@ We can easily implement this in SymPy
 
     theta, d = sm.symbols('theta d')
     R_b_to_a = sm.Matrix([  [1, 0, 0],
-                            [0, cos(theta), -sin(theta)],
-                            [0, sin(theta), cos(theta)]])
+                            [0, cos(theta), sin(theta)],
+                            [0, -sin(theta), cos(theta)]])
     R_b_to_a
 
 .. jupyter-execute::
@@ -253,7 +257,7 @@ We can orient a new reference :math:`B` relative to our frame :math:`A` with an 
 
 .. jupyter-execute::
 
-    B = A.orientnew('B', 'Axis', [theta, A.x]) # x-axis rotation from box example
+    B = A.orientnew('B', 'Axis', [-theta, A.x]) # negative x-axis rotation from box example
 
 If we want the rotation matrix between two frames, we can call the *direction cosine matrix* or `dcm` method
 
