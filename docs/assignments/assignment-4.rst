@@ -2,10 +2,6 @@
 Assignment 4 - Newton-Euler
 =============================
 
-.. warning::
-
-    The accompanying code for problem 1 is under development and will be released in time.
-
 .. note::
 
     Submit your assignment as a single PDF, including plots and source code (if any).
@@ -16,6 +12,12 @@ This assignment is about the Newton-Euler method for developing a dynamic model 
 
 Problem 1 - Satellite
 ===========================
+
+.. note::
+
+    This problem contains a programming exercise.
+    Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
+    The relevant notebook is `assignment-4-satellite.ipynb`.
 
 In this task, we will consider a satellite orbiting Earth. We define an inertial reference frame with its origin at Earth's center and with an arbitrary and fixed orientation.
 
@@ -90,13 +92,13 @@ Where :math:`\mathbf{v}_c^i` is the velocity of the center of mass given in the 
 .. hint::
     :class: dropdown
 
-    You will find Python code templates / examples on Blackboard to help you get started. Further hints are provided therein. You have to edit `Satellite3DTemplate.py` and `SatelliteDynamics.py` in order for the code to run. The entry point of the code is the former file.
+    You will find the Python code template in the `code handout repository <https://github.com/TTK4130/code-handouts>`_ or on Blackboard.
 
 .. admonition:: Tasks
 
-    a) Consider the satellite without the added mass. Use the Newton-Euler equations to derive the dynamics of the satellite, i.e., find expressions for :math:`\mathbf{v}_c^i` and :math:`\boldsymbol{\omega}_b^i`.
+    a) Consider the satellite without the added mass. Use the Newton-Euler equations to derive the dynamics of the satellite, i.e., find expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
 
-    b) Now consider the added mass (case 2 above). The added mass will shift the center of mass of the system. Calculate the inertia matrix around this new center of mass and find the updated expressions for :math:`\mathbf{v}_c^i` and :math:`\boldsymbol{\omega}_b^i`.
+    b) Now consider the added mass (case 2 above). The added mass will shift the center of mass of the system. Calculate the inertia matrix around this new center of mass and find the updated expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
 
     .. hint::
 
@@ -178,5 +180,5 @@ The oscillating mass is connected to a stationary construction through a spring 
 
     In some cases, when dealing with moment balances of rigid bodies that are rotating about some point that is not their center of gravity, we may modify the moment of inertia expression by employing the parallel axis theorem. This adjustment allows us to simplify the modeling of motion as a pure rotation.
 
-    Why can we not simply use the parallel axis theorem in Task b) above, and model the pendulum as a pure rotation about the hinge point of the rod? What term would be missing in the model you derived in Task b)?
+    Why can we not simply use the parallel axis theorem in Task d) above, and model the pendulum as a pure rotation about the hinge point of the rod? What term would be missing in the model you derived in Task d)?
 
