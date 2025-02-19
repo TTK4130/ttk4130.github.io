@@ -19,6 +19,111 @@ Problem 1 - Ball on a Beam
     Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
     The relevant notebook is `assingment-5-ball-and-beam.ipynb`.
 
+.. admonition:: Animation code
+    :class: dropdown
+
+    .. jupyter-execute::
+
+        import pythreejs as pj
+        import numpy as np
+        import requests
+        import base64
+
+        def load_image_from_url(url):
+            response = requests.get(url)
+            if response.status_code == 200:
+                return f"data:image/png;base64,{base64.b64encode(response.content).decode('utf-8')}"
+            else:
+                raise Exception(f"Failed to load image from {url}")
+
+        # Cubemap texture URLs, because I'm lazy
+        texture_urls = [
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/px.png",  # Positive X
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/nx.png",  # Negative X
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/py.png",  # Positive Y
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/ny.png",  # Negative Y
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/pz.png",  # Positive Z
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/nz.png"   # Negative Z
+        ]
+
+        scene = pj.Scene()
+        camera = pj.PerspectiveCamera(position=[0, 0, 5], up=[0, 1, 0], aspect=1)
+        camera.lookAt([0, 0, 0])
+
+        skybox_geometry = pj.BoxGeometry(width=500, height=500, depth=500)
+
+        materials = [
+            pj.MeshBasicMaterial(
+                map=pj.ImageTexture(imageUri=load_image_from_url(url)),
+                side='BackSide'
+            ) for url in texture_urls
+        ]
+        skybox = pj.Mesh(skybox_geometry, materials)
+        scene.add(skybox)
+
+        ## Placeholder trajectory
+
+        ys = np.zeros((4, 100), dtype=np.float32)
+        ts = np.zeros((1, 100), dtype=np.float32)
+
+        ## Setting up objects
+        ball_radius = 0.25
+        beam_length, beam_width, beam_height = 3, .5, .1
+
+        ball = pj.Mesh(
+            pj.SphereGeometry(ball_radius, 32, 16),
+            pj.MeshStandardMaterial(color="blue"))
+        beam = pj.Mesh(
+            pj.BoxGeometry(beam_length, beam_height, beam_width),
+            pj.MeshStandardMaterial(color="red"))
+
+        ## Position and rotation
+        ball_pos = np.zeros((3, ys.shape[1]), dtype=np.float32)
+        ball_pos[0, :] = ys[0, :]
+        ball_pos[1, :] = (ball_radius + 0.5 * beam_height) * np.ones((len(ts)))
+
+        from scipy.spatial.transform import Rotation
+        exaggeration_coefficient = 10
+        beam_rot = Rotation.from_euler("z", exaggeration_coefficient * ys[1, :], degrees=True).as_quat().astype(np.float32).T
+
+        beam.position = (0, 0, 0)
+        ball.position = tuple(ball_pos[:, 0])
+
+        ## Collecting in a group for correct rotation animation
+        pivot = pj.Group()
+        pivot.add(beam)  # this becomes pivot.children[0]
+        pivot.add(ball)  # this becomes pivot.children[1]
+        pivot.quaternion = tuple(beam_rot[:, 0])
+        scene.add(pivot)
+
+        ## Setting up the animation
+        ball_position_track = pj.VectorKeyframeTrack(name=".children[1].position", times = ts, values = ball_pos.T)
+        pivot_rotation_track = pj.QuaternionKeyframeTrack(name=".quaternion", times = ts, values = beam_rot.T)
+        pivot_clip = pj.AnimationClip(tracks = [ball_position_track, pivot_rotation_track])
+        pivot_action = pj.AnimationAction(pj.AnimationMixer(pivot), pivot_clip, pivot)
+
+        ## Setting the scene
+        view_width, view_height = 800, 600
+        camera = pj.PerspectiveCamera(position=[0, 1, 4], aspect = view_width/view_height)
+        ambient_light = pj.AmbientLight(color="#ffffff", intensity=1.0)
+        key_light = pj.DirectionalLight(position=[0, 10, 0])
+        scene.add(ambient_light)
+        scene.add(key_light)
+
+        ## Making the renderer
+        controls = pj.OrbitControls(controlling = camera)
+        renderer = pj.Renderer(camera=camera, scene=scene, width=view_width, height=view_height, controls=[controls])
+
+
+
+.. jupyter-execute::
+
+    renderer
+
+.. jupyter-execute::
+
+    pivot_action
+
 We consider here a solid ball on a beam system as depicted in :numref:`bob`.
 The ball rolls without slipping (pure rotation) on a beam that is articulated without friction in the middle.
 A torque :math:`T` acts on the beam joint.
