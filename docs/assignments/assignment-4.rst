@@ -19,6 +19,70 @@ Problem 1 - Satellite
     Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
     The relevant notebook is `assignment-4-satellite.ipynb`.
 
+.. admonition:: Animation code
+    :class: dropdown
+
+    .. jupyter-execute::
+
+        import pythreejs as pj
+        import numpy as np
+        import base64
+        from pathlib import Path
+
+        def load_image_base64(file_path): # Directly embed files in the code
+            with open(file_path, "rb") as image_file:
+                return base64.b64encode(image_file.read()).decode('utf-8')
+
+        # Cubemap texture paths
+        folder = "space_cubemap"
+        base_path = Path("_static") / folder
+
+        texture_paths = [
+            base_path / "px.png",  # Positive X
+            base_path / "nx.png",  # Negative X
+            base_path / "py.png",  # Positive Y
+            base_path / "ny.png",  # Negative Y
+            base_path / "pz.png",  # Positive Z
+            base_path / "nz.png"   # Negative Z
+        ]
+
+        scene = pj.Scene()
+        camera = pj.PerspectiveCamera(position=[10, 6, 10], aspect=800/600)
+
+        skybox_geometry = pj.BoxGeometry(width=500, height=500, depth=500)
+        materials = [
+            pj.MeshBasicMaterial(
+                map=pj.ImageTexture(imageUri=f"data:image/png;base64,{load_image_base64(path)}"), # Decode png
+                side='BackSide'
+            ) for path in texture_paths # Eliminate racing condition by loading images synch
+        ]
+        skybox = pj.Mesh(skybox_geometry, materials)
+        scene.add(skybox)
+
+        cubesat = pj.Mesh(
+            pj.BoxGeometry(1, 1, 1),
+            pj.MeshStandardMaterial(color='red')
+        )
+        scene.add(cubesat)
+
+        axis_helper = pj.AxesHelper(size=5)
+        axis_helper.position = cubesat.position
+        axis_helper.quaternion = cubesat.quaternion
+
+        scene.add(axis_helper)
+
+        scene.add(pj.AmbientLight(color='#ffffff', intensity=1.0))
+        scene.add(pj.DirectionalLight(position=[0, 10, 0]))
+
+        controls = pj.OrbitControls(controlling=camera)
+        renderer = pj.Renderer(camera=camera, scene=scene, width=800, height=600, controls=[controls])
+
+
+.. jupyter-execute::
+
+     renderer
+
+
 In this task, we will consider a satellite orbiting Earth. We define an inertial reference frame with its origin at Earth's center and with an arbitrary and fixed orientation.
 
 We will consider two cases:
