@@ -38,12 +38,12 @@ Problem 1 - Ball on a Beam
 
         # Cubemap texture URLs, because I'm lazy
         texture_urls = [
-            "https://raw.githubusercontent.com/TTK4130/code-handouts/refs/heads/main/ceiling_lights_cubemap/px.png",  # Positive X
-            "https://raw.githubusercontent.com/TTK4130/code-handouts/refs/heads/main/ceiling_lights_cubemap/nx.png",  # Negative X
-            "https://raw.githubusercontent.com/TTK4130/code-handouts/refs/heads/main/ceiling_lights_cubemap/py.png",  # Positive Y
-            "https://raw.githubusercontent.com/TTK4130/code-handouts/refs/heads/main/ceiling_lights_cubemap/ny.png",  # Negative Y
-            "https://raw.githubusercontent.com/TTK4130/code-handouts/refs/heads/main/ceiling_lights_cubemap/pz.png",  # Positive Z
-            "https://raw.githubusercontent.com/TTK4130/code-handouts/refs/heads/main/ceiling_lights_cubemap/nz.png"   # Negative Z
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/px.png",  # Positive X
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/nx.png",  # Negative X
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/py.png",  # Positive Y
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/ny.png",  # Negative Y
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/pz.png",  # Positive Z
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/nz.png"   # Negative Z
         ]
 
         scene = pj.Scene()
