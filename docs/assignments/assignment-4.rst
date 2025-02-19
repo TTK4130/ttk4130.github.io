@@ -26,24 +26,24 @@ Problem 1 - Satellite
 
         import pythreejs as pj
         import numpy as np
+        import requests
         import base64
-        from pathlib import Path
 
-        def load_image_base64(file_path): # Directly embed files in the code
-            with open(file_path, "rb") as image_file:
-                return base64.b64encode(image_file.read()).decode('utf-8')
+        def load_image_from_url(url):
+            response = requests.get(url)
+            if response.status_code == 200:
+                return f"data:image/png;base64,{base64.b64encode(response.content).decode('utf-8')}"
+            else:
+                raise Exception(f"Failed to load image from {url}")
 
-        # Cubemap texture paths
-        folder = "space_cubemap"
-        base_path = Path("_static") / folder
-
-        texture_paths = [
-            base_path / "px.png",  # Positive X
-            base_path / "nx.png",  # Negative X
-            base_path / "py.png",  # Positive Y
-            base_path / "ny.png",  # Negative Y
-            base_path / "pz.png",  # Positive Z
-            base_path / "nz.png"   # Negative Z
+        # Cubemap texture URLs, because I'm lazy
+        texture_urls = [
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/px.png",  # Positive X
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/nx.png",  # Negative X
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/py.png",  # Positive Y
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/ny.png",  # Negative Y
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/pz.png",  # Positive Z
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/nz.png"   # Negative Z
         ]
 
         scene = pj.Scene()
@@ -52,9 +52,9 @@ Problem 1 - Satellite
         skybox_geometry = pj.BoxGeometry(width=500, height=500, depth=500)
         materials = [
             pj.MeshBasicMaterial(
-                map=pj.ImageTexture(imageUri=f"data:image/png;base64,{load_image_base64(path)}"), # Decode png
+                map=pj.ImageTexture(imageUri=load_image_from_url(url)),
                 side='BackSide'
-            ) for path in texture_paths # Eliminate racing condition by loading images synch
+            ) for url in texture_urls
         ]
         skybox = pj.Mesh(skybox_geometry, materials)
         scene.add(skybox)
