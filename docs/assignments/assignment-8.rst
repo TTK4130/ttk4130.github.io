@@ -23,7 +23,7 @@ Problem 1 - Pendulum on an oscillator
 We will revisit the oscillating pendulum one last time. 
 This time we will use bond graph to model the system.
 
-Figure  :numref:`assignment_8_pendulum` shows a sktch of the system. 
+Figure  :numref:`assignment_8_pendulum` shows a sketch of the system. 
 A pendulum with a point mass :math:`m_2` is attached to a mass :math:`m_1` that can oscillate along a vertical axis. 
 The pendulum rod has a length :math:`L` and the rod can be considered mass-less 
 (i.e. the pendulum can be considered as a point mass at the end of a mass-less rod).
