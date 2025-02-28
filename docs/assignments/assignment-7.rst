@@ -43,7 +43,7 @@ steering mechanism.
 
     b) The following information is given about each submodel:
 
-    - **Batter**:
+    - **Battery**:
         Gives a constant voltage.
     - **DC motor**:
         A DC-motor can be described by the following equations
