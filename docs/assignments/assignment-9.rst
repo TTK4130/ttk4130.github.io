@@ -9,33 +9,19 @@ Assignment 9 - Bond Graphs III
     
     This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
 
+In this assignment we will build bond graph models, assign causality and extract state space equations from the models.
+Specifically, will make a simple system model of the drive-line of a rear wheel drive diesel powered car as outlined in :numref:`assignment_9_drive_line`.
+The drive line includes a diesel engine, a clutch, a gearbox (with only one gear), a drive shaft, a differential and rear wheels with shafts.
+
 .. figure:: ./figures/assignment_9/car.png
-    :width: 100%
+    :width: 10cm
     :align: center
     :name: assignment_9_drive_line
     
     Schematic drawing of the drive-line of a car.
 
-In this assignment we will build bond graph models, assign causality and extract state space equations from the models.
-Specifically, will make a simple system model of the drive-line of a rear wheel drive diesel powered car as outlined in :numref:`assignment_9_drive_line`.
-The drive line includes a diesel engine, a clutch, a gearbox (with only one gear), a drive shaft, a differential and rear wheels with shafts.
-
 Problem 1 - Car drive line
 --------------------------
-
-.. figure:: ./figures/assignment_9/diesel_engine_submodel.png
-    :width: 100%
-    :align: center
-    :name: assignment_9_diesel_engine
-    
-    Diesel engine submodel.
-
-.. figure:: ./figures/assignment_9/clutch_submodel.png
-    :width: 100%
-    :align: center
-    :name: assignment_9_clutch
-    
-    Clutch submodel.
 
 In the first problem, we will consider the diesel engine, the gearbox and the drive shaft (the shaft between the gear box and rear axle).
 
@@ -58,6 +44,13 @@ In the first problem, we will consider the diesel engine, the gearbox and the dr
         Draw a bond graph for the system and assign causality.
         Verify that the causality is consistent with the power port of the abstract diesel engine submodel shown in :numref:`assignment_9_diesel_engine`.
 
+        .. figure:: ./figures/assignment_9/diesel_engine_submodel.png
+            :width: 10cm
+            :align: center
+            :name: assignment_9_diesel_engine
+
+            Diesel engine submodel.
+
     b. 
     
         We continue by modelling the gear along with the connecting shafts (gearbox and drive shaft model). 
@@ -77,6 +70,13 @@ In the first problem, we will consider the diesel engine, the gearbox and the dr
         The abstract 2-port submodel for the clutch is illustrated in :numref:`assignment_9_clutch`. 
         Use this and your solution from the first two tasks to draw a bond graph for the diesel engine, clutch, gearbox and drive shaft.
         Also assign causality.
+
+        .. figure:: ./figures/assignment_9/clutch_submodel.png
+            :width: 8cm
+            :align: center
+            :name: assignment_9_clutch
+
+            Clutch submodel.
         
     d. 
     
@@ -84,27 +84,6 @@ In the first problem, we will consider the diesel engine, the gearbox and the dr
 
 Problem 2 - Rear axle and car assembly
 --------------------------------------
-
-.. figure:: ./figures/assignment_9/rear_axle.png
-    :width: 100%
-    :align: center
-    :name: assignment_9_rear_axle_naive
-    
-    Rear axle submodel
-
-.. figure:: ./figures/assignment_9/flexible_element.png
-    :width: 100%
-    :align: center
-    :name: assignment_9_rear_axle_improved
-    
-    Improved rear axle submodel
-
-.. figure:: ./figures/assignment_9/contact.png
-    :width: 100%
-    :align: center
-    :name: assignment_9_road_wheel_contact
-    
-    Model for the contact between the road and the wheel.
 
 We will now model the rear axle, and see how the power associated to the angular speed of the drive shaft can be utilized to move the car.
 If you are not sure how a differential works, there are videos on YouTube explaining it (e.g. `Around The Corner - How Differential Steering Works (1937) <https://www.youtube.com/watch?v=yYAw79386WI>`_).
@@ -124,6 +103,13 @@ If you are not sure how a differential works, there are videos on YouTube explai
         Note that this is not compatible with the final bond graph of the previous task.
         We will attend to this shortly.
 
+        .. figure:: ./figures/assignment_9/rear_axle.png
+            :width: 8cm
+            :align: center
+            :name: assignment_9_rear_axle_naive
+
+            Rear axle submodel
+
         Draw a bond graph for the rear axle.
         Including friction associated to the angular speed of the left and right part of the rear axle.
         Include also the moment of inertia for the left and right side (including the wheels).
@@ -140,6 +126,13 @@ If you are not sure how a differential works, there are videos on YouTube explai
         Draw a new bond graph for the rear axle where the flexible shaft element is included.
         Assign causality, and verify that the rear axle will now be compatible with the last model in the Problem 1.
 
+        .. figure:: ./figures/assignment_9/flexible_element.png
+            :width: 14cm
+            :align: center
+            :name: assignment_9_rear_axle_improved
+
+            Improved rear axle submodel
+
     c. 
 
         Now we will connect the rear wheels to the road with slip.
@@ -152,6 +145,13 @@ If you are not sure how a differential works, there are videos on YouTube explai
             F_{w,i} = R_{w,i} \left( r \omega_i - v \right)
         
         where :math:`i` is :math:`L` or :math:`R`, and :math:`r` is the radius of the wheels.
+
+        .. figure:: ./figures/assignment_9/contact.png
+            :width: 10cm
+            :align: center
+            :name: assignment_9_road_wheel_contact
+
+            Model for the contact between the road and the wheel.
 
         Draw a bond graph for the submodel.
 
@@ -180,13 +180,6 @@ If you are not sure how a differential works, there are videos on YouTube explai
 Problem 3 - Simulation (Optional)
 ---------------------------------
 
-.. figure:: ./figures/assignment_9/torque_power_curve.png
-    :width: 100%
-    :align: center
-    :name: assignment_9_GM_65_TD_plot
-    
-    Approximation of torque and power limitation for GM's 6.5TD engine
-
 In this task we simulate the car model. 
 Please find the Jupyter notebook in the `code handout repository <https://github.com/TTK4130/code-handouts>`_.
 
@@ -202,6 +195,13 @@ We have also implemented the following torque limitation for the motor, as a fun
 
 
 The resulting torque and power limit is shown in :numref:`assignment_9_GM_65_TD_plot`.
+
+.. figure:: ./figures/assignment_9/torque_power_curve.png
+    :width: 75%
+    :align: center
+    :name: assignment_9_GM_65_TD_plot
+    
+    Approximation of torque and power limitation for GM's 6.5TD engine
 
 Your task is to fill in your state equations in the notebook as indicated. After doing this, you may run the simulator script to make a simulation and plot your states.
 
