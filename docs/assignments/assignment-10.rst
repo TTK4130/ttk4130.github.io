@@ -9,7 +9,7 @@ Assignment 10 - Advanced Bond Graphs
     
     This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
 
-In this assignment we will consider the mechanical system shown in :numref:`assignment_10_system` first by using the procedure for modelling complex mechanical systems using bondgraphs descirbed in Pedersen and Engja, ch. 8.3, and then by means of an IC-field and Lagrange.
+In this assignment we will consider the mechanical system shown in :numref:`assignment_10_system` first by using the procedure for modelling complex mechanical systems using bondgraphs described in Pedersen and Engja, ch. 8.3, and then by means of an IC-field and Lagrange.
 
 .. figure:: ./figures/assignment_10/System.png
     :width: 100%
@@ -87,7 +87,7 @@ In practice such a model can be made to represent a no slip model by selecting a
 Problem 3 - Alternative implementation (Optional)
 -------------------------------------------------
 
-Up until now we have modelled the system, discovered that we get into some algebraic trouble due to differential causality, and instead of dealing with the algebraic loops, we have proceeded with an alternative approach, namely that of decoupling the linear and angular motion of the ball. 
+Up until now we have modeled the system, discovered that we get into some algebraic trouble due to differential causality, and instead of dealing with the algebraic loops, we have proceeded with an alternative approach, namely that of decoupling the linear and angular motion of the ball. 
 We will now consider an alternative implementation where we keep the original assumption of no slip between the ball and its surface, and use Lagrange dynamics to help us resolve the differential causality. 
 :numref:`assignment_10_ic` show how the system can be implemented as an IC-field. 
 The constitutive relation for the IC-field is the generalized momentum state space form of the Lagrange equations. 
