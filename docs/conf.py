@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'TTK4130'
-author = 'Tord Natlandsmyr & Børge Rokseth'
+author = 'Tord Natlandsmyr, Bjørnar Ørjansen Kaarevik & Børge Rokseth'
 release = '0.0.0'
 
 # -- General configuration ---------------------------------------------------
