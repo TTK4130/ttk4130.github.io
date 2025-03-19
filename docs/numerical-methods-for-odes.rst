@@ -195,9 +195,9 @@ We need two ingredients, the initial value problem we defined earlier and the de
 
 .. math::
 
-    \dot{x} = f(t, x)
+    \dot{x} &= f(t, x)
 
-    \dot{x} = \lim_{h \to 0} \frac{x_{n+1} - x_n}{h}
+    \dot{x} &= \lim_{h \to 0} \frac{x_{n+1} - x_n}{h}
 
 Armed with these two, we can first say that a good approximation to the derivative :math:`\dot{x}` is the *finite difference*
 
@@ -218,7 +218,7 @@ With some algebra, this can be worked into the form:
 
 .. math::
 
-    x_{n+1} = x_n + h \cdot f(t_n, x_n)
+    x_{n+1} = x_n + h f(t_n, x_n)
 
 This gives a rule as to how we update the *next step* :math:`x_{n+1}` using what we already know, namely the current step :math:`x_n` and the time.
 If we apply this method to the model problem :math:`\dot{x} = \lambda x`, we get that
@@ -240,7 +240,7 @@ Still using the same notation that :math:`\dot{x} = f(t, x)` and that :math:`\do
 .. math::
     :label: backward_euler_general
 
-    x_{n+1} = x_n + h \cdot f(t_{n+1}, x_{n+1})
+    x_{n+1} = x_n + h f(t_{n+1}, x_{n+1})
 
 The only difference is that the *next step* :math:`x_{n+1}` features inside the function defining the system dynamics.
 In the case of the model problem, this is no issue, since we get that
@@ -266,7 +266,7 @@ So we're stuck with the equation on the form
     x_{n+1} = x_n + h f(t_{n+1}, x_{n+1})
 
 This equation is on a form known as a *fixed point formulation*, where the defining feature is that if we input the exactly correct :math:`x_{n+1}` into the righthand side, we get that same value back on the lefthand side.
-This is good news, as there are many methods to find the solutions to such problems, the so-called *fixed points*!
+This is good news, as there are many methods to find the solutions to such problems (the so-called *fixed points*)!
 
 Fixed point methods
 -------------------
@@ -319,7 +319,9 @@ Newton's method
 ---------------
 
 Newton's method is one of several methods one can use to find the zero points of a function.
-Some good sources describing the method in greater detail can be found at `libretexts <https://math.libretexts.org/Bookshelves/Calculus/Calculus_(OpenStax)/04%3A_Applications_of_Derivatives/4.09%3A_Newtons_Method>`_ or `wikipedia <https://en.wikipedia.org/wiki/Newton's_method>`_.
+Some good sources describing the method in greater detail can be found
+in LibreTexts :cite:`calculus_openstax_2016` or Wikipedia :cite:`newtons_method_wikipedia_2025`.
+
 The main idea of the method is to use the tangent line as an approximation to the function in question, so that we can successively find better guesses to the root.
 For a function :math:`f(x)`, we can use the derivative of the function :math:`f'(x)` to set up the following fixed point scheme:
 
@@ -344,14 +346,21 @@ then we accept the point :math:`x_{n+1}` as a solution.
 This is starting to sound like an algorithm we could implement for ourselves and use in potential implicit Runge-Kutta solvers.
 It's been a while since we talked about those, but in the end, this is why we even need to discuss implicit equations and fixed points and all that.
 
-At any rate, if we accept that :math:`f(x_n)` can be a vector-valued function (which often is the case in our dynamical systems), then the derivative will actually be the Jacobi matrix of the function, which we will call :math:`J_f`.
+At any rate, if we say that :math:`f(x_n)` can be a vector-valued function (which often is the case in our dynamical systems), then the derivative will actually be the Jacobi matrix of the function, which we will call :math:`J_f`.
 In index-notation we have that
 
 .. math::
 
     \left[J_f \right]_{i, j} = \frac{\partial f_i}{\partial x_j}
 
-If we write the algorithm up as a function in Python, we might get something like:
+In this case, the division becomes *multiplication by the inverse* or that
+
+.. math::
+    x_{n+1} = x_n - J_f^{-1} f(x_n)
+
+
+While it's not clear from the notation, bear in mind that the Jacobian may also be a function of :math:`x`, and so must be evaluated at the point :math:`x_n`.
+Now the time is right for writing the algorithm as a function in Python, and we might get something looking like the following: 
 
 .. jupyter-execute::
 
@@ -372,13 +381,13 @@ If we program a model problem to test this against, we can see whether it works.
 .. jupyter-execute::
 
     def f(x):
-        return (x + 1)**2
+        return (x + 1)**3
     
     def J_f(x):
         return np.array([
-            [2 * (x[0] + 1), 0, 0],
-            [0, 2 * (x[1] + 1), 0],
-            [0, 0, 2 * (x[2] + 1)]])
+            [3 * (x[0] + 1)**2, 0, 0],
+            [0, 3 * (x[1] + 1)**2, 0],
+            [0, 0, 3 * (x[2] + 1)**2]])
 
     zero_point, diagnostic_data = newtons_method(f, J_f, np.ones((3,)))
     print(f"Zero point: {zero_point}\nNumber of iterations: {diagnostic_data['iterations']}\nDelta: {diagnostic_data['delta']}")
