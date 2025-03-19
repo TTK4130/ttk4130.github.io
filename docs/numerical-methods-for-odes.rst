@@ -206,7 +206,7 @@ Armed with these two, we can first say that a good approximation to the derivati
     \dot{x} \approx \frac{x_{n+1} - x_n}{h}
 
 This is a first order approximation to the derivative, which means that the explicit Euler method is a first order method.
-If we wanted higher order methods, we could design (and you will do this in the assignments) schemes that are hiigher order approximations to the derivative.
+If we wanted higher order methods, we could design (and you will do this in the assignments) schemes that are higher order approximations to the derivative.
 But, at any rate, we need to relate this to the function :math:`f(t, x)` if we are going to be able to solve it.
 In this contex, the forward Euler method is defined as:
 
@@ -234,7 +234,7 @@ Implicit Euler (IRK)
 ====================
 
 The implicit Euler method, or the backward Euler method, is a close cousin to the forward method.
-In fact, the only difference between the two is an index!
+In fact, the only difference between the two is the index!
 Still using the same notation that :math:`\dot{x} = f(t, x)` and that :math:`\dot{x} \approx \frac{x_{n+1} - x_n}{h}`, we define the backward euler method as
 
 .. math::
@@ -250,22 +250,22 @@ In the case of the model problem, this is no issue, since we get that
     x_{n+1} = x_n + h\lambda x_{n+1} \Rightarrow x_{n+1} = \frac{x_n}{1 - h\lambda}
 
 However, this becomes much more complicated if the system dynamics is a vector valued function that may depend on the state :math:`x_{n+1}` nonlinearly.
-In general, we're stuch with the formulation in :eq:`backward_euler_general`.
-We would be albe to find the next step only if we *already had it*, which means that for implicit methods we need additional machinery to wring some answers out of them.
-Conveniently, we discuss this in the section below.
+In general, we're stuck with the formulation in :eq:`backward_euler_general`.
+We would be able to find the next step only if we *already had it*, which means that for implicit methods we need additional steps to evaluate them.
+We'll discuss this in the section below.
 
 Implicit equations
 ===================
 
 By implicit equation, we mean an equation that describes a relationship, but where the symbols cannot be rearranged to isolate the unknown quantity.
-This ties together with the lsat section where we found an equation where the unknown quantity :math:`x{n+1}` featured in an expression that may not have a known inverse.
-So we're stuck with the equation on the form
+This ties together with the last section where we found an equation where the unknown quantity :math:`x{n+1}` featured in an expression that may not have a known inverse.
+Initially, we're stuck with the equation on the form
 
 .. math::
 
     x_{n+1} = x_n + h f(t_{n+1}, x_{n+1})
 
-This equation is on a form known as a *fixed point formulation*, where the defining feature is that if we input the exactly correct :math:`x_{n+1}` into the righthand side, we get that same value back on the lefthand side.
+This equation is on a form known as a *fixed point formulation*, where the defining feature is that if we input the exactly correct :math:`x_{n+1}` into the right-hand side, we get that same value back on the left-hand side.
 This is good news, as there are many methods to find the solutions to such problems (the so-called *fixed points*)!
 
 Fixed point methods
@@ -328,7 +328,7 @@ For a function :math:`f(x)`, we can use the derivative of the function :math:`f'
 .. math::
     x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}
 
-As long as :math:`f'(x_n) \neq 0` and the initial guess :math:`x_0` is not too far off, this method will usually converge.
+As long as :math:`f'(x_n) \neq 0` and the initial guess :math:`x_0` is not too far off, this method will usually converge within some margin.
 By rearranging the expression slightly, we can say that the update to the point :math:`\Delta x_{n+1}` is equal to
 
 .. math::
@@ -346,7 +346,7 @@ then we accept the point :math:`x_{n+1}` as a solution.
 This is starting to sound like an algorithm we could implement for ourselves and use in potential implicit Runge-Kutta solvers.
 It's been a while since we talked about those, but in the end, this is why we even need to discuss implicit equations and fixed points and all that.
 
-At any rate, if we say that :math:`f(x_n)` can be a vector-valued function (which often is the case in our dynamical systems), then the derivative will actually be the Jacobi matrix of the function, which we will call :math:`J_f`.
+At any rate, if we say that :math:`f(x_n)` can be a vector-valued function (which often is the case in dynamical systems we care about), then the derivative will actually be the Jacobi matrix of the function, which we will call :math:`J_f`.
 In index-notation we have that
 
 .. math::
@@ -376,7 +376,7 @@ Now the time is right for writing the algorithm as a function in Python, and we 
         return x, {"iterations": i, "delta": delta_x}
 
 This function will return either when the update is sufficiently small or when the maximum number of iterations is reached.
-If we program a model problem to test this against, we can see whether it works.
+If we program a model problem to test this against, we can see whether it converges given our parameters.
 
 .. jupyter-execute::
 
@@ -396,5 +396,5 @@ The code shows that the root of the function occurs when :math:`x = y = z = -1`.
 It also reached the root using fewer than the allocated iterations and with a final update within the accepted level of tolerance.
 
 
-Stiff Equations
-===============
+Stiff Equations (WIP)
+=====================
