@@ -258,7 +258,7 @@ Implicit equations
 ===================
 
 By implicit equation, we mean an equation that describes a relationship, but where the symbols cannot be rearranged to isolate the unknown quantity.
-This ties together with the last section where we found an equation where the unknown quantity :math:`x{n+1}` featured in an expression that may not have a known inverse.
+This ties together with the last section where we found an equation where the unknown quantity :math:`x_{n+1}` featured in an expression that may not have a known inverse.
 Initially, we're stuck with the equation on the form
 
 .. math::
@@ -334,15 +334,17 @@ By rearranging the expression slightly, we can say that the update to the point 
 .. math::
     \Delta x_{n+1} = x_{n+1} - x_n = - \frac{f(x_n)}{f'(x_n)}
 
-Thus, if we're close to a fixed point, the update will be small.
-This is great news as we can use this as a measure for convergence.
-If we set a tolerance level :math:`\text{tol}`, we can say that if
+The reason we care about the "update" is because it gives us the iterative scheme were we simply compute the :math:`\Delta x_{n+1}` with the :math:`x_n` we currently hold as our best guess and then obtain a *better* guess by adding the update!
+Thus, the closer we are to a fixed point (i.e. our solution), the smaller the update will be.
+Since the scheme is iterative and will only give the right answer when we've done an infinite number of iterations, we have to be able to stop iterating when things are "good enough".
+Since the update will get smaller and smaller, we can say that a good place to stop is when the update is smaller than a certain threshold, the error *tolerance* of the iteration.
+For a specific (user-defined) tolerance level :math:`\text{tol}`, we can say that if
 
 .. math::
 
     \bigg| - \frac{f(x_n)}{f'(x_n)} \bigg| < \text{tol}
 
-then we accept the point :math:`x_{n+1}` as a solution.
+then we accept the point :math:`x_{n+1}` as a "good enough" solution.
 This is starting to sound like an algorithm we could implement for ourselves and use in potential implicit Runge-Kutta solvers.
 It's been a while since we talked about those, but in the end, this is why we even need to discuss implicit equations and fixed points and all that.
 
