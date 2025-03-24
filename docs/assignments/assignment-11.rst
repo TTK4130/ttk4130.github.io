@@ -94,8 +94,7 @@ with initial condition :math:`x(0) = 1`, :math:`y(0) = 1`, :math:`z(0) = 1`.
 .. admonition:: Tasks
 
     a. 
-    
-        The file `irk.py` contains a general RK integrator that can take both ERK and IRK Butcher tables (requiring to use a Newton iteration).
+
         The Gauss-Legendre collocation method is an IRK scheme with :math:`s = 2` stages and of order :math:`2s = 4`, which has the Butcher table:
         
         .. math::
@@ -109,6 +108,9 @@ with initial condition :math:`x(0) = 1`, :math:`y(0) = 1`, :math:`z(0) = 1`.
             \end{array}
 
         Simulate the system :eq:`lorentz_system` with this method, using time interval :math:`[0, 2]`, :math:`N = 200` simulation points.
+        You will need to program your own implicit RK-routine for this task.
+        Have a look at the `numerical methods <../numerical-methods-for-odes.html>`_ webpage for some tips on where to start, especially the `Implicit Euler <../numerical-methods-for-odes.html#example-implicit-euler-for-a-scalar-system>`_ example.
+
         Add a code screen shot and a plot of the result to your answer.
 
     b. 
