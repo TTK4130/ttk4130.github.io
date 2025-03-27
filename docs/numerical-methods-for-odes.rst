@@ -531,7 +531,7 @@ We can visually inspect that they do more or less the same by plotting them both
 .. jupyter-execute::
 
     plt.plot(ts_fnc, xs_fnc, label="make_residual")
-    plt.plot(ts_inline, xs_inline, label="inline")
+    plt.plot(ts_inline, xs_inline, label="inline", linestyle="--")
     plt.legend(); plt.show()
 
 Stiff Equations (WIP)
