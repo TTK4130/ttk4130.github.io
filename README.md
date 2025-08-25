@@ -42,7 +42,11 @@ Make sure you are at the root of this repository and you have activated the virt
 ```
 pip install -r docs/requirements.txt
 ```
-Step 4. Build the website
+Install pandoc and graphviz
+```
+sudo apt install graphviz pandoc
+```
+Step 5. Build the website
 To build the website go to the `docs` subfolder with `cd docs`. Then run
 ```
 make
