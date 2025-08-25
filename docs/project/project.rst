@@ -15,6 +15,15 @@ The point is for you to be curious, inquisitive, creative and independent.
 For your convenience, we have provided you with an example project which details the process from picking a system all the way to delivering your final report.
 Please see :ref:`Example Project: Bicycle`.
 
+Other example projects:
+
+- Car drivetrain
+- 4-axis robot arm
+- Unicycle
+- Multistage rocket
+- `Parallel Axis Tripteron <https://www.youtube.com/watch?v=6EtXycVGJg4>`_
+- `Reaction wheel controlled drone <https://www.youtube.com/watch?v=4kfBEaTncjI>`_
+
 Requirements
 =============
 

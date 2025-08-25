@@ -13,6 +13,7 @@ Welcome to Modelling and Simulation!
     installation
     jupyter-notebook
     sympy-and-cas
+    animation
     reference-frames
     vector-kinematics
     mass-and-inertia

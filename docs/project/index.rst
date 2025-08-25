@@ -6,4 +6,4 @@ Project
     :maxdepth: 1
 
     project
-    example-project
+    example_project
