@@ -20,6 +20,7 @@ Welcome to Modelling and Simulation!
     quaternions
     numerical-methods-for-odes
     whats-next
+    project/index
     assignments/index
     lecture-notes/index
     sympy-live

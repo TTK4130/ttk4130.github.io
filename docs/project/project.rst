@@ -1,19 +1,24 @@
 ====================================
-Project description and requirements
+Simulation Project
 ====================================
 
+In this project we invite you to find a system of your interest and use the tools provided in this course to analyse it.
 The aim of the project is to develop independence and provide a space where you can creatively engage with the course curriculum.
-We also want to support your ability to assess your own work.
-In order to do so, we invite you to find a system that may interest you and use the tools of the course to analyze that system.
-Some formal requirements follow below, but they are hopefully open-ended enough to allow you to come up with something you are passionate about,
-or personally motivated to study.
-It can be any system you would like, and if you are unsure whether what you have in mind is a good fit, please ask us and we can talk about it.
-Also, you're very welcome to discuss potential projects with each other.
+This may suit those who find normal assignments tedious and unengaging, and who would like to deepen their knowledge through independent
+application of the course material. The system must fulfil some formal requirements, but these are formulated open-enede enough to allow
+you to pick a system which you are passionate about. If you're not sure whether your system is suitable or fulfils the requirements, please
+ask us and we'll provide an anwer. Additionally, we encourage to discuss potential projects with each other, as this might spark new ideas.
 The point is for you to be curious, inquisitive, creative and independent.
 
-Requirements:
+**TL;DR**: Deepen your knowledge by modelling and analysing a system which you find interesting, and most of all exciting.
 
-* The chosen system must be a rigid system with kinematics.
+For your convenience, we have provided you with an example project which details the process from picking a system all the way to delivering your final report.
+Please see :ref:`Example Project: Bicycle`.
+
+Requirements
+=============
+
+* The chosen system must be a rigid system with `kinematics <https://en.wikipedia.org/wiki/Kinematics>`_.
 * The chosen system must have a physically meaningful and realizable control variable.
 * Simulation of the system must be done using a bespoke implementation of a numerical solver.
 * The choice of numerical solver must be justified.
