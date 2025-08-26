@@ -2,8 +2,206 @@
 Welcome to Modelling and Simulation!
 ============================================
 
-.. figure:: _static/lorenz.png
-  :align: center
+.. raw:: html
+
+   <div id="lorenz-container" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555;"></div>
+
+   <script type="importmap">
+   {
+     "imports": {
+       "three": "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js"
+     }
+   }
+   </script>
+
+   <script type="module">
+   import * as THREE from 'three';
+   import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js';
+
+   const container = document.getElementById('lorenz-container');
+   const scene = new THREE.Scene();
+   scene.background = new THREE.Color(0x1e1e1e); // Dark modern gray
+
+   // Get initial container dimensions
+   const containerWidth = container.clientWidth;
+   const containerHeight = container.clientHeight;
+
+   const camera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
+   const renderer = new THREE.WebGLRenderer({ antialias: true });
+   renderer.setSize(containerWidth, containerHeight);
+   renderer.setPixelRatio(window.devicePixelRatio); // For high DPI displays
+   container.appendChild(renderer.domElement);
+
+   // Add controls
+   const controls = new OrbitControls(camera, renderer.domElement);
+   controls.enableDamping = true;
+   controls.dampingFactor = 0.05;
+   controls.enableZoom = false;
+   controls.enablePan = false;
+   controls.enableRotate = false;
+   controls.autoRotate = true;
+
+   // Handle window resize
+   function onWindowResize() {
+       const width = container.clientWidth;
+       const height = container.clientHeight;
+
+       camera.aspect = width / height;
+       camera.updateProjectionMatrix();
+
+       renderer.setSize(width, height);
+       renderer.setPixelRatio(window.devicePixelRatio);
+   }
+
+   // Add resize listener
+   window.addEventListener('resize', onWindowResize, false);
+
+   // Also listen for container size changes (for responsive layouts)
+   if (window.ResizeObserver) {
+       const resizeObserver = new ResizeObserver(entries => {
+           for (let entry of entries) {
+               if (entry.target === container) {
+                   onWindowResize();
+               }
+           }
+       });
+       resizeObserver.observe(container);
+   }
+
+   // Lighting
+   const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+   scene.add(ambientLight);
+
+   const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+   directionalLight.position.set(10, 10, 10);
+   scene.add(directionalLight);
+
+   // Camera rotation parameters - focus on the crossing/transition region
+   let cameraAngle = 0;
+   const cameraRadius = 5; // Closer to see crossing detail
+   const cameraHeight = 1.2; // Positioned to see the transition region
+   const rotationSpeed = 0.0005; // Slow rotation speed
+   
+   // Crossing point where trajectory switches between lobes (approximate center of transition)
+   const crossingPoint = new THREE.Vector3(0, 0, 1.4); // Elevated to capture transition region
+
+   // Lorenz attractor parameters
+   const sigma = 10;
+   const rho = 28;
+   const beta = 8/3;
+   const dt = 0.01;
+
+   // Generate Lorenz attractor trajectory
+   function generateLorenzTrajectory(steps = 100000) {
+       const points = [];
+       let x = 1, y = 1, z = 1; // Initial conditions
+
+       for (let i = 0; i < steps; i++) {
+           // Lorenz equations
+           const dx = sigma * (y - x);
+           const dy = x * (rho - z) - y;
+           const dz = x * y - beta * z;
+
+           // Euler integration
+           x += dx * dt;
+           y += dy * dt;
+           z += dz * dt;
+
+           // Scale for better visualization
+           points.push(new THREE.Vector3(x * 0.1, y * 0.1, z * 0.1));
+       }
+
+       return points;
+   }
+
+   const lorenzPoints = generateLorenzTrajectory();
+   const trajectoryGeometry = new THREE.BufferGeometry();
+   const trajectoryMaterial = new THREE.LineBasicMaterial({
+       color: 0xffd700,
+       transparent: true,
+       opacity: 0.8,
+       linewidth: 2
+   });
+   const trajectoryLine = new THREE.Line(trajectoryGeometry, trajectoryMaterial);
+   scene.add(trajectoryLine);
+
+   // Create a glowing sphere to show current position
+   const sphereGeometry = new THREE.SphereGeometry(0.05);
+   const sphereMaterial = new THREE.MeshPhongMaterial({
+       color: 0xffd700, // Match trajectory color
+       emissive: 0x664400,
+       shininess: 100
+   });
+   const currentPoint = new THREE.Mesh(sphereGeometry, sphereMaterial);
+   scene.add(currentPoint);
+
+   // Animation variables
+   let currentFrame = 0;
+   let animatedPoints = [];
+   const animationSpeed = 3; // Points per frame
+
+   // Set initial camera position and target to the crossing point
+   controls.target.copy(crossingPoint);
+   controls.update();
+
+   function updateCameraPosition() {
+       // Update camera angle
+       cameraAngle += rotationSpeed;
+
+       // Calculate new camera position in a circle around the crossing point
+       const x = crossingPoint.x + Math.cos(cameraAngle) * cameraRadius;
+       const z = crossingPoint.z + Math.sin(cameraAngle) * cameraRadius;
+       const y = crossingPoint.y + cameraHeight;
+
+       camera.position.set(x, y, z);
+       camera.lookAt(crossingPoint); // Look at the crossing/transition region
+
+       // Update controls target to maintain focus on crossing point
+       controls.target.copy(crossingPoint);
+   }
+
+   function updateAnimation() {
+       // Add new points to the animated trajectory
+       for (let i = 0; i < animationSpeed && currentFrame < lorenzPoints.length; i++) {
+           animatedPoints.push(lorenzPoints[currentFrame]);
+           currentFrame++;
+       }
+
+       // Update the trajectory line
+       if (animatedPoints.length > 0) {
+           trajectoryGeometry.setFromPoints(animatedPoints);
+
+           // Update current position sphere
+           const lastPoint = animatedPoints[animatedPoints.length - 1];
+           currentPoint.position.copy(lastPoint);
+       }
+
+       // Reset when complete and start over
+       if (currentFrame >= lorenzPoints.length) {
+           currentFrame = 0;
+           animatedPoints = [];
+       }
+   }
+
+   // Animation loop
+   function animate() {
+       requestAnimationFrame(animate);
+
+       updateCameraPosition(); // Update camera rotation around crossing point
+       controls.update();
+       updateAnimation();
+
+       // Add some rotation for visual interest on the current point
+       if (animatedPoints.length > 0) {
+           currentPoint.rotation.x += 0.01;
+           currentPoint.rotation.y += 0.01;
+       }
+
+       renderer.render(scene, camera);
+   }
+
+   animate();
+   </script>
 
 
 .. toctree::
