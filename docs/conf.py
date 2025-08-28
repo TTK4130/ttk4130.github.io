@@ -55,7 +55,6 @@ intersphinx_mapping = {
 html_theme = 'sphinx_book_theme'
 html_title = 'Modelling and Simulation TTK4130'
 html_static_path = ['_static']
-html_js_files = ['lorenz.js']
 html_favicon = "_static/lorenz.png"
 html_theme_options = {
     "repository_url": "https://github.com/TTK4130/ttk4130.github.io",

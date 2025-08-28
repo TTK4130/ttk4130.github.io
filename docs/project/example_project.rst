@@ -122,6 +122,6 @@ Animation
 ^^^^^^^^^
 
     Note: Please look at the `3D Animation in Python
-    page <https://ttk4130.github.io/force-and-torque.html>`__ for an
+    page <https://ttk4130.github.io/animation.html>`__ for an
     introduction to how you make animations in Python
 
