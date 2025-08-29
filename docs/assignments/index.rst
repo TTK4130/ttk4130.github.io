@@ -7,7 +7,7 @@ Assignments
     :maxdepth: 1
 
     code-handout
-    assignment-1
+    assignment-0
     assignment-2
     assignment-3
     assignment-4
