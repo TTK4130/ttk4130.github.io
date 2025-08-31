@@ -2,19 +2,53 @@
 3D Visualization and Animation
 ==============================
 
-When modelling a system, visualization is a cruicial part of evaluating that system. When dealing with a system with more than a couple of parameters, plots become
-difficult to interpret. By visualizing our system in 3D we can leverage our spatial and physics intution of the world. This is the same intution
-which tells us that when we throw a ball, its trajectory should be parabolic or that it's easier to stop a bike than a car. When it comes to mechanical systems,
-when something doesn't look right, your model is usually incorrect or has some fundamentally flawed assumptions. Visualizing your system through animation
-will help you weed out unintended behaviour from your model and will deepen your understanding of your model.
+Visualization is a crucial part of evaluating any attempt of modelling a system. When dealing with a system with more than a couple of parameters, plots become
+difficult to interpret. By visualizing our system in 3D we can leverage our spatial and physics intuition of the world. This is the same intuition
+which tells us that when we throw a ball, its trajectory should be parabolic, or the intuition that it takes less effort stop a bike than a car. When it comes to mechanical systems,
+when something doesn't look right, it's indicative of a model built on fundamentally flawed assumptions. Visualizing your system through animation
+will help you weed out unintended behaviour from your model and will ultimately deepen your understanding of your model.
 This page will go into the basic principles of animating a system in 3D, as well as some common frameworks for visualization an animation.
 
 
-
-Principles of 3D animation
+Principles of Animation
 ===========================
 
-Something about generating trajectories vs updating in the loop realtime etc. Using frames, tracks etc.
+.. raw:: HTML
+
+    <p><a href="https://commons.wikimedia.org/wiki/File:Animhorse.gif#/media/File:Animhorse.gif"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Animhorse.gif" alt="Animhorse.gif" height="230" width="307"></a><br>By <a href="//commons.wikimedia.org/wiki/User:Janke" title="User:Janke">Janke</a> - <span class="int-own-work" lang="en">Own work</span>, <a href="https://creativecommons.org/licenses/by-sa/2.5" title="Creative Commons Attribution-Share Alike 2.5">CC BY-SA 2.5</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=433430">Link</a></p>
+
+We distinguish between two approaches to animation: **real-time animation** and **precomputed animation**.
+
+**Real-time animation** means that we simulate the system's state in the same loop (as in programming) as the animation progress. For each new
+animation frame we integrate our system from the last frame to the current frame. This allows for interactive and responsive animations,
+but can be computationally demanding for complex systems or stiff systems that demand fine time resolutions.
+
+**Precomputed animation** uses pre-generated trajectories (state over time). We compute the system's trajectory
+*before* animating, and play back the trajectory upon animation. This approach is often more practical and efficient,
+as it allows us to decouple simulation from rendering. This allows us to reuse our simulation data, and is generally
+more stable for visualization purposes.
+
+In both cases, we need a time series of the **trajectory** of our system. This trajectory could include positions, orientations
+and other relevant quantities and measures. Additionally, we need to specify the time step or **frame duration** between each state,
+as this determines how long each animation frame should last, consequently determining our frame rate (frames/second). Matching the
+animation frame rate with the simulation time step produces a reproduction of the system's motion. However, in some cases
+adjusting the playback speed (faster or slower) can be both practically useful (i.e. a very slow or fast system).
+
+A trajectory alone is not very useful to animate without a corresponding 3D (or 2D) model of the system.
+This model doesn't need to be photorealistic nor physically accurate. It just needs to capture the
+essential geometry and behaviour of our system. For example, the details on the bike seat are of little interest when analysing the motion of a bike.
+Most animation libraries include primitive geometric shapes like cubes, spheres and cylinders, which
+are usually sufficient to represent the key components of a system. You'd be surprised how basic a model can be, as our
+brains are excellent at filling in the blanks when the **motion** is convincing. A simple rectangle moving like a boat
+can evoke the image of a vessel at sea given that the motion behaves as expected.
+
+Our advice: **start simple**. Focus on correct motion first, as you undoubtedly will make some
+interesting mistakes with reference frames and defining coordinate systems. You can always improve the visual flair and fidelity later.
+The goal is by no means to produce a Pixar-quality animation, but rather to understand and effectively communicate how your system behaves.
+
+In the following sections, we'll present four animation tools of increasing complexity, from
+lightweight plotting using Matplotlib to state-of-the-art 3D engines using Blender.
+
 
 Matplotlib.animation
 =====================
@@ -26,7 +60,7 @@ Matplotlib.animation
 
 Many of you are already familiar with the Matplotlib library. Inspired by Matlab's plotting library, Matplotlib offers many useful easy-to-use functions for plotting
 and visualizing data. While library was made with data visualization in mind, it also supports a rudamentary framework for plotting and animating in 3D.
-In this section we'll go through a basic example of a 3D pendulum with air resistance. For a more comprehensice introduction to Matplotlib.animation, take a look at
+In this section we'll go through a basic example of a 3D pendulum with damping. For a more comprehensice introduction to Matplotlib.animation, take a look at
 the `official documentation <https://matplotlib.org/stable/users/explain/animations/animations.html#animations-using-matplotlib>`_.
 
 Example: Pendulum
@@ -147,6 +181,7 @@ We separate the second order ODE into four first order ODEs on the standard SciP
         phi_ddot = (-2*np.cos(theta)/max(np.sin(theta), 1e-6))*theta_dot*phi_dot - c*phi_dot # Numerical stability
         return [theta_dot, theta_ddot, phi_dot, phi_ddot]
 
+
 Integrating with SciPy
 
 .. jupyter-execute::
@@ -164,6 +199,7 @@ Integrating with SciPy
 
     theta, phi = sol.y[0], sol.y[2] # Extract trajectory polar coordinates
 
+
 Polar coordinates can be tricky to work with, so to make animation simpler we convert to cartesian
 
 .. jupyter-execute::
@@ -172,8 +208,9 @@ Polar coordinates can be tricky to work with, so to make animation simpler we co
     y = L * np.sin(theta) * np.sin(phi)
     z = -L * np.cos(theta)
 
+
 Similar to an ordinary plot, we create a figure with :code:`plt.fig()` and add a 3D subplot. We can also set the bounds
-of our plot explicitly by :code:`set_lim()` for all the axes.
+of our plot explicitly by :code:`set_lim()` for all axes.
 
 .. jupyter-execute::
 
@@ -192,7 +229,7 @@ Like any other plot we can pick the formatting for each of the trajectories.
 
 .. jupyter-execute::
 
-    line, = ax.plot([], [], [], lw=2, c="black")
+    line, = ax.plot([], [], [], lw=2, c="black") # The comma "," unpacks the one-element list returned by ax.plot()
     bob, = ax.plot([], [], [], "o", c="red", markersize=8)
 
 
@@ -222,17 +259,17 @@ That's it!
 Then we just have to pass our figure, functions and remaining parameters.
 The frame argument is the number of steps we integrated is self explanatory. The interval parameter controls milliseconds between frames, use 50-100ms for smooth playback.
 Additionally, you can use :code:`blit=True` to make the animation more efficient, as it makes sure only
-updated pixels are drawn for every frame. If the animation doesn't appear, try removing `blit=True` or use `plt.show()` instead of HTML display.
+updated pixels are drawn for every frame. If the animation doesn't appear when testing locally, try removing `blit=True` or use `plt.show()` instead of HTML display.
 
 .. jupyter-execute::
 
     from matplotlib.animation import FuncAnimation
-    from IPython.display import HTML # Just to display on webpage
+    from IPython.display import HTML # HTML needed to display on webpage
 
     ani = FuncAnimation(fig, update, frames=len(t_eval), init_func=init,
                         blit=True, interval=10)
 
-    plt.close(fig)  # suppress static image, animate using HTML
+    plt.close(fig)  # suppress static plot, animate using HTML instead
     HTML(ani.to_jshtml()) # Display inline
 
 Alternative display methods include `plt.show()` for interactive viewing or `ani.save('pendulum.mp4')` to save as video.
@@ -244,20 +281,20 @@ Matplotlib animations may behave differently depending on your backend. If the a
     matplotlib.use('TkAgg')  # or 'Qt5Agg', 'notebook' for Jupyter
     import matplotlib.pyplot as plt
 
-Common backends include TkAgg for desktop applications, Qt5Agg for interactive plots and 'notebook' for Jupyter environments.
+Common backends include TkAgg for desktop applications, Qt5Agg for interactive plots and 'notebook' for Jupyter environments, such as Jupyter notebooks.
 
 Pythreejs
 ======================
 
 .. warning::
 
-    This is a sparesly maintained python package. Compatability not guaranteed. Use at your own risk.
+    This is a sparsely maintained Python package. It's simple to use, but since compatability is not guaranteed, use it at your own risk.
 
 
 Example: Pendulum-cart
 -------------------------
 
-The example system we'll be animating is a three-link pendulum with a mass attached at the end. We'll ignore collision and friction forces for now.
+The example system we'll be animating is a pendulum with a mass attached at the end. We'll ignore collision and friction forces for now.
 
 .. figure:: figures/pendulum_w_cart.png
    :scale: 60%
@@ -390,6 +427,7 @@ where
     \end{bmatrix}
 
 
+
 .. jupyter-execute::
 
     import pythreejs as pj
@@ -403,24 +441,19 @@ where
         g = 9.81
         S, C = np.sin(theta), np.cos(theta)
 
-        # Mass matrix W(q)
         W = np.array([
             [M + m,      m*L*C],
             [m*L*C,      m*L**2]
         ])
 
-        # Nonlinear terms (Coriolis + gravity)
         f = np.array([
             -m*L*S*theta_dot**2,
             m*g*S
         ])
 
-        # Solve for accelerations: W * q_ddot + f = 0  →  q_ddot = -W^{-1} f
-        q_ddot = np.linalg.solve(W, -f)
-
+        q_ddot = np.linalg.solve(W, -f) # Solve to get rhs
         x_ddot, theta_ddot = q_ddot[0], q_ddot[1]
-
-        return [theta_dot, theta_ddot, x_dot, x_ddot]
+        return [theta_dot, theta_ddot, x_dot, x_ddot] # Same shape as input
 
 
     time = np.arange(0, 30, 0.1)
@@ -500,6 +533,10 @@ Threejs
 Example: Sphere in bowl
 ------------------------
 
+
+.. code:: javascript
+
+    var a = 2
 
 .. dropdown:: Derivation
 
