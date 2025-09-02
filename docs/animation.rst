@@ -290,11 +290,14 @@ Pythreejs
 
     This is a sparsely maintained Python package. It's simple to use, but since compatability is not guaranteed, use it at your own risk.
 
+`Pythreejs <https://pythreejs.readthedocs.io/en/stable/>`_ is a Jupyter widgets based notebook extension (libary made specifically for Jupyter notebooks) that makes it possible to use
+some of the capabilities of the widely popular 3D animation framework `threejs <https://threejs.org>`_. From the name you probably figured out that threejs is written in Javascript.
+Since we use Python in this course we'll introduce threejs through pythreejs first, and then take a look at threejs. In this section we'll go through a simple example using pythreejs. We'll introduce concepts such as *scenes*, *cameras* and much more.
 
 Example: Pendulum-cart
 -------------------------
 
-The example system we'll be animating is a pendulum with a mass attached at the end. We'll ignore collision and friction forces for now.
+The example system we'll be animating is a pendulum with a mass or bob attached at the end. We'll ignore collision and friction forces for now.
 
 .. figure:: figures/pendulum_w_cart.png
    :scale: 60%
@@ -426,15 +429,11 @@ where
     mL\cos\theta & mL^2
     \end{bmatrix}
 
-
+We'll start by defining our system of first order ODEs as a Python function
 
 .. jupyter-execute::
 
-    import pythreejs as pj
-    import ipywidgets as widgets
     import numpy as np
-    from IPython.display import display
-    from scipy.integrate import odeint
 
     def cart_pendulum_ode(state, t, L, m, M):
         theta, theta_dot, x, x_dot = state
@@ -455,76 +454,144 @@ where
         x_ddot, theta_ddot = q_ddot[0], q_ddot[1]
         return [theta_dot, theta_ddot, x_dot, x_ddot] # Same shape as input
 
+We'll then define our parameters and generate our trajectory by integrating with SciPy.
 
-    time = np.arange(0, 30, 0.1)
-    L = 3
-    m = 1
-    M = 3
+.. jupyter-execute::
+
+    from scipy.integrate import odeint
+
+    time = np.arange(0, 30, 0.1) # 30 seconds, 100ms step size
+    L = 3 # meters
+    m = 1 # kg
+    M = 3 # kg
     initial_state = [0.7, 0, 0, 0]
     solution = odeint(cart_pendulum_ode, initial_state, time, args=(L, m, M))
 
-    cart_y = 0.5
+We then have to extract the cartesian coordinates of the pendulum bob and the cart.
+Here we can define additional offsets, such as where in the scene the cart is placed initially etc.
 
-    x_pos = solution[:, 2]
-    x_vals = [[x, cart_y, 0] for x in x_pos]
+.. jupyter-execute::
 
-    pendulum_vals = [
+
+    cart_y = 0.5 # Y-offset
+
+    x_pos = solution[:, 2] # Solution has the following shape [time, state(s)]
+    x_vals = [[x, cart_y, 0] for x in x_pos] # Append the additional Y-offset
+
+    pendulum_vals = [ # We have to convert the generalized coordinates into cartesian coordinates
         [x + L*np.sin(theta), cart_y - L*np.cos(theta), 0]
         for theta, x in zip(solution[:,0], x_pos)
     ]
 
+Pythreejs expects a contiguous (flattened) list of coordinates, and not a multidimentional array, so we'll have to flatten our
+coordinate arrays to get it on the form :math:`[x0, y0, z0, x1, y1, z1, x2 ...]`. Luckily, numpy has a built-in mathod to
+flatten ND-arrays to 1D arrays, namely :code:`.ravel()`
+
+.. jupyter-execute::
+
     cart_values = np.asarray(x_vals).ravel()
     pend_values = np.asarray(pendulum_vals).ravel()
 
+We now have the trajectory we want to animate. Next up is importing pythreejs and setting up our **scene**.
+In animation, a scene is an environment containing 3D models, lights, cameras, and other elements arranged and animated together to represent a specific part of an animation sequence.
+We start by defining our camera, which will be what we observe our scene through. There are many possible parameters we can tweak, but the most important
+are its `aspect ratio <https://en.wikipedia.org/wiki/Aspect_ratio_(image)>`_ and position.
 
+.. jupyter-execute::
 
-
-    # Animation
+    import pythreejs as pj
+    import ipywidgets as widgets
+    from IPython.display import display
 
     camera = pj.PerspectiveCamera(position=[0, 0, 7], aspect=6/4)
+
+We'll then define our scene. In pythreejs, we define a scene by passing a list of objects to the *children=* parameter.
+These children represent all the elements contained within the scene, including cameras, light sources and meshes.
+When the scene is rendered, every child object in this list is included and displayed together as part of the scene.
+This allows easy grouping of all objects that make up the 3D environment. In this example we'll use directional light as a light source,
+which we have to set a position and intensity for. Other light sources, such as ambient light, can also be used.
+
+.. jupyter-execute::
+
     scene = pj.Scene(children=[camera, pj.DirectionalLight(position=[0, 3, 7], intensity=0.6),])
     renderer = pj.Renderer(scene=scene, camera=camera, controls=[pj.OrbitControls(controlling=camera)], width=600, height=400)
 
+We now have have a scene to put our objects into. Pythreejs includes geometric primitives we can use to represent elemenst like our cart and pendulum.
+Each object in the scene must be associated with a **mesh**, which is a combination of geometry (the shape of the object) and material (its appearance).
+The renderer is the component that converts the entire scene, including all meshes, lights and cameras, into pixels displayed on the screen. Since the
+renderer cannot process abstract objects directly, meshes serve as the concrete representations of these objects that can be rendered visually.
+This setup ensures that every object has a defined shape and appearance allowing the renderer to generate the final visual output of the scene accurately.
+For every mesh we also need to specify its material. In this example we'll use MeshLambertMaterial, which tells Pythreejs to render our meshes with `lambertian reflectance <https://en.wikipedia.org/wiki/Lambertian_reflectance>`_.
 
+.. jupyter-execute::
 
     cart = pj.BoxGeometry(1, 1, 1)
     cart_mesh = pj.Mesh(cart, material=pj.MeshLambertMaterial(color='red', side='FrontSide'))
+    bob = pj.SphereGeometry(radius=0.2)
+    bob_mesh = pj.Mesh(bob, pj.MeshLambertMaterial(color='blue'))
+    rod = pj.CylinderGeometry(radiusTop=0.05, radiusBottom=0.05, height=L)
+    rod_mesh = pj.Mesh(rod, material=pj.MeshLambertMaterial(color='black'))
+
+In case where multiple objects having the same relative motion, we can define a group. Much like a rigid group in mechanics, we can define
+objects' relative position within that group. In the case of the cart and pendulum we know that the bob and rod will have have the same relative
+movement around the pivot the rod is attached to. This can simplify our animation, since we can use the angle of the pendulum to animate the
+motion of the mass and rod instead of the individual cartesian coordinates over time.
+
+.. jupyter-execute::
 
     pivot = pj.Group(position=[0, 0, 0])
     cart_mesh.add(pivot)
-    scene.add(cart_mesh)
+    scene.add(cart_mesh) # Make sure to add pivot to cart before adding to scene
 
-    rod = pj.CylinderGeometry(radiusTop=0.05, radiusBottom=0.05, height=L)
-    rod_mesh = pj.Mesh(rod, material=pj.MeshLambertMaterial(color='black'))
     rod_mesh.position = [0, -L/2, 0] # top at pivot
-    pivot.add(rod_mesh)
-
-    bob = pj.SphereGeometry(radius=0.2)
-    bob_mesh = pj.Mesh(bob, pj.MeshLambertMaterial(color='blue'))
     bob_mesh.position = [0, -L, 0] # at end of rod
+
+    pivot.add(rod_mesh)
     pivot.add(bob_mesh)
 
-    angles = solution[:, 0]
-    pend_values = np.array([[0 , 0, np.sin(a/2), np.cos(a/2)] for a in angles])
+We now have all the objects and meshes we need in our scene. We now need to link the motion of our system to the individual components
+in our scene. This is done with **keyframe tracks** which determine the motion of objects througout our animation.
+Keyframe tracks store arrays of keyframe data and interpolate between these keyframes to create smooth animations of various properties (positions, rotations, scales, colors, etc.) over time.
+To be able to easily track our objects we give names to each of the meshes and groups in our scene.
+
+We can then define the keyframe track of the position of the cart. The :code:`VectorKeyframeTrack` takes the target object and property,
+an array of time values, and corresponding position vectors
+
+Animating the rotation of the pivot group requires us to use quaternions (see Quaternions page).
+Quaternions provide a robust way to represent rotations without suffering from gimbal lock, and they interpolate smoothly between orientations.
+For a pendulum rotating around the z-axis, we construct quaternions where the rotation angle θ maps to the quaternion :math:`[0, 0, sin(θ/2), cos(θ/2)]`:
+
+.. note::
+
+    Naming needs to be in the same Jupyter notebook block where they are used
+
+.. jupyter-execute::
+
     cart_mesh.name = "cart_mesh"
     pivot.name = "pivot"
 
-    cart_values = cart_values.astype(np.float32)
-    pend_values = pend_values.astype(np.float32)
-
     cart_position_track = pj.VectorKeyframeTrack(name="cart_mesh.position", times=time, values=cart_values)
+    angles = solution[:, 0]
+    pend_values = np.array([[0 , 0, np.sin(a/2), np.cos(a/2)] for a in angles]) # Quaternions
     rotation_track = pj.QuaternionKeyframeTrack("pivot.quaternion", times=time, values=pend_values)
+
+The :code:`AnimationAction` object provides methods to play, pause, stop, and control the animation.
+The :code:`AnimationMixer` handles the actual updating of object properties based on the keyframe data, while the :code:`AnimationClip` bundles together all the keyframe tracks that should play simultaneously.
+
+.. jupyter-execute::
+
     clip = pj.AnimationClip(tracks=[cart_position_track, rotation_track], duration=time[-1])
     mixer = pj.AnimationMixer(cart_mesh)
     action = pj.AnimationAction(mixer, clip, cart_mesh)
-    renderer.layout = widgets.Layout(width="100%", height="auto")
+    renderer.layout = widgets.Layout(width="100%", height="auto") # For display compatability
 
     renderer
+
+We then call action in a seperate block to control our animation.
 
 .. jupyter-execute::
 
     action
-
 
 Threejs
 ======================
