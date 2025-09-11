@@ -100,14 +100,14 @@ assumption we make.
 
 .. admonition:: Assumptions
 
-    1. All components are rigid bodies: By assuming this we disregard any bending/tortion/elasticity in our components. Effects like vibrations disappear from our model
+    1. All components are rigid bodies: By assuming this we disregard any bending/torsion/elasticity in our components. Effects like vibrations disappear from our model
 
 
 Starting from this assumption, let’s examine the most essential feature
 of a bicycle, namely its wheels.
 
 The bike wheel
-~~~~~~~~~~~~~~
+---------------
 
 Looking at the bike wheel, the most obvious and simplest way of
 modelling it is as a simple flywheel. This adds a new term to our list
@@ -115,13 +115,14 @@ of assumptions.
 
 .. admonition:: Assumptions
 
-    1. All components are rigid bodies: By assuming this we disregard any bending/tortion/elasticity in our components. Effects like vibrations disappear from our model
+    1. All components are rigid bodies: By assuming this we disregard any bending/torsion/elasticity in our components. Effects like vibrations disappear from our model
     2. The mass of our wheels is evenly distributed: This is not usually the case, as the spokes of a bike wheel have less mass than the main wheel.
 
 Animation
-^^^^^^^^^
+---------
 
-    Note: Please look at the `3D Animation in Python
-    page <https://ttk4130.github.io/animation.html>`__ for an
-    introduction to how you make animations in Python
+.. note::
+
+    Please look at the `animation page <https://ttk4130.github.io/animation.html>`_ for an
+    introduction to how you make animations in Python.
 
