@@ -673,25 +673,25 @@ For convenience, we'll use SymPy to derive our equations of motion (see :ref:`Nu
         z_center = h + r / sm.sqrt(1 + h.diff(x)**2 + h.diff(y)**2)
         z_center
 
-    We'll now construct our Lagrangian using sphere center height, speed and angular velocity.
+    We'll now construct our Lagrangian using sphere center height, speed and absolute angular velocity.
 
     .. jupyter-execute::
 
         x_dot, y_dot = x.diff(), y.diff()
         h_dot = h.diff(x)*x_dot + h.diff(y)*y_dot # Chain rule
 
-        v_c = sm.sqrt(x_dot**2 + y_dot**2 + h_dot**2)
+        v_c = sm.sqrt(x_dot**2 + y_dot**2 + h_dot**2) # Small slope approximation
 
-        # Angular velocities
-        w_x = -y_dot/r
-        w_y = x_dot/r
+        # Absolute angular velocity
+        omega_magnitude = v_c / r
+
 
     Using the formula for the inertia of a sphere :math:`\frac{2 m {r^2}}{5}`
 
     .. jupyter-execute::
 
         T_translational = (1/2)*m*v_c**2
-        T_rotational = (1/2)*(2/5)*m*(r**2)*(w_x**2 + w_y**2) # Standard sphere inertia
+        T_rotational = (1/2)*(2/5)*m*(r**2)*(omega_magnitude**2) # Standard sphere inertia
         T = T_translational + T_rotational
 
         V = m*g*z_center
@@ -747,7 +747,7 @@ We can now define the parameters and initial state and simulate our system.
     t_span = (0, 30) # 30 seconds
     t_eval = np.linspace(0, 30, 3000) # dt = 0.01
 
-We'll SciPy's :code:`solve_ivp` as our integrator and use RK45 as a numerical method, which is the default integration method.
+We'll use SciPy's :code:`solve_ivp` as our integrator and RK45 as the numerical method, which is the default integration method in SciPy.
 
 .. jupyter-execute::
 
@@ -779,7 +779,10 @@ We'll first calculate all the trajectories we might need when animating our syst
     y_traj = solution.y[2]
     x_dot_traj = solution.y[1]
     y_dot_traj = solution.y[3]
+    norm_factor = np.sqrt(1 + (x_traj/2)**2 + (y_traj/2)**2)
 
+    x_center_traj = x_traj - r_val * (x_traj/2) / norm_factor
+    y_center_traj = y_traj - r_val * (y_traj/2) / norm_factor
     z_contact_traj = (1/4)*(x_traj**2 + y_traj**2)
     z_center_traj = z_center_func(x_traj, y_traj, r_val)
 
@@ -797,8 +800,8 @@ essentially an object that holds some data.
         'x_contact': x_traj,
         'y_contact': y_traj,
         'z_contact': z_contact_traj,
-        'x_center': x_traj, # This is just an approximation for now
-        'y_center': y_traj, # Same here
+        'x_center': x_center_traj,
+        'y_center': y_center_traj,
         'z_center': z_center_traj,
         'mass': m_val,
         'radius': r_val,
@@ -855,20 +858,169 @@ For this example we'll use Three.js version 0.150.1.
     </script>
 
 Next we'll create a container where our animation will be displayed. We can specify size, color and style
-our our container.
+of our container. For maximum compatability we recommend picking a container size which scales with the screen its is 
+displayed on. We'll pick 100% width and a minimum height in order to scale the container with the screen. You 
+can also define border width and color.
 
 .. code::
 
-    <div id="threejs-container" style="width: 600px; height: 400px; border: 1px solid #ccc;"></div>
+    <div id="threejs-container" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555;"></div>
 
 With all the imports and containers in place, we can now start writing our animation.
-In a new script block we'll create a new scene.
+In a new script block we'll create a new scene inside an E6 module using :code:`<script type="module">`.
+We'll start by importing Three.js and OrbitControls. OrbitControls is just a simple example script which makes 
+the animation window interactive. This gives you controls such as zoom and pan when displaying your animation.
+
+.. code::
+
+    <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js';
+    // Rest of your animation code goes here
+    </script>
+
+Continuing inside our script block we'll start by getting some information from the threejs-container to get the correct
+height and width.
+
+.. code::
+
+    const container = document.getElementById('threejs-container')
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+Now we'll create the objects we need to display our scene. All objects in a Three.js animation are contained by a Scene object.
+
+.. code::
+    
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1e1e1e); // Set background color for scene
+
+We use a camera object to specify how a scene is viewed. There are many different camera models that can be used, but
+the most common one is the `PerspectiveCamera <https://threejs.org/docs/#api/en/cameras/PerspectiveCamera>`_. We have to define the field of view, aspect ratio and furstum of our camera.
+Together with the field of view the frustum is the 3D volume that defines what gets rendered on screen. It's shaped like a pyramid with the camera at the apex.
+This is to avoid having to render objects that we're not viewing. We'll also set our camera position, although later this will
+be controlled by the OrbitControls. 
+
+.. code::
+    
+    const camera = new THREE.PerspectiveCamera(75, containerWidth/containerHeight, 0.1, 1000);
+    camera.position.set(3,3,3);
+
+
+Next up we'll create the scene renderer. This is the program the determines how the scene is converted into viewable frames
+displayed on our screen. We'll have to specify the type of renderer, window size and pixel ratio to make our animation compatible with
+screens of different sizes and resolutions. We'll also enable antialiasing to make edges appear more smooth. The renderer draws its output to domElement, which is a `canvas <https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/canvas>`_ HTML element made for drawing
+graphics and animations. To make the render drawing appear in our container we just need to add the domElement with appendChild.
+
+
+
+.. code::
+    
+    const renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(containerWidth, containerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+The next natural step is to add some lightning. The most common light sources are AmbientLight and DirectionalLight.
+Ambient light will light all elements in the scene evenly, while the directional light will have the added effect of 
+casting shadows. Let's add them to our scene
+
+.. code::
+
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.4); // (color, intensity)
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8); (color, intensity)
+    directionalLight.position.set(5, 5, 5); // Default target light points to is (0, 0, 0)
+    directionalLight.castShadow = true; // Expensive, but pretty
+    scene.add(directionalLight);
+
+Next up we'll add our camera controls. We've already imported an example module of orbit controls which 
+allows us to zoom, rotate and pan out camera interactively. We'll pick the settings we want as well as
+specifying which camera we're controlling and which canvas (scene).
+
+.. code::
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.enableZoom = true;
+    controls.enablePan = true;
+    controls.enableRotate = true;
+
+The last and final step in any animation in Three.js is defining and running our animation loop.
+We'll also add some axes to have something to look at. 
+
+.. code::
+
+    const axesHelper = new THREE.AxesHelper(1.5);
+    scene.add(axesHelper); // Just for reference
+
+    function animate(){
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+    }
+    
+    animate(); // Run animation
+
+:code:`requestAnimationFrame(animate)` schedules the next frame in our animation by telling the browser to call `animate` before the next repaint, which is usually around 60 times
+per second. This automatically synchronizes the animation loop with the display refresh rate. If you want you animation to only animate according to your own frame rate you'll have to add extra logic. 
+:code:`controls.update()` updates the camera controls by processing mouse movements, clicks etc. :code:`renderer.render(scene, camera)` renders the entire scene from the camera's perspective. You should now be able to view and interact with the 
+following animation window.
+
+.. dropdown:: Script
+
+    .. code::
+
+        <div id="threejs-container" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555;"></div>
+        <script type="importmap">
+        {
+        "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js"
+        }
+        }
+        </script>
+        <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js';
+        const container = document.getElementById('threejs-container');
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1e1e1e);
+        const camera = new THREE.PerspectiveCamera(75, containerWidth/containerHeight, 0.1, 1000);
+        camera.position.set(3,3,3)
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(containerWidth, containerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = true; 
+        controls.enablePan = true;
+        controls.enableRotate = true;   
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 5, 5);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+        const axesHelper = new THREE.AxesHelper(1.5);
+        scene.add(axesHelper);
+        function animate(){
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+        </script>
+
 
 .. raw:: html
 
     <div id="threejs-container" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555;"></div>
-    <div id="controls" style="margin-top: 10px;">
-    </div>
     <script type="importmap">
     {
      "imports": {
@@ -888,24 +1040,20 @@ In a new script block we'll create a new scene.
     camera.position.set(3,3,3)
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(containerWidth, containerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio); // For high DPI displays
+    renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.enableZoom = true;      // Disable zoom
-    controls.enablePan = true;        // Enable panning
-    controls.enableRotate = true;    // Disable rotation
-    // Lighting setup
+    controls.enableZoom = true; 
+    controls.enablePan = true;
+    controls.enableRotate = true;   
     const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
     scene.add(ambientLight);
-
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(5, 5, 5);
     directionalLight.castShadow = true;
     scene.add(directionalLight);
-
-    // Coordinate axes for reference
     const axesHelper = new THREE.AxesHelper(1.5);
     scene.add(axesHelper);
     function animate(){
@@ -916,6 +1064,110 @@ In a new script block we'll create a new scene.
     animate();
     </script>
 
+Looking good! 
+
+Next up we'll make a parabolic surface. 
+
+.. code::
+
+    const geometry = new THREE.PlaneGeometry
+
+
+.. raw:: html
+
+    <div id="threejs-container-2" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555;"></div>
+    <script type="importmap">
+    {
+     "imports": {
+       "three": "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js"
+     }
+    }
+    </script>
+    <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js';
+    const container = document.getElementById('threejs-container-2');
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1e1e1e);
+    const camera = new THREE.PerspectiveCamera(75, containerWidth/containerHeight, 0.1, 1000);
+    camera.position.set(3,3,3)
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(containerWidth, containerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.enableZoom = true; 
+    controls.enablePan = true;
+    controls.enableRotate = true;   
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 0, 7);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
+
+    const geometry = new THREE.PlaneGeometry(3, 3, 100, 100);
+    const material = new THREE.MeshLambertMaterial({color: 0xffff00, side: THREE.DoubleSide});
+    const plane = new THREE.Mesh(geometry, material);
+    const positionAttribute = geometry.attributes.position;
+
+    const trailPoints = [];
+    const maxTrailLength = 2000;
+    const trailGeometry = new THREE.BufferGeometry().setFromPoints(trailPoints);
+    const trailMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    const trail = new THREE.Line(trailGeometry, trailMaterial);
+    scene.add(trail);
+
+    for (let i = 0; i < positionAttribute.count; i++){
+        let x = positionAttribute.getX(i);
+        let y = positionAttribute.getY(i);
+        let z = (1/4)*(x**2 + y**2);
+        positionAttribute.setZ(i, z);
+    }
+    positionAttribute.needsUpdate = true;
+    geometry.computeVertexNormals();
+
+    var simulation_data; 
+    fetch('_static/lagrange_bowl_simulation_data.json')
+        .then(response => response.json())
+        .then(data => {
+        simulation_data = data;
+        })
+        .catch(err => console.error('Error loading JSON:', err));
+
+    const sphere_geom = new THREE.SphereGeometry( 0.1, 32, 16);
+    const sphere_material = new THREE.MeshLambertMaterial( { color: 0x54AEC4 } ); 
+    const sphere = new THREE.Mesh(sphere_geom, sphere_material);
+    scene.add(sphere);
+    const spherePos = sphere.position;
+
+    var frame = 0;
+
+    scene.add(plane);
+    function animate(){
+        requestAnimationFrame(animate);
+        controls.update();
+        spherePos.set(simulation_data[frame].x_center, simulation_data[frame].y_center, simulation_data[frame].z_center)
+        spherePos.needsUpdate = true;
+        sphere_geom.computeVertexNormals();
+        trailPoints.push(spherePos.clone());
+        if (trailPoints.length > maxTrailLength) {
+            trailPoints.shift();
+        }
+
+        // Update trail geometry
+        trailGeometry.setFromPoints(trailPoints);
+        renderer.render(scene, camera);
+        frame = (frame + 1)%3000;
+    }
+    animate();
+
+
+    </script>
 
 Blender
 ==========
