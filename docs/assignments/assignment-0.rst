@@ -58,7 +58,7 @@ Explicit Euler and do the following tasks.
 
     a) Explain the forward Euler integration method in your own words. How does step size :math:`\Delta t` affect the integration error?
 
-    b) Write a Python function of the ordinary differential equation for the mass-damper-spring system in problem 1 similar to the following form
+    b) Write a Python function of the system of ordinary differential equations derived for the mass-damper-spring system in problem 1. The function must have the following canonical form
 
         .. code:: python
 
