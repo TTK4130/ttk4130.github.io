@@ -806,7 +806,9 @@ are several options for how the json file should be formatted. Since we're worki
 we want our data to be sequential and list like, so we'll use :code:`'records'` for the layout `‘records’ : list like [{column -> value}, … , {column -> value}]`.
 Indentation specifies how many spaces should be used to indent each record, which only affects readability.
 
-.. jupyter-execute::
+.. jupyter-execute could be used to generate it, but this unnecessary to do during build time
+
+.. code::
 
     file_location = "_static/lagrange_bowl_simulation_data.json" # Specific to this website
     simulation_data.to_json(file_location, orient='records', indent=2)
