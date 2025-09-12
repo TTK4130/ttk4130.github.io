@@ -211,6 +211,7 @@ Welcome to Modelling and Simulation!
     installation
     jupyter-notebook
     sympy-and-cas
+    animation
     reference-frames
     vector-kinematics
     mass-and-inertia
@@ -218,6 +219,7 @@ Welcome to Modelling and Simulation!
     quaternions
     numerical-methods-for-odes
     whats-next
+    project/index
     assignments/index
     lecture-notes/index
     sympy-live
