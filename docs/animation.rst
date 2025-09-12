@@ -618,9 +618,9 @@ By utilizing the power of modern web browsers and WebGL we can create versatile 
 It runs on all modern browsers without plugins, and offers real-time rendering, various geometries, lighting effects and interactive controls.
 It also supports more sophisticated tools for loading 3D models, post-processing effects and even virtual/augmented reality capabilities.
 
-In this section we'll cover some of the basics of creating animations using Threejs with a simple rolling ball example. This tutorial is by no means
+In this section we'll cover some of the basics of creating animations using Three.js with a simple rolling ball example. This tutorial is by no means
 comprehensive, and in fact we'll barely scratch the surface. We highly recommend you checking out the `impressive library of examples on the
-official website <https://threejs.org/examples/#webgl_animation_keyframes>`_.
+official website <https://threejs.org/examples/#webgl_animation_keyframes>`_. For a more in-depth introduction to Three.js, check out `Discover Threejs <https://discoverthreejs.com>`_.
 
 Example: Sphere in bowl simulation
 ------------------------------------
@@ -779,14 +779,12 @@ We'll first calculate all the trajectories we might need when animating our syst
     y_traj = solution.y[2]
     x_dot_traj = solution.y[1]
     y_dot_traj = solution.y[3]
-    norm_factor = np.sqrt(1 + (x_traj/2)**2 + (y_traj/2)**2)
+    norm_factor = np.sqrt(1 + (x_traj/2)**2 + (y_traj/2)**2) # Good approximation for small slope
 
     x_center_traj = x_traj - r_val * (x_traj/2) / norm_factor
     y_center_traj = y_traj - r_val * (y_traj/2) / norm_factor
     z_contact_traj = (1/4)*(x_traj**2 + y_traj**2)
     z_center_traj = z_center_func(x_traj, y_traj, r_val)
-
-    # Skip angle for now
 
 To be able to export these trajectories to a json file we'll have to create a Pandas :code:`DataFrame`, which is
 essentially an object that holds some data.
@@ -797,15 +795,9 @@ essentially an object that holds some data.
 
     simulation_data = pd.DataFrame({
         'time' : time,
-        'x_contact': x_traj,
-        'y_contact': y_traj,
-        'z_contact': z_contact_traj,
         'x_center': x_center_traj,
         'y_center': y_center_traj,
         'z_center': z_center_traj,
-        'mass': m_val,
-        'radius': r_val,
-        'gravity': g_val
     })
 
 Exporting to a json file is as simple as calling :code:`.to_json()` for your dataframe.
@@ -816,7 +808,7 @@ Indentation specifies how many spaces should be used to indent each record, whic
 
 .. jupyter-execute::
 
-    file_location = "_static/lagrange_bowl_simulation_data.json"
+    file_location = "_static/lagrange_bowl_simulation_data.json" # Specific to this website
     simulation_data.to_json(file_location, orient='records', indent=2)
 
 
@@ -1066,12 +1058,221 @@ following animation window.
 
 Looking good! 
 
-Next up we'll make a parabolic surface. 
+Next up we'll make a parabolic surface for the ball to roll on. We can use the function
+`PlaneGeometry() <https://threejs.org/docs/?q=plane#api/en/geometries/PlaneGeometry>`_ to
+create our initial plane. In 3D graphics everything is made up of triangles (vertices), so
+for every object we create we have to tell Three.js how many triangles it should be made of
+as well as its dimensions. We'll create a 3x3 plane with 100 segments/triangles in each dimension.
+As with any geometry in Three.js, we can the combine it with a material to create a mesh our
+renderer can work with.
 
 .. code::
 
-    const geometry = new THREE.PlaneGeometry
+    const plane_geometry = new THREE.PlaneGeometry(3, 3, 100, 100);
+    const plane_material = new THREE.MeshLambertMaterial({color: 0xFF6E00, side: THREE.DoubleSide}); // We want both sides of the surface to be rendered
+    const plane = new THREE.Mesh(geometry, material);
 
+We then have to modify our plane to approximate a smooth parabolic surface.
+This is as simple as iterating through each vertex on our plane and apply the
+surface formula we defined earlier. We can modify the positions in our plane with the position attribute.
+We then iterate through each position and modify the z-value. After modifying
+all the points on the plane we have to tell Three.js that our geometry needs updating. Additionally,
+since we're using a shader we have to recompute the surface normals which are used by the shader.
+
+.. code::
+
+    const positionAttribute = plane_geometry.attributes.position;
+
+    for (let i = 0; i < positionAttribute.count; i++){
+        let x = positionAttribute.getX(i);
+        let y = positionAttribute.getY(i);
+        let z = (1/4)*(x**2 + y**2);
+        positionAttribute.setZ(i, z);
+    }
+    positionAttribute.needsUpdate = true;
+    plane_geometry.computeVertexNormals();
+    scene.add(plane); // Don't forget to add the mesh to our scene!
+
+
+Next we'll add our sphere as a `SphereGeometry() <https://threejs.org/docs/?q=sphere#api/en/geometries/SphereGeometry>`_.
+Similarly to the plane we'll have to define its segment count. We'll also give it a name so
+that we can reference it later when we add our animation. For later use we'll also extract its position
+object.
+
+.. code::
+
+    const sphere_geom = new THREE.SphereGeometry( 0.1, 32, 16);
+    const sphere_material = new THREE.MeshLambertMaterial( { color: 0xFA902D } );
+    const sphere = new THREE.Mesh(sphere_geom, sphere_material);
+    sphere.name = 'sphere';
+    scene.add(sphere);
+    const spherePos = sphere.position;
+
+We now have all the objects we want to animate. We'll now create an `AnimationMixer <https://threejs.org/docs/?q=animation#api/en/animation/AnimationMixer>`_.
+The AnimationMixer is a player for animations on a particular object in the scene. We usually create one per object if
+the objects move independently. In our case we only have one moving object so we'll only create one.
+
+.. code::
+
+    const mixer = new THREE.AnimationMixer(scene);
+
+We now have to set up all the necessary objects needed to animate our sphere.
+
+.. code::
+
+    var simulation_data;
+    fetch('_static/lagrange_bowl_simulation_data.json')
+        .then(response => response.json())
+        .then(data => {
+            simulation_data = data;
+
+            const times = simulation_data.map(frame => frame.time);
+            const positions = simulation_data.flatMap(frame => [frame.x_center, frame.y_center, frame.z_center]);
+
+            const positionTrack = new THREE.VectorKeyframeTrack('sphere.position', times, positions);
+            const clip = new THREE.AnimationClip('simulation', times[times.length-1], [positionTrack]);
+            const action = mixer.clipAction(clip);
+            action.setLoop(THREE.LoopRepeat);
+            action.play();
+        })
+        .catch(err => console.error('Error loading JSON:', err));
+
+
+This snippet fetches simulation data from the json file we made previously, parses it and uses to create a `VectorKeyframeTrack <https://threejs.org/docs/?q=vector#api/en/animation/tracks/VectorKeyframeTrack>`_ of the sphere’s motion.
+The json frames contain a timestamp and the sphere’s center coordinates, which are extracted into arrays of times and positions.
+These values build a VectorKeyframeTrack that defines how the sphere’s position evolves over time.
+The track is wrapped into an AnimationClip, linked to an animation mixer, set to loop and then played.
+The reason we use a VectorKeyframeTrack instead of the animation loop we made earlier is to avoid having to
+calculate the time step for each track and interpolate if we're in between frames. Using VectorKeyframeTracks
+Three.js makes sure the animation is animated in the correct playback speed and interpolates between positions.
+The final step to make our sphere animated is to add the mixer to our animation loop. We'll only
+need to provide the time elapsed between the last frame/loop. This is fairly simple to do with
+the `Clock <https://threejs.org/docs/?q=clock#api/en/core/Clock>`_ object.
+
+.. code::
+
+    const clock = new THREE.Clock();
+
+    function animate(){
+        requestAnimationFrame(animate);
+        controls.update();
+        const deltaTime = clock.getDelta();
+        mixer.update(deltaTime);
+        renderer.render(scene, camera);
+    }
+    animate();
+
+That's it! You should now see your ball rolling around in the parabolic bowl.
+If you want, you can add a little visual flair by adding a trailing line.
+
+.. dropdown:: Script
+
+    .. code::
+
+        <div id="threejs-container-2" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555;"></div>
+        <script type="importmap">
+        {
+         "imports": {
+           "three": "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js"
+         }
+        }
+        </script>
+        <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js';
+        const container = document.getElementById('threejs-container-2');
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1e1e1e);
+        const camera = new THREE.PerspectiveCamera(75, containerWidth/containerHeight, 0.1, 1000);
+        camera.position.set(3,3,3)
+        camera.up.set(0, 0, 1);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(containerWidth, containerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = true;
+        controls.enablePan = true;
+        controls.enableRotate = true;
+
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 0, 7);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+
+        const plane_geometry = new THREE.PlaneGeometry(3, 3, 100, 100);
+        const plane_material = new THREE.MeshLambertMaterial({color: 0xFF6E00, side: THREE.DoubleSide});
+        const plane = new THREE.Mesh(plane_geometry, plane_material);
+
+        const positionAttribute = plane_geometry.attributes.position;
+
+        for (let i = 0; i < positionAttribute.count; i++){
+            let x = positionAttribute.getX(i);
+            let y = positionAttribute.getY(i);
+            let z = (1/4)*(x**2 + y**2);
+            positionAttribute.setZ(i, z);
+        }
+        positionAttribute.needsUpdate = true;
+        plane_geometry.computeVertexNormals();
+        scene.add(plane);
+
+        const sphere_geometry = new THREE.SphereGeometry( 0.1, 32, 16);
+        const sphere_material = new THREE.MeshLambertMaterial( { color: 0xFA902D } );
+        const sphere = new THREE.Mesh(sphere_geometry, sphere_material);
+        sphere.name = 'sphere';
+        scene.add(sphere);
+        const spherePos = sphere.position;
+
+        const trailPoints = [];
+        const maxTrailLength = 2000;
+        const trailGeometry = new THREE.BufferGeometry().setFromPoints(trailPoints);
+        const trailMaterial = new THREE.LineBasicMaterial({ color: 0xF5F5F5 });
+        const trail = new THREE.Line(trailGeometry, trailMaterial);
+        scene.add(trail);
+
+        const mixer = new THREE.AnimationMixer(scene);
+
+        var simulation_data;
+        fetch('_static/lagrange_bowl_simulation_data.json')
+            .then(response => response.json())
+            .then(data => {
+                simulation_data = data;
+
+                const times = simulation_data.map(frame => frame.time);
+                const positions = simulation_data.flatMap(frame => [frame.x_center, frame.y_center, frame.z_center]);
+
+                const positionTrack = new THREE.VectorKeyframeTrack('sphere.position', times, positions);
+                const clip = new THREE.AnimationClip('simulation', times[times.length-1], [positionTrack]);
+                const action = mixer.clipAction(clip);
+                action.setLoop(THREE.LoopRepeat);
+                action.play();
+            })
+            .catch(err => console.error('Error loading JSON:', err));
+
+        const clock = new THREE.Clock();
+
+        function animate(){
+            requestAnimationFrame(animate);
+            controls.update();
+            const deltaTime = clock.getDelta();
+            mixer.update(deltaTime);
+            trailPoints.push(spherePos.clone());
+            if (trailPoints.length > maxTrailLength) {
+                trailPoints.shift();
+            }
+            trailGeometry.setFromPoints(trailPoints);
+            renderer.render(scene, camera);
+        }
+        animate();
+        </script>
 
 .. raw:: html
 
@@ -1093,6 +1294,7 @@ Next up we'll make a parabolic surface.
     scene.background = new THREE.Color(0x1e1e1e);
     const camera = new THREE.PerspectiveCamera(75, containerWidth/containerHeight, 0.1, 1000);
     camera.position.set(3,3,3)
+    camera.up.set(0, 0, 1);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(containerWidth, containerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -1100,9 +1302,9 @@ Next up we'll make a parabolic surface.
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.enableZoom = true; 
+    controls.enableZoom = true;
     controls.enablePan = true;
-    controls.enableRotate = true;   
+    controls.enableRotate = true;
     const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
     scene.add(ambientLight);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -1110,17 +1312,11 @@ Next up we'll make a parabolic surface.
     directionalLight.castShadow = true;
     scene.add(directionalLight);
 
-    const geometry = new THREE.PlaneGeometry(3, 3, 100, 100);
-    const material = new THREE.MeshLambertMaterial({color: 0xffff00, side: THREE.DoubleSide});
-    const plane = new THREE.Mesh(geometry, material);
-    const positionAttribute = geometry.attributes.position;
+    const plane_geometry = new THREE.PlaneGeometry(3, 3, 100, 100);
+    const plane_material = new THREE.MeshLambertMaterial({color: 0xFF6E00, side: THREE.DoubleSide});
+    const plane = new THREE.Mesh(plane_geometry, plane_material);
 
-    const trailPoints = [];
-    const maxTrailLength = 2000;
-    const trailGeometry = new THREE.BufferGeometry().setFromPoints(trailPoints);
-    const trailMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
-    const trail = new THREE.Line(trailGeometry, trailMaterial);
-    scene.add(trail);
+    const positionAttribute = plane_geometry.attributes.position;
 
     for (let i = 0; i < positionAttribute.count; i++){
         let x = positionAttribute.getX(i);
@@ -1129,48 +1325,63 @@ Next up we'll make a parabolic surface.
         positionAttribute.setZ(i, z);
     }
     positionAttribute.needsUpdate = true;
-    geometry.computeVertexNormals();
+    plane_geometry.computeVertexNormals();
+    scene.add(plane);
 
-    var simulation_data; 
-    fetch('_static/lagrange_bowl_simulation_data.json')
-        .then(response => response.json())
-        .then(data => {
-        simulation_data = data;
-        })
-        .catch(err => console.error('Error loading JSON:', err));
-
-    const sphere_geom = new THREE.SphereGeometry( 0.1, 32, 16);
-    const sphere_material = new THREE.MeshLambertMaterial( { color: 0x54AEC4 } ); 
-    const sphere = new THREE.Mesh(sphere_geom, sphere_material);
+    const sphere_geometry = new THREE.SphereGeometry( 0.1, 32, 16);
+    const sphere_material = new THREE.MeshLambertMaterial( { color: 0xFA902D } );
+    const sphere = new THREE.Mesh(sphere_geometry, sphere_material);
+    sphere.name = 'sphere';
     scene.add(sphere);
     const spherePos = sphere.position;
 
-    var frame = 0;
+    const trailPoints = [];
+    const maxTrailLength = 2000;
+    const trailGeometry = new THREE.BufferGeometry().setFromPoints(trailPoints);
+    const trailMaterial = new THREE.LineBasicMaterial({ color: 0xF5F5F5 });
+    const trail = new THREE.Line(trailGeometry, trailMaterial);
+    scene.add(trail);
 
-    scene.add(plane);
+    const mixer = new THREE.AnimationMixer(scene);
+
+    var simulation_data;
+    fetch('_static/lagrange_bowl_simulation_data.json')
+        .then(response => response.json())
+        .then(data => {
+            simulation_data = data;
+
+            const times = simulation_data.map(frame => frame.time);
+            const positions = simulation_data.flatMap(frame => [frame.x_center, frame.y_center, frame.z_center]);
+
+            const positionTrack = new THREE.VectorKeyframeTrack('sphere.position', times, positions);
+            const clip = new THREE.AnimationClip('simulation', times[times.length-1], [positionTrack]);
+            const action = mixer.clipAction(clip);
+            action.setLoop(THREE.LoopRepeat);
+            action.play();
+        })
+        .catch(err => console.error('Error loading JSON:', err));
+
+    const clock = new THREE.Clock();
+
     function animate(){
         requestAnimationFrame(animate);
         controls.update();
-        spherePos.set(simulation_data[frame].x_center, simulation_data[frame].y_center, simulation_data[frame].z_center)
-        spherePos.needsUpdate = true;
-        sphere_geom.computeVertexNormals();
+        const deltaTime = clock.getDelta();
+        mixer.update(deltaTime);
         trailPoints.push(spherePos.clone());
         if (trailPoints.length > maxTrailLength) {
             trailPoints.shift();
         }
-
-        // Update trail geometry
         trailGeometry.setFromPoints(trailPoints);
         renderer.render(scene, camera);
-        frame = (frame + 1)%3000;
     }
     animate();
 
 
     </script>
 
-Blender
-==========
+Blender (WIP)
+==============
 
 
 Example: Tennis racket theorem

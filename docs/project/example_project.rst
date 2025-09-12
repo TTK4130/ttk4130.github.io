@@ -123,6 +123,6 @@ Animation
 
 .. note::
 
-    Please look at the `animation page <https://ttk4130.github.io/animation.html>`_ for an
+    Please look at the animation page :ref:`3D Visualization and Animation` for an
     introduction to how you make animations in Python.
 
