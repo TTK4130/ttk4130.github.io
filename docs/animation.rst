@@ -59,8 +59,8 @@ Matplotlib.animation
     a more modern plotting library. However, Plotly it is not designed for 3D animation.
 
 Many of you are already familiar with the Matplotlib library. Inspired by Matlab's plotting library, Matplotlib offers many useful easy-to-use functions for plotting
-and visualizing data. While library was made with data visualization in mind, it also supports a rudamentary framework for plotting and animating in 3D.
-In this section we'll go through a basic example of a 3D pendulum with damping. For a more comprehensice introduction to Matplotlib.animation, take a look at
+and visualizing data. While library was made with data visualization in mind, it also supports a rudimentary framework for plotting and animating in 3D.
+In this section we'll go through a basic example of a 3D pendulum with damping. For a more comprehensive introduction to Matplotlib.animation, take a look at
 the `official documentation <https://matplotlib.org/stable/users/explain/animations/animations.html#animations-using-matplotlib>`_.
 
 Example: Pendulum
@@ -200,7 +200,7 @@ Integrating with SciPy
     theta, phi = sol.y[0], sol.y[2] # Extract trajectory polar coordinates
 
 
-Polar coordinates can be tricky to work with, so to make animation simpler we convert to cartesian
+Polar coordinates can be tricky to work with, so to make animation simpler we convert to Cartesian
 
 .. jupyter-execute::
 
@@ -288,9 +288,9 @@ Pythreejs
 
 .. warning::
 
-    This is a sparsely maintained Python package. It's simple to use, but since compatability is not guaranteed, use it at your own risk.
+    This is a sparsely maintained Python package. It's simple to use, but since compatibility is not guaranteed, use it at your own risk.
 
-`Pythreejs <https://pythreejs.readthedocs.io/en/stable/>`_ is a Jupyter widgets based notebook extension (libary made specifically for Jupyter notebooks) that makes it possible to use
+`Pythreejs <https://pythreejs.readthedocs.io/en/stable/>`_ is a Jupyter widgets based notebook extension (library made specifically for Jupyter notebooks) that makes it possible to use
 some of the capabilities of the widely popular 3D animation framework `threejs <https://threejs.org>`_. From the name you probably figured out that threejs is written in Javascript.
 Since we use Python in this course we'll introduce threejs through pythreejs first, and then take a look at threejs. In this section we'll go through a simple example using pythreejs. We'll introduce concepts such as *scenes*, *cameras* and much more.
 
@@ -472,7 +472,7 @@ We'll then define our parameters and generate our trajectory by integrating with
     initial_state = [0.7, 0, 0, 0]
     solution = odeint(cart_pendulum_ode, initial_state, time, args=(L, m, M))
 
-We then have to extract the cartesian coordinates of the pendulum bob and the cart.
+We then have to extract the Cartesian coordinates of the pendulum bob and the cart.
 Here we can define additional offsets, such as where in the scene the cart is placed initially etc.
 
 .. jupyter-execute::
@@ -483,13 +483,13 @@ Here we can define additional offsets, such as where in the scene the cart is pl
     x_pos = solution[:, 2] # Solution has the following shape [time, state(s)]
     x_vals = [[x, cart_y, 0] for x in x_pos] # Append the additional Y-offset
 
-    pendulum_vals = [ # We have to convert the generalized coordinates into cartesian coordinates
+    pendulum_vals = [ # We have to convert the generalized coordinates into Cartesian coordinates
         [x + L*np.sin(theta), cart_y - L*np.cos(theta), 0]
         for theta, x in zip(solution[:,0], x_pos)
     ]
 
-Pythreejs expects a contiguous (flattened) list of coordinates, and not a multidimentional array, so we'll have to flatten our
-coordinate arrays to get it on the form :math:`[x0, y0, z0, x1, y1, z1, x2 ...]`. Luckily, numpy has a built-in mathod to
+Pythreejs expects a contiguous (flattened) list of coordinates, and not a multidimensional array, so we'll have to flatten our
+coordinate arrays to get it on the form :math:`[x0, y0, z0, x1, y1, z1, x2 ...]`. Luckily, numpy has a built-in method to
 flatten ND-arrays to 1D arrays, namely :code:`.ravel()`
 
 .. jupyter-execute::
@@ -521,7 +521,7 @@ which we have to set a position and intensity for. Other light sources, such as 
     scene = pj.Scene(children=[camera, pj.DirectionalLight(position=[0, 3, 7], intensity=0.6),])
     renderer = pj.Renderer(scene=scene, camera=camera, controls=[pj.OrbitControls(controlling=camera)], width=600, height=400)
 
-We now have have a scene to put our objects into. Pythreejs includes geometric primitives we can use to represent elemenst like our cart and pendulum.
+We now have have a scene to put our objects into. Pythreejs includes geometric primitives we can use to represent elements like our cart and pendulum.
 Each object in the scene must be associated with a **mesh**, which is a combination of geometry (the shape of the object) and material (its appearance).
 The renderer is the component that converts the entire scene, including all meshes, lights and cameras, into pixels displayed on the screen. Since the
 renderer cannot process abstract objects directly, meshes serve as the concrete representations of these objects that can be rendered visually.
@@ -544,7 +544,7 @@ For every mesh we also need to specify its material. In this example we'll use M
 In case where multiple objects having the same relative motion, we can define a group. Much like a rigid group in mechanics, we can define
 objects' relative position within that group. In the case of the cart and pendulum we know that the bob and rod will have have the same relative
 movement around the pivot the rod is attached to. This can simplify our animation, since we can use the angle of the pendulum to animate the
-motion of the mass and rod instead of the individual cartesian coordinates over time.
+motion of the mass and rod instead of the individual Cartesian coordinates over time.
 
 .. jupyter-execute::
 
@@ -561,7 +561,7 @@ motion of the mass and rod instead of the individual cartesian coordinates over 
 
 
 We now have all the objects and meshes we need in our scene. We now need to link the motion of our system to the individual components
-in our scene. This is done with **keyframe tracks** which determine the motion of objects througout our animation.
+in our scene. This is done with **keyframe tracks** which determine the motion of objects throughout our animation.
 Keyframe tracks store arrays of keyframe data and interpolate between these keyframes to create smooth animations of various properties (positions, rotations, scales, colors, etc.) over time.
 To be able to easily track our objects we give names to each of the meshes and groups in our scene.
 
@@ -594,11 +594,11 @@ The :code:`AnimationMixer` handles the actual updating of object properties base
     clip = pj.AnimationClip(tracks=[cart_position_track, rotation_track], duration=time[-1])
     mixer = pj.AnimationMixer(cart_mesh)
     action = pj.AnimationAction(mixer, clip, cart_mesh)
-    renderer.layout = widgets.Layout(width="100%", height="auto") # For display compatability
+    renderer.layout = widgets.Layout(width="100%", height="auto") # For display compatibility
 
     renderer
 
-We then call action in a seperate block to control our animation.
+We then call action in a separate block to control our animation.
 
 .. jupyter-execute::
 
@@ -852,7 +852,7 @@ For this example we'll use Three.js version 0.150.1.
     </script>
 
 Next we'll create a container where our animation will be displayed. We can specify size, color and style
-of our container. For maximum compatability we recommend picking a container size which scales with the screen its is 
+of our container. For maximum compatibility we recommend picking a container size which scales with the screen its is 
 displayed on. We'll pick 100% width and a minimum height in order to scale the container with the screen. You 
 can also define border width and color.
 
