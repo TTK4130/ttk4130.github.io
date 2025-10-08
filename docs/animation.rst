@@ -4,11 +4,12 @@
 
 Visualization is a crucial part of evaluating any attempt of modelling a system. When dealing with a system with more than a couple of parameters, plots become
 difficult to interpret. By visualizing our system in 3D we can leverage our spatial and physics intuition of the world. This is the same intuition
-which tells us that when we throw a ball, its trajectory should be parabolic, or the intuition that it takes less effort stop a bike than a car. When it comes to mechanical systems,
-when something doesn't look right, it's indicative of a model built on fundamentally flawed assumptions. Visualizing your system through animation
-will help you weed out unintended behaviour from your model and will ultimately deepen your understanding of your model.
-This page will go into the basic principles of animating a system in 3D, as well as some common frameworks for visualization an animation.
+which tells us that when we throw a ball, its trajectory should be parabolic, or the intuition that it takes less effort stop a bike than a car.
 
+For mechanical systems, a visualization that “does not look right” can indicate either a model built on fundamentally flawed assumptions or something as simple as an incorrect sign in an expression. Visualizing your system through animation
+will help you weed out unintended behaviour from your model and will ultimately deepen your understanding of your model.
+
+This page introduces the basic principles of animating a system in 3D and presents some common frameworks for visualization and animation.
 
 Principles of Animation
 ===========================
@@ -19,8 +20,8 @@ Principles of Animation
 
 We distinguish between two approaches to animation: **real-time animation** and **precomputed animation**.
 
-**Real-time animation** means that we simulate the system's state in the same loop (as in programming) as the animation progress. For each new
-animation frame we integrate our system from the last frame to the current frame. This allows for interactive and responsive animations,
+**Real-time animation** means that the system is simulated step by step in the same program loop that updates the animation.
+After each simulation step, the animation is refreshed to show the new state.This allows for interactive and responsive animations,
 but can be computationally demanding for complex systems or stiff systems that demand fine time resolutions.
 
 **Precomputed animation** uses pre-generated trajectories (state over time). We compute the system's trajectory
@@ -35,12 +36,13 @@ animation frame rate with the simulation time step produces a reproduction of th
 adjusting the playback speed (faster or slower) can be both practically useful (i.e. a very slow or fast system).
 
 A trajectory alone is not very useful to animate without a corresponding 3D (or 2D) model of the system.
-This model doesn't need to be photorealistic nor physically accurate. It just needs to capture the
+This model does not need to be photorealistic nor physically accurate. It just needs to capture the
 essential geometry and behaviour of our system. For example, the details on the bike seat are of little interest when analysing the motion of a bike.
+
 Most animation libraries include primitive geometric shapes like cubes, spheres and cylinders, which
-are usually sufficient to represent the key components of a system. You'd be surprised how basic a model can be, as our
-brains are excellent at filling in the blanks when the **motion** is convincing. A simple rectangle moving like a boat
-can evoke the image of a vessel at sea given that the motion behaves as expected.
+are usually sufficient to represent the key components of a system. Even a very simple model can be effective,
+because the human brain is highly skilled at filling in missing detail when the motion appears convincing.
+A simple rectangle moving like a boat can evoke the image of a vessel at sea given that the motion behaves as expected.
 
 Our advice: **start simple**. Focus on correct motion first, as you undoubtedly will make some
 interesting mistakes with reference frames and defining coordinate systems. You can always improve the visual flair and fidelity later.
@@ -59,8 +61,8 @@ Matplotlib.animation
     a more modern plotting library. However, Plotly it is not designed for 3D animation.
 
 Many of you are already familiar with the Matplotlib library. Inspired by Matlab's plotting library, Matplotlib offers many useful easy-to-use functions for plotting
-and visualizing data. While library was made with data visualization in mind, it also supports a rudimentary framework for plotting and animating in 3D.
-In this section we'll go through a basic example of a 3D pendulum with damping. For a more comprehensive introduction to Matplotlib.animation, take a look at
+and visualizing data. While the library was made with data visualization in mind, it also supports a rudimentary framework for plotting and animating in 3D.
+In this section we will go through a basic example of a 3D pendulum with damping. For a more comprehensive introduction to Matplotlib.animation, take a look at
 the `official documentation <https://matplotlib.org/stable/users/explain/animations/animations.html#animations-using-matplotlib>`_.
 
 Example: Pendulum
@@ -200,7 +202,7 @@ Integrating with SciPy
     theta, phi = sol.y[0], sol.y[2] # Extract trajectory polar coordinates
 
 
-Polar coordinates can be tricky to work with, so to make animation simpler we convert to Cartesian
+Polar coordinates can be tricky to work with, so to make the animation code simpler we convert to Cartesian
 
 .. jupyter-execute::
 
@@ -223,7 +225,7 @@ of our plot explicitly by :code:`set_lim()` for all axes.
     ax.set_zlim(-L, 0.5*L)
     ax.set_box_aspect([1, 1, 0.6]) # Not strictly necessary, but nice for web view
 
-We've now created out plot. Now for the animation. The simplest way to animate using Matplotlib is to define
+We have now created out plot. Now for the animation. The simplest way to animate using Matplotlib is to define
 a trajectory for every object in your system. We create one for the line (rod) and one for the bob (mass attached to rod).
 Like any other plot we can pick the formatting for each of the trajectories.
 
@@ -233,7 +235,7 @@ Like any other plot we can pick the formatting for each of the trajectories.
     bob, = ax.plot([], [], [], "o", c="red", markersize=8)
 
 
-We'll now define the functions we need to animate the trajectory using :code:`FuncAnimation`. Apart from our figure and data,
+We will now define the functions we need to animate the trajectory using :code:`FuncAnimation`. Apart from our figure and data,
 the animation function needs an initialization function and an update function to animate our trajectory. The initialization
 function sets up all the properties we need for the trajectories we animate, and gets called whenever we reset or restart our animation.
 The update function takes in which time step we are on, and returns the updated trajectory of the objects we animate.
@@ -273,7 +275,7 @@ updated pixels are drawn for every frame. If the animation doesn't appear when t
     HTML(ani.to_jshtml()) # Display inline
 
 Alternative display methods include `plt.show()` for interactive viewing or `ani.save('pendulum.mp4')` to save as video.
-Matplotlib animations may behave differently depending on your backend. If the animation doesn't display properly, try switching backends before importing pyplot:
+Matplotlib animations may behave differently depending on your backend. If the animation does not display properly, try switching backends before importing pyplot:
 
 .. code-block:: python3
 
@@ -292,12 +294,12 @@ Pythreejs
 
 `Pythreejs <https://pythreejs.readthedocs.io/en/stable/>`_ is a Jupyter widgets based notebook extension (library made specifically for Jupyter notebooks) that makes it possible to use
 some of the capabilities of the widely popular 3D animation framework `threejs <https://threejs.org>`_. From the name you probably figured out that threejs is written in Javascript.
-Since we use Python in this course we'll introduce threejs through pythreejs first, and then take a look at threejs. In this section we'll go through a simple example using pythreejs. We'll introduce concepts such as *scenes*, *cameras* and much more.
+Since we use Python in this course we will introduce threejs through pythreejs first, and then take a look at threejs. In this section we go through a simple example using pythreejs. We'll introduce concepts such as *scenes*, *cameras* and much more.
 
 Example: Pendulum-cart
 -------------------------
 
-The example system we'll be animating is a cart pendulum with a mass or bob attached at the end, as shown in :ref:`fig:pendulum_w_cart` :cite:`gros2011`). We'll ignore collision and friction forces for now.
+The example system we will be animating is a cart pendulum with a mass or bob attached at the end, as shown in :ref:`fig:pendulum_w_cart` :cite:`gros2011`). We will ignore collision and friction forces for now.
 
 .. _fig:pendulum_w_cart:
 
@@ -434,7 +436,7 @@ where
     mL\cos\theta & mL^2
     \end{bmatrix}
 
-We'll start by defining our system of first order ODEs as a Python function
+We start by defining our system of first order ODEs as a Python function
 
 .. jupyter-execute::
 
@@ -459,7 +461,7 @@ We'll start by defining our system of first order ODEs as a Python function
         x_ddot, theta_ddot = q_ddot[0], q_ddot[1]
         return [theta_dot, theta_ddot, x_dot, x_ddot] # Same shape as input
 
-We'll then define our parameters and generate our trajectory by integrating with SciPy.
+We then define our parameters and generate our trajectory by integrating with SciPy.
 
 .. jupyter-execute::
 
@@ -488,7 +490,7 @@ Here we can define additional offsets, such as where in the scene the cart is pl
         for theta, x in zip(solution[:,0], x_pos)
     ]
 
-Pythreejs expects a contiguous (flattened) list of coordinates, and not a multidimensional array, so we'll have to flatten our
+Pythreejs expects a contiguous (flattened) list of coordinates, and not a multidimensional array, so we have to flatten our
 coordinate arrays to get it on the form :math:`[x0, y0, z0, x1, y1, z1, x2 ...]`. Luckily, numpy has a built-in method to
 flatten ND-arrays to 1D arrays, namely :code:`.ravel()`
 
@@ -510,10 +512,10 @@ are its `aspect ratio <https://en.wikipedia.org/wiki/Aspect_ratio_(image)>`_ and
 
     camera = pj.PerspectiveCamera(position=[0, 0, 7], aspect=6/4)
 
-We'll then define our scene. In pythreejs, we define a scene by passing a list of objects to the *children=* parameter.
+Next, we then define our scene. In pythreejs, a scene is defined by passing a list of objects to the *children=* parameter.
 These children represent all the elements contained within the scene, including cameras, light sources and meshes.
 When the scene is rendered, every child object in this list is included and displayed together as part of the scene.
-This allows easy grouping of all objects that make up the 3D environment. In this example we'll use directional light as a light source,
+This allows easy grouping of all objects that make up the 3D environment. In this example we use directional light as a light source,
 which we have to set a position and intensity for. Other light sources, such as ambient light, can also be used.
 
 .. jupyter-execute::
@@ -526,7 +528,7 @@ Each object in the scene must be associated with a **mesh**, which is a combinat
 The renderer is the component that converts the entire scene, including all meshes, lights and cameras, into pixels displayed on the screen. Since the
 renderer cannot process abstract objects directly, meshes serve as the concrete representations of these objects that can be rendered visually.
 This setup ensures that every object has a defined shape and appearance allowing the renderer to generate the final visual output of the scene accurately.
-For every mesh we also need to specify its material. In this example we'll use MeshLambertMaterial, which tells Pythreejs to render our meshes with `lambertian reflectance <https://en.wikipedia.org/wiki/Lambertian_reflectance>`_.
+For every mesh we also need to specify its material. In this example we use MeshLambertMaterial, which tells Pythreejs to render our meshes with `lambertian reflectance <https://en.wikipedia.org/wiki/Lambertian_reflectance>`_.
 
 .. jupyter-execute::
 
@@ -541,7 +543,7 @@ For every mesh we also need to specify its material. In this example we'll use M
     rod = pj.CylinderGeometry(radiusTop=0.05, radiusBottom=0.05, height=L)
     rod_mesh = pj.Mesh(rod, material=pj.MeshLambertMaterial(color='black'))
 
-In case where multiple objects having the same relative motion, we can define a group. Much like a rigid group in mechanics, we can define
+In case where multiple objects have the same relative motion, we can define a group. Much like a rigid group in mechanics, we can define
 objects' relative position within that group. In the case of the cart and pendulum we know that the bob and rod will have have the same relative
 movement around the pivot the rod is attached to. This can simplify our animation, since we can use the angle of the pendulum to animate the
 motion of the mass and rod instead of the individual Cartesian coordinates over time.
@@ -568,7 +570,7 @@ To be able to easily track our objects we give names to each of the meshes and g
 We can then define the keyframe track of the position of the cart. The :code:`VectorKeyframeTrack` takes the target object and property,
 an array of time values, and corresponding position vectors
 
-Animating the rotation of the pivot group requires us to use quaternions (see Quaternions page).
+Animating the rotation of the pivot group can be done using quaternions (see Quaternions page).
 In short, quaternions provide a robust way to represent rotations without suffering from gimbal lock, and they interpolate smoothly between orientations.
 For a pendulum rotating around the z-axis, we construct quaternions where the rotation angle θ maps to the quaternion :math:`[0, 0, sin(θ/2), cos(θ/2)]`:
 
@@ -618,8 +620,8 @@ By utilizing the power of modern web browsers and WebGL we can create versatile 
 It runs on all modern browsers without plugins, and offers real-time rendering, various geometries, lighting effects and interactive controls.
 It also supports more sophisticated tools for loading 3D models, post-processing effects and even virtual/augmented reality capabilities.
 
-In this section we'll cover some of the basics of creating animations using Three.js with a simple rolling ball example. This tutorial is by no means
-comprehensive, and in fact we'll barely scratch the surface. We highly recommend you checking out the `impressive library of examples on the
+This section covers some of the basics of creating animations using Three.js with a simple rolling ball example.
+If you would like to learn more, we recommend checking out the `impressive library of examples on the
 official website <https://threejs.org/examples/#webgl_animation_keyframes>`_. For a more in-depth introduction to Three.js, check out `Discover Threejs <https://discoverthreejs.com>`_.
 
 Example: Sphere in bowl simulation
@@ -633,18 +635,18 @@ Example: Sphere in bowl simulation
 
    Sphere in parabolic bowl
 
-In this example we'll simulate and animate a sphere rolling in a parabolic bowl assuming no slipping, as shown in :numref:`fig:lagrangebowl` :cite:`gros2011`.
-For convenience, we'll use SymPy to derive our equations of motion (see :ref:`Numerical Methods for ODEs`).
+In this example the idea is to simulate and animate a sphere rolling in a parabolic bowl assuming no slipping, as shown in :numref:`fig:lagrangebowl` :cite:`gros2011`.
+For convenience, we use SymPy to derive our equations of motion (see :ref:`Numerical Methods for ODEs`).
 
 .. dropdown:: Derivation with SymPy
 
-    We'll pick the following parabolic surface
+    We pick the following parabolic surface
 
     .. math::
 
         z = \frac{1}{4} (x^2 + y^2)
 
-    Since we're using a parabolic surface we can use the :math:`x` and :math:`y` positions of the contact point
+    On a parabolic surface we can use the :math:`x` and :math:`y` positions of the contact point
     between the sphere and surface as generalized coordinates. Alternatively, this could be modelled as a constrained system.
 
     .. jupyter-execute::
@@ -673,7 +675,7 @@ For convenience, we'll use SymPy to derive our equations of motion (see :ref:`Nu
         z_center = h + r / sm.sqrt(1 + h.diff(x)**2 + h.diff(y)**2)
         z_center
 
-    We'll now construct our Lagrangian using sphere center height, speed and absolute angular velocity.
+    We now construct our Lagrangian using sphere center height, speed and absolute angular velocity.
 
     .. jupyter-execute::
 
@@ -712,7 +714,7 @@ For convenience, we'll use SymPy to derive our equations of motion (see :ref:`Nu
 
         sm.Matrix([x_ddot_expr.simplify(), y_ddot_expr.simplify()])
 
-    As you can see, these equations of motion are very complicated, so let's appreciate that we didn't have
+    As you can see, these equations of motion are very complicated, so let's appreciate that we did not have
     to solve them by hand.
 
 
@@ -723,7 +725,7 @@ From the derivation above we get the following equations of motion:
 
     sm.Matrix([x_ddot_expr.simplify(), y_ddot_expr.simplify()])
 
-Using Sympy's `lambdify()` function we'll convert our SymPy expressions to Python functions and create a system of ordinary differential equations on the standard SciPy format (see :ref:`SymPy and CAS`).
+Using Sympy's `lambdify()` function we convert our SymPy expressions to Python functions and create a system of ordinary differential equations on the standard SciPy format (see :ref:`SymPy and CAS`).
 
 .. jupyter-execute::
 
@@ -747,7 +749,7 @@ We can now define the parameters and initial state and simulate our system.
     t_span = (0, 30) # 30 seconds
     t_eval = np.linspace(0, 30, 3000) # dt = 0.01
 
-We'll use SciPy's :code:`solve_ivp` as our integrator and RK45 as the numerical method, which is the default integration method in SciPy.
+We use SciPy's :code:`solve_ivp` as our integrator and RK45 as the numerical method, which is the default integration method in SciPy.
 
 .. jupyter-execute::
 
@@ -767,10 +769,10 @@ We'll use SciPy's :code:`solve_ivp` as our integrator and RK45 as the numerical 
 
 Now we have our trajectory, but as you might recall, Three.js is a JavaScript library. So how are we going to access our trajectory?
 As with most problems you can encounter in software engineering, someone has already solved it for us and made it into a library for our convenience.
-We'll use `Pandas <https://pandas.pydata.org/docs/getting_started/index.html#getting-started>`_ to export our trajectory and
+We use `Pandas <https://pandas.pydata.org/docs/getting_started/index.html#getting-started>`_ to export our trajectory and
 parameters to a `json` (`JavaScript Object Notation <https://en.wikipedia.org/wiki/JSON>`_) file which is readable to JavaScript.
 
-We'll first calculate all the trajectories we might need when animating our system
+We first calculate all the trajectories we might need when animating our system
 
 .. jupyter-execute::
 
@@ -786,7 +788,7 @@ We'll first calculate all the trajectories we might need when animating our syst
     z_contact_traj = (1/4)*(x_traj**2 + y_traj**2)
     z_center_traj = z_center_func(x_traj, y_traj, r_val)
 
-To be able to export these trajectories to a json file we'll have to create a Pandas :code:`DataFrame`, which is
+To be able to export these trajectories to a json file we have to create a Pandas :code:`DataFrame`, which is
 essentially an object that holds some data.
 
 .. jupyter-execute::
@@ -802,8 +804,8 @@ essentially an object that holds some data.
 
 Exporting to a json file is as simple as calling :code:`.to_json()` for your dataframe.
 Looking at the `Pandas documentation <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_json.html#pandas.DataFrame.to_json>`_ we see that there
-are several options for how the json file should be formatted. Since we're working with a time series,
-we want our data to be sequential and list like, so we'll use :code:`'records'` for the layout `‘records’ : list like [{column -> value}, … , {column -> value}]`.
+are several options for how the json file should be formatted. Since we are working with a time series,
+we want our data to be sequential and list like, so we use :code:`'records'` for the layout `‘records’ : list like [{column -> value}, … , {column -> value}]`.
 Indentation specifies how many spaces should be used to indent each record, which only affects readability.
 
 .. jupyter-execute could be used to generate it, but this unnecessary to do during build time
@@ -814,14 +816,14 @@ Indentation specifies how many spaces should be used to indent each record, whic
     simulation_data.to_json(file_location, orient='records', indent=2)
 
 
-We'll now move on to the interesting part, namely how to animate our system in Three.js.
+We are now ready to animate our system in Three.js.
 
 Example: Sphere in bowl animation
 ------------------------------------
 
 The only thing you need to get started animating in Three.js is a modern web browser.
-First we'll create a simple skeleton HTML file. For larger examples, it's better to keep HTML files
-and animation scripts separate, but for this example we'll just keep them in the same file.
+First we create a simple skeleton HTML file. For larger examples, it is better to keep HTML files
+and animation scripts separate, but for this example we just keep them in the same file.
 
 .. code::
 
@@ -836,10 +838,9 @@ and animation scripts separate, but for this example we'll just keep them in the
     </body>
     </html>
 
-For the remainder of the example we'll assume you're writing in the :code:`<body> </body>` of a HTML file.
-The first thing we need to get started is to import our Three.js module. We'll import our JavaScript
-module with `importmap <https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap>`_.
-For this example we'll use Three.js version 0.150.1.
+For the remainder of the example we write in the :code:`<body> </body>` of a HTML file.
+We start by importing our Three.js module with `importmap <https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap>`_.
+For this example Three.js version 0.150.1 has been used.
 
 .. code::
 
@@ -851,9 +852,9 @@ For this example we'll use Three.js version 0.150.1.
     }
     </script>
 
-Next we'll create a container where our animation will be displayed. We can specify size, color and style
+Next we create a container where our animation will be displayed. We can specify size, color and style
 of our container. For maximum compatibility we recommend picking a container size which scales with the screen its is 
-displayed on. We'll pick 100% width and a minimum height in order to scale the container with the screen. You 
+displayed on. We pick 100% width and a minimum height in order to scale the container with the screen. You
 can also define border width and color.
 
 .. code::
@@ -861,8 +862,8 @@ can also define border width and color.
     <div id="threejs-container" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555;"></div>
 
 With all the imports and containers in place, we can now start writing our animation.
-In a new script block we'll create a new scene inside an E6 module using :code:`<script type="module">`.
-We'll start by importing Three.js and OrbitControls. OrbitControls is just a simple example script which makes 
+In a new script block we create a new scene inside an E6 module using :code:`<script type="module">`.
+First it is necessary to import Three.js and OrbitControls. OrbitControls is just a simple example script which makes
 the animation window interactive. This gives you controls such as zoom and pan when displaying your animation.
 
 .. code::
@@ -873,7 +874,7 @@ the animation window interactive. This gives you controls such as zoom and pan w
     // Rest of your animation code goes here
     </script>
 
-Continuing inside our script block we'll start by getting some information from the threejs-container to get the correct
+Continuing inside our script block we start by getting some information from the threejs-container to get the correct
 height and width.
 
 .. code::
@@ -882,7 +883,7 @@ height and width.
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
 
-Now we'll create the objects we need to display our scene. All objects in a Three.js animation are contained by a Scene object.
+Next we create the objects we need to display our scene. All objects in a Three.js animation are contained by a Scene object.
 
 .. code::
     
@@ -890,9 +891,9 @@ Now we'll create the objects we need to display our scene. All objects in a Thre
     scene.background = new THREE.Color(0x1e1e1e); // Set background color for scene
 
 We use a camera object to specify how a scene is viewed. There are many different camera models that can be used, but
-the most common one is the `PerspectiveCamera <https://threejs.org/docs/#api/en/cameras/PerspectiveCamera>`_. We have to define the field of view, aspect ratio and furstum of our camera.
-Together with the field of view the frustum is the 3D volume that defines what gets rendered on screen. It's shaped like a pyramid with the camera at the apex.
-This is to avoid having to render objects that we're not viewing. We'll also set our camera position, although later this will
+the most common one is the `PerspectiveCamera <https://threejs.org/docs/#api/en/cameras/PerspectiveCamera>`_. It is necessary to define the field of view, aspect ratio and furstum of our camera.
+Together with the field of view the frustum is the 3D volume that defines what gets rendered on screen. It is shaped like a pyramid with the camera at the apex.
+This is to avoid having to render objects that we are not viewing. We also set our camera position, although later this will
 be controlled by the OrbitControls. 
 
 .. code::
@@ -901,9 +902,9 @@ be controlled by the OrbitControls.
     camera.position.set(3,3,3);
 
 
-Next up we'll create the scene renderer. This is the program the determines how the scene is converted into viewable frames
-displayed on our screen. We'll have to specify the type of renderer, window size and pixel ratio to make our animation compatible with
-screens of different sizes and resolutions. We'll also enable antialiasing to make edges appear more smooth. The renderer draws its output to domElement, which is a `canvas <https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/canvas>`_ HTML element made for drawing
+Next up we will create the scene renderer. This is the program the determines how the scene is converted into viewable frames
+displayed on our screen. Here we specify the type of renderer, window size and pixel ratio to make our animation compatible with
+screens of different sizes and resolutions. We also enable antialiasing to make edges appear more smooth. The renderer draws its output to domElement, which is a `canvas <https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/canvas>`_ HTML element made for drawing
 graphics and animations. To make the render drawing appear in our container we just need to add the domElement with appendChild.
 
 
@@ -929,8 +930,8 @@ casting shadows. Let's add them to our scene
     directionalLight.castShadow = true; // Expensive, but pretty
     scene.add(directionalLight);
 
-Next up we'll add our camera controls. We've already imported an example module of orbit controls which 
-allows us to zoom, rotate and pan out camera interactively. We'll pick the settings we want as well as
+Next up we add our camera controls. We have already imported an example module of orbit controls which
+allows us to zoom, rotate and pan out camera interactively. We pick the settings we want as well as
 specifying which camera we're controlling and which canvas (scene).
 
 .. code::
@@ -942,8 +943,8 @@ specifying which camera we're controlling and which canvas (scene).
     controls.enablePan = true;
     controls.enableRotate = true;
 
-The last and final step in any animation in Three.js is defining and running our animation loop.
-We'll also add some axes to have something to look at. 
+The last and final step in any animation in Three.js is defining and running our animation loop
+and to add some axes to have something to look at.
 
 .. code::
 
@@ -959,7 +960,7 @@ We'll also add some axes to have something to look at.
     animate(); // Run animation
 
 :code:`requestAnimationFrame(animate)` schedules the next frame in our animation by telling the browser to call `animate` before the next repaint, which is usually around 60 times
-per second. This automatically synchronizes the animation loop with the display refresh rate. If you want you animation to only animate according to your own frame rate you'll have to add extra logic. 
+per second. This automatically synchronizes the animation loop with the display refresh rate. If you want you animation to only animate according to your own frame rate you can add extra logic.
 :code:`controls.update()` updates the camera controls by processing mouse movements, clicks etc. :code:`renderer.render(scene, camera)` renders the entire scene from the camera's perspective. You should now be able to view and interact with the 
 following animation window.
 
@@ -1060,7 +1061,7 @@ following animation window.
 
 Looking good! 
 
-Next up we'll make a parabolic surface for the ball to roll on. We can use the function
+Next, we make a parabolic surface for the ball to roll on. We can use the function
 `PlaneGeometry() <https://threejs.org/docs/?q=plane#api/en/geometries/PlaneGeometry>`_ to
 create our initial plane. In 3D graphics everything is made up of triangles (vertices), so
 for every object we create we have to tell Three.js how many triangles it should be made of
@@ -1096,9 +1097,9 @@ since we're using a shader we have to recompute the surface normals which are us
     scene.add(plane); // Don't forget to add the mesh to our scene!
 
 
-Next we'll add our sphere as a `SphereGeometry() <https://threejs.org/docs/?q=sphere#api/en/geometries/SphereGeometry>`_.
-Similarly to the plane we'll have to define its segment count. We'll also give it a name so
-that we can reference it later when we add our animation. For later use we'll also extract its position
+Next we add our sphere as a `SphereGeometry() <https://threejs.org/docs/?q=sphere#api/en/geometries/SphereGeometry>`_.
+Similarly to the plane we have to define its segment count. We also give it a name so
+that we can reference it later when we add our animation. For later use it is also useful to extract its position
 object.
 
 .. code::
@@ -1110,7 +1111,7 @@ object.
     scene.add(sphere);
     const spherePos = sphere.position;
 
-We now have all the objects we want to animate. We'll now create an `AnimationMixer <https://threejs.org/docs/?q=animation#api/en/animation/AnimationMixer>`_.
+We now have all the objects we want to animate nd proceed to create an `AnimationMixer <https://threejs.org/docs/?q=animation#api/en/animation/AnimationMixer>`_.
 The AnimationMixer is a player for animations on a particular object in the scene. We usually create one per object if
 the objects move independently. In our case we only have one moving object so we'll only create one.
 
@@ -1147,7 +1148,7 @@ The track is wrapped into an AnimationClip, linked to an animation mixer, set to
 The reason we use a VectorKeyframeTrack instead of the animation loop we made earlier is to avoid having to
 calculate the time step for each track and interpolate if we're in between frames. Using VectorKeyframeTracks
 Three.js makes sure the animation is animated in the correct playback speed and interpolates between positions.
-The final step to make our sphere animated is to add the mixer to our animation loop. We'll only
+The final step to make our sphere animated is to add the mixer to our animation loop. We only
 need to provide the time elapsed between the last frame/loop. This is fairly simple to do with
 the `Clock <https://threejs.org/docs/?q=clock#api/en/core/Clock>`_ object.
 
@@ -1165,7 +1166,7 @@ the `Clock <https://threejs.org/docs/?q=clock#api/en/core/Clock>`_ object.
     animate();
 
 That's it! You should now see your ball rolling around in the parabolic bowl.
-If you want, you can add a little visual flair by adding a trailing line.
+If you want, you can add trailing line.
 
 .. dropdown:: Script
 
