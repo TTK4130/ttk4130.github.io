@@ -1111,7 +1111,7 @@ object.
     scene.add(sphere);
     const spherePos = sphere.position;
 
-We now have all the objects we want to animate nd proceed to create an `AnimationMixer <https://threejs.org/docs/?q=animation#api/en/animation/AnimationMixer>`_.
+We now have all the objects we want to animate and proceed to create an `AnimationMixer <https://threejs.org/docs/?q=animation#api/en/animation/AnimationMixer>`_.
 The AnimationMixer is a player for animations on a particular object in the scene. We usually create one per object if
 the objects move independently. In our case we only have one moving object so we'll only create one.
 
@@ -1166,7 +1166,7 @@ the `Clock <https://threejs.org/docs/?q=clock#api/en/core/Clock>`_ object.
     animate();
 
 That's it! You should now see your ball rolling around in the parabolic bowl.
-If you want, you can add trailing line.
+If you want, you can add a trailing line.
 
 .. dropdown:: Script
 
