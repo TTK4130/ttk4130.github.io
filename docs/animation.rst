@@ -119,7 +119,7 @@ In this example we'll simulate a 3D pendulum with damping terms.
        c(q, \dot{q}) = mL^2
        \begin{bmatrix}
           -\sin\theta\cos\theta \, \dot{\phi}^2 \\
-          -2\cos\theta \, \dot{\theta}\dot{\phi}
+          2\cos\theta \sin\theta\, \dot{\theta}\dot{\phi}
        \end{bmatrix},
        \qquad
        g(q) =
@@ -141,7 +141,7 @@ In this example we'll simulate a 3D pendulum with damping terms.
        +
        \begin{bmatrix}
        -mL^2\sin\theta\cos\theta \, \dot{\phi}^2 + mgL\sin\theta \\
-       -2mL^2\cos\theta \, \dot{\theta}\dot{\phi}
+       2mL^2\cos\theta\sin\theta \, \dot{\theta}\dot{\phi}
        \end{bmatrix}
        = 0.
 
@@ -380,7 +380,7 @@ The example system we will be animating is a cart pendulum with a mass or bob at
        g(q) =
        \begin{bmatrix}
           0 \\
-          m g \sin\theta
+          m g L\sin\theta
        \end{bmatrix}.
 
     Thus, the final equations of motion are
@@ -397,7 +397,7 @@ The example system we will be animating is a cart pendulum with a mass or bob at
        +
        \begin{bmatrix}
        -mL\sin\theta \, \dot{\theta}^2 \\
-       m g \sin\theta
+       m g L \sin\theta
        \end{bmatrix}
        = 0.
 
@@ -428,7 +428,7 @@ where
     g(q) =
     \begin{bmatrix}
       0 \\
-      m g \sin\theta
+      m g L\sin\theta
     \end{bmatrix},
     \qquad
     W(q) = \begin{bmatrix}
