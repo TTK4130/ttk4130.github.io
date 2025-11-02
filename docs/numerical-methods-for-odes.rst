@@ -190,7 +190,7 @@ and their limitations. We'll start by looking at Euler's method.
 Explicit Euler (ERK)
 ====================
 
-The explict Euler method, also called the forward Euler method, is really the simplest numerical scheme there is.
+The explicit Euler method, also called the forward Euler method, is really the simplest numerical scheme there is.
 We need two ingredients, the initial value problem we defined earlier and the definition of the derivative:
 
 .. math::
@@ -208,7 +208,7 @@ Armed with these two, we can first say that a good approximation to the derivati
 This is a first order approximation to the derivative, which means that the explicit Euler method is a first order method.
 If we wanted higher order methods, we could design (and you will do this in the assignments) schemes that are higher order approximations to the derivative.
 But, at any rate, we need to relate this to the function :math:`f(t, x)` if we are going to be able to solve it.
-In this contex, the forward Euler method is defined as:
+In this context, the forward Euler method is defined as:
 
 .. math::
 
@@ -235,7 +235,7 @@ Implicit Euler (IRK)
 
 The implicit Euler method, or the backward Euler method, is a close cousin to the forward method.
 In fact, the only difference between the two is the index!
-Still using the same notation that :math:`\dot{x} = f(t, x)` and that :math:`\dot{x} \approx \frac{x_{n+1} - x_n}{h}`, we define the backward euler method as
+Still using the same notation that :math:`\dot{x} = f(t, x)` and that :math:`\dot{x} \approx \frac{x_{n+1} - x_n}{h}`, we define the backward Euler method as
 
 .. math::
     :label: backward_euler_general
@@ -249,7 +249,7 @@ In the case of the model problem, this is no issue, since we get that
 
     x_{n+1} = x_n + h\lambda x_{n+1} \Rightarrow x_{n+1} = \frac{x_n}{1 - h\lambda}
 
-However, this becomes much more complicated if the system dynamics is a vector valued function that may depend on the state :math:`x_{n+1}` nonlinearly.
+However, this becomes much more complicated if the system dynamics is a vector valued function that may depend on the state :math:`x_{n+1}` non-linearly.
 In general, we're stuck with the formulation in :eq:`backward_euler_general`.
 We would be able to find the next step only if we *already had it*, which means that for implicit methods we need additional steps to evaluate them.
 We'll discuss this in the section below.
@@ -258,7 +258,7 @@ Implicit equations
 ===================
 
 By implicit equation, we mean an equation that describes a relationship, but where the symbols cannot be rearranged to isolate the unknown quantity.
-This ties together with the last section where we found an equation where the unknown quantity :math:`x{n+1}` featured in an expression that may not have a known inverse.
+This ties together with the last section where we found an equation where the unknown quantity :math:`x_{n+1}` featured in an expression that may not have a known inverse.
 Initially, we're stuck with the equation on the form
 
 .. math::
@@ -281,7 +281,7 @@ The general form of such problems are
         x^* = G(x^*)
 
 If we take :math:`x_n` and :math:`t_{n+1}` as constants for our problem above, we get a problem of this kind if we say that :math:`x^* = x_{n+1}`.
-At least the mathematicians are happy with that formualtion (probably).
+At least the mathematicians are happy with that formulation (probably).
 The iteration in this type of problem comes from the fact that in many cases, we can define the function :math:`G(x)` in such a way that we can set up a chain of guesses to the solution, or that for a sufficient initial guess :math:`x_0`, we can prove that repeatedly applying :math:`G` in the sense that
 
 .. math::
@@ -308,12 +308,12 @@ The general form here is
         F(x^*) = 0
 
 The name *root-finding* is motivated by polynomials, where we say that the zeros of a polynomial are its roots.
-Thus, in the literature, you may find such methods refered to as "root-finding", even though they are concerned with the zeros of a function.
+Thus, in the literature, you may find such methods referred to as "root-finding", even though they are concerned with the zeros of a function.
 Also, if we spend some time thinking, we can see that it is possible to turn a fixed point problem into a root-finding problem.
 If we set :math:`F(x) = x - G(x)`, we obtain that a fixed point :math:`x^*` of :math:`G` is also a root (or zero point) of :math:`F`!
 It is also possible to go the other way and converting a root-finding problem into a fixed point problem.
 The quickest way to go about it may be to add the input :math:`x` to both sides.
-However, this does not always result in a fixed point formualtion which lends itself well to iteration.
+However, this does not always result in a fixed point formulation which lends itself well to iteration.
 
 Newton's method
 ---------------
@@ -334,15 +334,17 @@ By rearranging the expression slightly, we can say that the update to the point 
 .. math::
     \Delta x_{n+1} = x_{n+1} - x_n = - \frac{f(x_n)}{f'(x_n)}
 
-Thus, if we're close to a fixed point, the update will be small.
-This is great news as we can use this as a measure for convergence.
-If we set a tolerance level :math:`\text{tol}`, we can say that if
+The reason we care about the "update" is because it gives us the iterative scheme were we simply compute the :math:`\Delta x_{n+1}` with the :math:`x_n` we currently hold as our best guess and then obtain a *better* guess by adding the update!
+Thus, the closer we are to a fixed point (i.e. our solution), the smaller the update will be.
+Since the scheme is iterative and will only give the right answer when we've done an infinite number of iterations, we have to be able to stop iterating when things are "good enough".
+Since the update will get smaller and smaller, we can say that a good place to stop is when the update is smaller than a certain threshold, the error *tolerance* of the iteration.
+For a specific (user-defined) tolerance level :math:`\text{tol}`, we can say that if
 
 .. math::
 
     \bigg| - \frac{f(x_n)}{f'(x_n)} \bigg| < \text{tol}
 
-then we accept the point :math:`x_{n+1}` as a solution.
+then we accept the point :math:`x_{n+1}` as a "good enough" solution.
 This is starting to sound like an algorithm we could implement for ourselves and use in potential implicit Runge-Kutta solvers.
 It's been a while since we talked about those, but in the end, this is why we even need to discuss implicit equations and fixed points and all that.
 
@@ -395,6 +397,142 @@ If we program a model problem to test this against, we can see whether it conver
 The code shows that the root of the function occurs when :math:`x = y = z = -1`.
 It also reached the root using fewer than the allocated iterations and with a final update within the accepted level of tolerance.
 
+Example: Implicit Euler for a scalar system
+===========================================
+
+In this example we will implement some Python code for simulating the solution to an initial value problem based on a scalar function using the implicit Euler method.
+In the assignments you will need to solve systems where the dynamics are a vector-valued function and the Jacobian (needed for Newton iterations) is a matrix.
+In the scalar case, however, this is a bit simpler, both the dynamics function and the derivative are scalar functions.
+Hopefully, this allows you to see the general shape of the simulation code and realize what steps are needed along the way to make a fully functioning simulation code.
+Let's dive in.
+
+We will try to simulate the system defined by the ODE:
+
+.. math::
+    \dot{x} = f(t, x) = e^{-x^2}
+
+This will mean that the Jacobian of the system dynamics is
+
+.. math::
+    f'(t, x) = -2x e^{-x^2}
+
+As code, these functions will look like
+
+.. jupyter-execute::
+
+    def system_dynamics(t, x):
+        return np.exp(-x**2)
+    
+    def system_jacobian(t, x):
+        return -2*x * np.exp(-x**2)
+
+By putting the expression for :math:`f(t,x)` into the general implicit Euler method in :eq:`backward_euler_general`, we get
+
+.. math::
+    x_{n+1} = x_n + h e^{-x_{n+1}^2}
+
+We see that it will not be as simple to find a solution for this as it was for the model equation :math:`\dot{x}=\lambda x`, where we could find a solution using some algebra.
+Instead, we turn to solving the implicit equation using an iterative method.
+We choose Newton's method, and in order to not confuse this example with previous code, we implement a scalar variant of the method (for variation, we use a while-loop):
+
+.. jupyter-execute::
+
+    def newtons_method_scalar(f, dfdx, x0: float, TOL=1e-6, MAX_ITER=100):
+        x, dx = x0, np.inf
+        i = 0
+
+        while np.abs(dx) > TOL and i < MAX_ITER:
+            dx = - f(x) / dfdx(x)
+            x += dx
+            i += 1  # important to update so that iterations are recorded
+        
+        return x
+
+As we've discussed earlier, the Newton's method finds the roots of a function.
+If we want to find the next step, we have to construct a function that has a root precisely where the next step is!
+We can rearrange the implicit Euler method:
+
+.. math::
+
+    x_{n+1} = x_n + h f(t_{n+1}, x_{n+1}) \iff 0 = x_{n+1} - x_n - h f(t_{n+1}, x_{n+1})
+
+This means that the function we will try to find the roots of is:
+
+.. math::
+
+    F(x) = x - x_n - h f(t_{n+1}, x)
+
+Note that :math:`x_n`, :math:`h` and :math:`t_{n+1}` are parameters to the function that will change at each timestep, but still be *known* at each timestep.
+The only *unknown* quantity is :math:`x`, and if we put :math:`x = x_{n+1}`, we should get zero (by the construction of the function).
+We sometimes call this function the *residual function* since it is "what remains to be accounted for", in a certain sense.
+If the residual is zero, our guess for :math:`x_{n+1}` is correct, and while the residual is not zero, we continue guessing until we get it right.
+Due to the construction of Newton's method, this is the function we have to give it, along with the Jacobian of this function.
+Crucially, it is not `system_dynamics` and `system_jacobian` that go into the Newton iterations, but the residual function and jacobian of the residual.
+The Jacobian of the residual is the derivative in the scalar case, so
+
+.. math::
+    F'(x) = 1 - h f'(t_{n+1}, x)
+
+One way of programming the two is:
+
+.. jupyter-execute::
+
+    def make_residual_function(f, dfdx, x_current, step_size, t_current):
+        def residual(x):
+            return x - x_current - step_size * f(t_current, x)
+        
+        def residual_jacobian(x):
+            return 1 - step_size * dfdx(t_current, x)
+        
+        return residual, residual_jacobian
+
+Now, we are ready to put the parts together in a main simulation loop
+
+.. jupyter-execute::
+
+    t0, x0 = 0, 0.1
+    ts, xs = [t0], [x0]
+
+    t_end, h = 1, 1/100
+    num_timesteps = int(t_end / h)
+
+    for i in range(num_timesteps):
+        res, res_jac = make_residual_function(system_dynamics, system_jacobian, xs[i], h, ts[i])
+        x_next = newtons_method_scalar(res, res_jac, xs[i])
+        xs.append(x_next)
+        ts.append(ts[i] + h)
+    
+    ts_fnc, xs_fnc = ts, xs  # set aside for plotting later
+
+From the code itself, it is really not possible to see that we use an implicit Euler solver.
+This is because the numerical scheme we use is baked into the definition of the residual.
+If we wanted to make it more clear, we could put it in the main loop.
+This might look like
+
+.. jupyter-execute::
+
+    t0, x0 = 0, 0.1
+    ts, xs = [t0], [x0]
+
+    t_end, h = 1, 1/100
+    num_timesteps = int(t_end / h)
+
+    for i in range(num_timesteps):
+        res = lambda x: x - xs[i] - h * system_dynamics(ts[i], x)
+        res_jac = lambda x: 1 - h * system_jacobian(ts[i], x)
+        x_next = newtons_method_scalar(res, res_jac, xs[i])
+        xs.append(x_next)
+        ts.append(ts[i] + h)
+    
+    ts_inline, xs_inline = ts, xs  # set aside for plotting later
+
+We can visually inspect that they do more or less the same by plotting them both.
+
+.. jupyter-execute::
+
+    plt.plot(ts_fnc, xs_fnc, label="make_residual")
+    plt.plot(ts_inline, xs_inline, label="inline", linestyle="--")
+    plt.legend(); plt.show()
 
 Stiff Equations (WIP)
 =====================

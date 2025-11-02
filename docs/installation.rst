@@ -170,6 +170,10 @@ list can be used as a reference:
    import plotly
    plotly.__version__
 
+.. jupyter-execute::
+
+    import pandas
+    pandas.__version__
 
 .. jupyter-execute::
 
