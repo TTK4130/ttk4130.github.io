@@ -119,7 +119,7 @@ In this example we'll simulate a 3D pendulum with damping terms.
        c(q, \dot{q}) = mL^2
        \begin{bmatrix}
           -\sin\theta\cos\theta \, \dot{\phi}^2 \\
-          -2\cos\theta \, \dot{\theta}\dot{\phi}
+          2\cos\theta \sin\theta\, \dot{\theta}\dot{\phi}
        \end{bmatrix},
        \qquad
        g(q) =
@@ -141,7 +141,7 @@ In this example we'll simulate a 3D pendulum with damping terms.
        +
        \begin{bmatrix}
        -mL^2\sin\theta\cos\theta \, \dot{\phi}^2 + mgL\sin\theta \\
-       -2mL^2\cos\theta \, \dot{\theta}\dot{\phi}
+       2mL^2\cos\theta\sin\theta \, \dot{\theta}\dot{\phi}
        \end{bmatrix}
        = 0.
 
@@ -380,7 +380,7 @@ The example system we will be animating is a cart pendulum with a mass or bob at
        g(q) =
        \begin{bmatrix}
           0 \\
-          m g \sin\theta
+          m g L\sin\theta
        \end{bmatrix}.
 
     Thus, the final equations of motion are
@@ -397,7 +397,7 @@ The example system we will be animating is a cart pendulum with a mass or bob at
        +
        \begin{bmatrix}
        -mL\sin\theta \, \dot{\theta}^2 \\
-       m g \sin\theta
+       m g L \sin\theta
        \end{bmatrix}
        = 0.
 
@@ -428,7 +428,7 @@ where
     g(q) =
     \begin{bmatrix}
       0 \\
-      m g \sin\theta
+      m g L\sin\theta
     \end{bmatrix},
     \qquad
     W(q) = \begin{bmatrix}
@@ -622,7 +622,8 @@ It also supports more sophisticated tools for loading 3D models, post-processing
 
 This section covers some of the basics of creating animations using Three.js with a simple rolling ball example.
 If you would like to learn more, we recommend checking out the `impressive library of examples on the
-official website <https://threejs.org/examples/#webgl_animation_keyframes>`_. For a more in-depth introduction to Three.js, check out `Discover Threejs <https://discoverthreejs.com>`_.
+official website <https://threejs.org/examples/#webgl_animation_keyframes>`_. For a more in-depth introduction to Three.js, check out `Discover Threejs <https://discoverthreejs.com>`_. There is also an
+interactive editor available at `https://threejs.org/editor <https://threejs.org/editor>`_.
 
 Example: Sphere in bowl simulation
 ------------------------------------
@@ -1279,7 +1280,7 @@ If you want, you can add a trailing line.
 
 .. raw:: html
 
-    <div id="threejs-container-2" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555;"></div>
+    <div id="threejs-container-2" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555555ff;"></div>
     <script type="importmap">
     {
      "imports": {
@@ -1383,11 +1384,293 @@ If you want, you can add a trailing line.
 
     </script>
 
-Blender (WIP)
+
+Blender
 ==============
 
+Blender is one of the most popular programs for 3D graphics, and is arguably one of the most successful free and open-source projects of all time. 
+Blender is a versatile 3D program used for creating animations, visual effects, 3D models and even video games. When visualizing a sufficiently complex mechanical system, 
+Blender should be your program of choice due to its versatility and widespread use. Mastering Blender is daunting, but you can go far by just by knowing the basic. 
+In this section we'll go through an example of how you can use the Blender Python API to create simple animations. We will assume you have familiarized yourself with the basics of Blender, which can be done through 
+numerous tutorials online or the `official Blender user manual <https://docs.blender.org/manual/en/latest/>`_. **This is not meant to be a tutorial on how to use Blender**, 
+but rather a demonstration of the capabilities of the program.
 
 Example: Tennis racket theorem
 ----------------------------------
 
+The tennis racket theorem is a famous kinetic phenomenon of classical mechanics. The theorem describes the effect 
+where rotation around the first and third prinicpal axes is stable, but rotation around the second principal axis is unstable.
+This can be demonstrated with a tennis racket when flipping it around its second principal axis. In almost all cases the racket will 
+also rotate around its first principal axis. This experiment can be performed with any object which has three different moments of intertia, 
+like a book or a smartphone. This effect happens when the rotation around the second principal axis is ever so slightly off axis :cite:`tennis_racket`.
 
+.. raw:: html
+
+    <p><a href="https://commons.wikimedia.org/wiki/File:Tennis_racquet_principal_axes.svg#/media/File:Tennis_racquet_principal_axes.svg"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Tennis_racquet_principal_axes.svg" alt="File:Tennis racquet principal axes.svg" height="448" width="512"></a><br>By cmglee, Franck Doucet - <a href="https://upload.wikimedia.org/wikipedia/commons/d/db/Tennis_racket.svg"></a><a href="//commons.wikimedia.org/wiki/File:Tennis_racket.svg#filelinks" title="File:Tennis racket.svg">Tennis racket.svg</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0" title="Creative Commons Attribution-Share Alike 4.0">CC BY-SA 4.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=106725066">Link</a></p>
+
+
+We can simulate this effect with the use of Euler's equations under torque-free conditions :cite:`goldstein`.
+This is the force-free equations of motion about the center of mass. We assume :math:`I_1 < I_2 < I_3`.
+
+.. math::
+
+    I_1 \dot \omega_1 = -(I_3 - I_2) \omega_2 \omega_3 \\
+    I_2 \dot \omega_2 = -(I_1 - I_3) \omega_1 \omega_3 \\
+    I_3 \dot \omega_3 = -(I_2 - I_1) \omega_1 \omega_2 \\
+
+A quick Google search gives us some rough estimates of the intertia of a typical tennis racket.
+
+.. math::
+    I_1 \approx 0.01 kg m^2 \\
+    I_2 \approx 0.32 kg m^2 \\
+    I_3 \approx 0.35 kg m^2 \\
+
+
+We can then simply integrate our system with SciPy to get a trajectory. We only need a tiny off-axis initial angular velocity
+to observe the effect.
+
+.. jupyter-execute::
+
+    Ixx = 0.01
+    Iyy = 0.32
+    Izz = 0.35
+
+    def tennis_racket_diff(y, t):
+        w1, w2, w3 = y
+        dw1_dt = (Iyy - Izz) / Ixx * w2 * w3
+        dw2_dt = (Izz - Ixx) / Iyy * w1 * w3
+        dw3_dt = (Ixx - Iyy) / Izz * w1 * w2
+        return [dw1_dt, dw2_dt, dw3_dt]
+
+    # Simulation
+    y0 = [0.000001, 1, 0]
+    dt = 0.01
+    t = np.arange(0, 30, dt)
+
+    solu = odeint(tennis_racket_diff, y0, t)
+    plt.plot(t, solu)
+
+Similarly to the Threejs example, we can then export this trajectory data with Pandas to be used in Blender. Blender prefers
+comma-separated values (CSV) as text data format.
+
+.. code:: python
+
+    # Export to CSV
+    df = pd.DataFrame({
+        'frame': np.arange(len(t)),
+        'time': t,
+        'omega_x': solu[:, 0],
+        'omega_y': solu[:, 1],
+        'omega_z': solu[:, 2]
+    })
+
+    df.to_csv('tennis_racket.csv', index=False)
+
+
+To get started with Blender we first need a fitting 3D model. For Blender, the best sites for free 3D models are BlendSwap, Sketchfab, BlenderKit, Free3D and Poly Haven. These platforms offer a wide range of formats compatible with Blender and high-quality assets for various projects.​
+In this example we use "Tennis Racket" (https://skfb.ly/6AVMB) by Yanez Designs is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+We import the model and make sure the coordinate system is defined at approximately the center of mass.
+
+.. figure:: figures/tennis_racket_blend.png
+    :width: 80%
+    :align: center
+
+    Tennis racket 3D model is centered around a custom coordinate system placed at its approximate center of mass.
+
+We then go to the scripting workspace to animate the racket.
+
+
+.. figure:: figures/tennis_racket_blend_script_workspace.png
+    :width: 80%
+    :align: center
+
+    Blender scripting workspace.
+
+To animate a tennis racket in Blender using Python, we import :code:`bpy` and access the named object via :code:`bpy.data.objects['RacketAnimation']`. Our trajectory is defined by angular velocity data from a CSV file, 
+which we integrate using Euler integration to compute rotational angles.
+
+Since Blender uses unit quaternions for rotations, we convert angular velocity vectors to quaternions using :code:`Quaternion(axis, angle)`. For each time step:
+
+1. Extract angular velocity (omega_x, omega_y, omega_z) from CSV
+2. Compute rotation angle: `angle = |ω| x dt`
+3. Derive rotation axis: `axis = ω.normalized()`
+4. Create incremental quaternion: `delta_q = Quaternion(axis, angle)`
+5. Update orientation: `current_q = current_q @ delta_q`
+6. Insert keyframe: `obj.keyframe_insert(data_path="rotation_quaternion", frame=frame)`
+
+The script initializes with identity quaternion, processes each CSV row sequentially, applies body-fixed rotations, maintains unit quaternion normalization and records animation keyframes for smooth playback.
+`
+
+.. code:: python
+
+    import bpy
+    import csv
+    from mathutils import Quaternion, Vector
+
+    def animate_tennis_racket_rotation():
+        obj = bpy.data.objects['RacketAnimation']
+        
+        obj.rotation_mode = 'QUATERNION'
+        
+        if obj.animation_data:
+            obj.animation_data_clear()
+        
+        # Read CSV data
+        with open('/path/to/tennis_racket.csv', 'r') as f:
+            reader = csv.DictReader(f)
+            data = list(reader)
+        
+        # Initialize quaternion
+        current_q = Quaternion((1.0, 0.0, 0.0, 0.0))
+        dt = 0.01
+        
+        for i, row in enumerate(data):
+            frame = int(row['frame'])
+            
+            omega = Vector((
+                float(row['omega_x']),  # rotation around ê₁ = X axis
+                float(row['omega_y']),  # rotation around ê₂ = Y axis  
+                float(row['omega_z'])   # rotation around ê₃ = Z axis
+            ))
+            
+            angle = omega.length * dt
+            
+            if angle > 1e-6:
+                axis = omega.normalized()
+                delta_q = Quaternion(axis, angle)
+                
+                # Body frame rotation: multiply on the right
+                current_q = current_q @ delta_q
+                current_q.normalize()
+            
+            obj.rotation_quaternion = current_q
+            obj.keyframe_insert(data_path="rotation_quaternion", frame=frame)
+
+    animate_tennis_racket_rotation()
+
+Calling this code animates our racket, which can then be rendered or exported. The animation below was made by exporting 
+the tennis racket animation in Blender to glTF (Graphics Library Transmission Format), which is the standard file format for 
+3D scenes and animation. This file is then read by threejs and displayed the browser. 
+
+.. raw:: html
+
+    <div id="threejs-container-3" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555555ff;"></div>
+    <script type="importmap">
+    {
+    "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js"
+    }
+    }
+    </script>
+    <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js';
+    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/loaders/GLTFLoader.js';
+
+
+    // Fixed: Use correct container ID
+    const container = document.getElementById('threejs-container-3');
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1e1e1e);
+
+    const camera = new THREE.PerspectiveCamera(75, containerWidth/containerHeight, 0.1, 1000);
+    camera.position.set(3,3,3);
+    camera.up.set(0, 0, 1);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(containerWidth, containerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.enableZoom = true;
+    controls.enablePan = true;
+    controls.enableRotate = true;
+
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 0, 7);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
+
+
+    // Test if we can fetch the file manually first
+    fetch('_static/TennisRacket.glb')
+    .then(response => {
+        console.log('Fetch response status:', response.status);
+        console.log('Content-Type:', response.headers.get('content-type'));
+        return response.arrayBuffer();
+    })
+    .then(buffer => {
+        console.log('File fetched successfully, size:', buffer.byteLength, 'bytes');
+    })
+    .catch(err => {
+        console.error('Fetch error:', err);
+    });
+
+    // Load GLTF model
+    const gltfLoader = new GLTFLoader();
+    let mixer;
+
+    gltfLoader.load(
+        '_static/TennisRacket.glb',
+        (gltf) => {
+            console.log('GLTF loaded successfully');
+            
+            // Add the model to scene
+            scene.add(gltf.scene);
+            
+            // Setup animation mixer
+            if (gltf.animations && gltf.animations.length > 0) {
+                console.log('Found animations:', gltf.animations.length);
+                mixer = new THREE.AnimationMixer(gltf.scene);
+                
+                // Play first animation
+                const action = mixer.clipAction(gltf.animations[0]);
+                action.play();
+                console.log('Playing animation:', gltf.animations[0].name || 'unnamed');
+            } else {
+                console.log('No animations found in model');
+            }
+            
+            // Position camera properly
+            camera.position.set(3, 3, 3);
+            camera.lookAt(0, 0, 0);
+            
+            // Optional: Center the model
+            const box = new THREE.Box3().setFromObject(gltf.scene);
+            const center = box.getCenter(new THREE.Vector3());
+            gltf.scene.position.sub(center);
+        },
+        (xhr) => {
+            console.log('Loading progress:', (xhr.loaded / xhr.total * 100) + '%');
+        },
+        (error) => {
+            console.error('GLTF loading error:', error);
+            console.error('Error details:', error.message);
+        }
+    );
+
+    const clock = new THREE.Clock();
+
+    function animate(){
+        requestAnimationFrame(animate);
+        
+        const deltaTime = clock.getDelta();
+        if (mixer) {
+            mixer.update(deltaTime);
+        }
+        
+        controls.update();
+        renderer.render(scene, camera);
+    }
+
+    animate();
+    </script>
