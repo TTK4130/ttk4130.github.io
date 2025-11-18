@@ -1,5 +1,5 @@
 =========================
-Assignment 6 - Lagrange
+Assignment 5 - Lagrange
 =========================
 
 .. note::

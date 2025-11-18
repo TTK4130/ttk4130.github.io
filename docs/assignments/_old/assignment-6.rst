@@ -1,5 +1,5 @@
 ===================================
-Assignment 7 - Constrained Lagrange
+Assignment 6 - Constrained Lagrange
 ===================================
 
 .. note::

@@ -1,5 +1,5 @@
 =============================
-Assignment 5 - Newton-Euler
+Assignment 4 - Newton-Euler
 =============================
 
 .. note::
