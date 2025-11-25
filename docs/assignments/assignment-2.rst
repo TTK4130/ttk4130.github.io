@@ -12,9 +12,9 @@ In the last exercise, we looked at the forward/explicit Euler method, which is a
 It is perhaps the simplest numerical integrator or solver one can come up with and it is quite effective in its own right.
 However, for complicated systems one may need to break out heavier machinery to perform calculations accurately enough.
 The forward Euler method is a first-order-in-time method, meaning that the local error it commits in each step is linear in the timestep.
-When numerically solving systems in matlab, one often uses `ode45`, which is an adaptive method combining a fourth and fifth order method.
+When numerically solving systems in Matlab, one often uses `ode45`, which is an adaptive method combining a fourth and fifth order method.
 This means that if one halves the length of the timestep, the error typically decreases with a factor 16.
-With the right mathematical framerwork, one can develop methods that have any convergence order one could wish for, but the tradeoff is that more accurate methods typically require more computation per timestep.
+With the right mathematical framework, one can develop methods that have any convergence order one could wish for, but the trade-off is that more accurate methods typically require more computation per timestep.
 In this exercise, we will work with second order methods and use tools that can at least in principle be extended to work with even higher order methods.
 
 
@@ -101,7 +101,7 @@ This can also be written for a step from :math:`y_n = y(t_n)` to :math:`y_{n+1} 
 
     There is a lot of algebra involved with developing these expressions, so we will not try to do this by hand for higher order methods.
     However, if we wanted to, we could compute higher order terms in the Taylor expansions and get more accurate methods.
-    Typically, we would need to calcuate more stages, since we need additional terms to match the coefficients in the Taylor series of :math:`y(t_n + h)`.
+    Typically, we would need to calculate more stages, since we need additional terms to match the coefficients in the Taylor series of :math:`y(t_n + h)`.
 
 
 
@@ -109,7 +109,7 @@ Problem 2 - Stability of explicit methods
 =========================================
 
 An important concept in numerical simulations is the stability of the methods.
-A shorter timestep :math:`h` yields more accurate simualtions, but are there any limits to how large we can take the timestep to be?
+A shorter timestep :math:`h` yields more accurate simulations, but are there any limits to how large we can take the timestep to be?
 Phrased differently: when do our models break down?
 In order to analyze this, people developed A-stability, which tests the "absolute stability" of the method.
 To analyze this, we use the prototypical linear ordinary differential equation
@@ -145,7 +145,7 @@ and we way that the method is stable for :math:`z` if it is the case that :math:
         
     c.
     
-        (Optional) Plot the stability functions for each method. Also plot the stability function for the fourth order classical Runge-Kutta method given in the note below. The plot should distinguish between inputs where :math:`|R(z)| \leq 1` and :math:`|R(z)| > 1`.
+        (Optional?) Plot the stability functions for each method. Also plot the stability function for the fourth order classical Runge-Kutta method given in the note below. The plot should distinguish between inputs where :math:`|R(z)| \leq 1` and :math:`|R(z)| > 1`.
 
         .. note::
             :class: dropdown
@@ -204,11 +204,11 @@ with the initial conditions :math:`y_1(0) = \theta(0), y_2(0) = \dot{\theta}(0)`
             :class: dropdown
 
             If we had a problem for which we knew the analytical solution, we could set :math:`y_{ref} = y_{analytical}`.
-            This would be the case for the simpler non-damped linear (harmonic) orscillator defined by :math:`\ddot{\theta} + \omega^2 \theta = 0`.
+            This would be the case for the simpler non-damped linear (harmonic) oscillator defined by :math:`\ddot{\theta} + \omega^2 \theta = 0`.
             Its solution for the same initial conditions as above would simply be :math:`\theta(t) = \cos(\omega t)`.
 
             We have a more complicated problem, so we would need to do something else if we wanted a reference solution.
-            One way is to use another (more expensive) simulator to get a high-fidelity numerical solution that we expect to be so accurate that the difference between it and the actual true solution is negligble compared to how our own numerical approximation fares.
+            One way is to use another (more expensive) simulator to get a high-fidelity numerical solution that we expect to be so accurate that the difference between it and the actual true solution is negligible compared to how our own numerical approximation fares.
             You may for instance use SciPy's ``solve_ivp`` or Matlab's ``ode45``.
             
             Remember to force evaluation at the same times as your fixed-step solvers evaluate.
@@ -217,7 +217,7 @@ with the initial conditions :math:`y_1(0) = \theta(0), y_2(0) = \dot{\theta}(0)`
 
     c.
 
-        Compute solutions for :math:`h = 2^{-i}` for some integers :math:`i`, with both explicit Euler, Heuns and Midpoint.
+        Compute solutions for :math:`h = 2^{-i}` for some integers :math:`i`, with both explicit Euler, Heun's and Midpoint.
         Typically, we want .5, .25, .125, .0625 and so on...
         Compute also the error :math:`E(h) = \|y_{num}(T) - y_{ref}(T)\|` in the :math:`\infty`-norm and 2-norm.
         Plot the errors for each method on a  log-log plot, observe roughly what convergence rate the methods have.
@@ -247,7 +247,7 @@ That is, the methods use just one timestep length over the entire simulation.
 However, with both a low-order and a high-order method (first and second order in our case), we can set up a simple predictor-corrector scheme to adaptively resize the simulation timestep during simulation.
 
 Let :math:`y_{n+1}^{(1)}` be the first order numerical approximation and :math:`y_{n+1}^{(2)}` be the second order approximation.
-These can be computed, for instance, with explict Euler and Heun's method, but you are free to select the second order method.
+These can be computed, for instance, with explicit Euler and Heun's method, but you are free to select the second order method.
 The crucial part is figuring out that if the two approximations are close, then we don't gain much from using the second order method over the first order one.
 That, in turn, means that we can increase the timestep so that the second order method actually does some useful work for us.
 For this we need the relative error between the methods, given by
