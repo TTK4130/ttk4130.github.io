@@ -207,7 +207,7 @@ When :math:`x_2` no longer contributes much, when it has become small, :math:`x_
 .. Generally for an :math:`s`-stage Runge-Kutta method, we expect the accuracy or convergence to be of order :math:`s`.
 .. However, with the Gauss-Legendre collocation points, this increases to :math:`2s`.
 .. This is phenomenal, as we can get with two stages what an explicit method would require *four* stages to accomplish.
-.. Of course, we still have to sovle a possibly non-linear system, so the computational cost may still be much higher than an explicit method.
+.. Of course, we still have to solve a possibly non-linear system, so the computational cost may still be much higher than an explicit method.
 .. Typically it will be.
 
 .. The second reason to care about collocation methods is that they are also *symplectic integrators*, which means that they will approximately conserve the energy of a Hamiltonian system, if you were to use the method for simulating a Hamiltonian system.
@@ -228,7 +228,7 @@ When :math:`x_2` no longer contributes much, when it has become small, :math:`x_
 
 .. Both of these methods are implicit, but it would be nice to have an explicit symplectic integrator as well. Such methods do exist, and the simplest one is called the Størmer-Verlet method in reference to the french physicist Loup Verlet who used it for molecular dynamics in the 1960s and the Norwegian astrophysicist Carl Størmer who used it to study the trajectory of electrical particles in a magnetic field in 1907.
 
-.. Anyways, the Størmer-Verlet integrator (often also simply called the Verlet integrator) is meant for applciation to second order ODEs, for example those that arise from Newton's equations of motion. Explicit symplectic integrators can be developed for other systems, but we often find ourselves tinkering with Newton's laws, so it may make a fine addition to a cyberneticist's or control engineer's collection.
+.. Anyways, the Størmer-Verlet integrator (often also simply called the Verlet integrator) is meant for application to second order ODEs, for example those that arise from Newton's equations of motion. Explicit symplectic integrators can be developed for other systems, but we often find ourselves tinkering with Newton's laws, so it may make a fine addition to a cyberneticist's or control engineer's collection.
 
 .. One slight issue is that the scheme requires that we can write our system as a "decoupled" one, in the sense that
 
@@ -337,7 +337,7 @@ As a two-stage method, it should then be a fourth order accurate method, which y
     
     b.
 
-        Both explicit and implicit RK methods can be described by Butcher tables. Hoever, it is wasteful to use the Newton on a known explicit scheme, since it can be sovled with a forward pass through the stages. Extend your general code to detect whether the Newton solver is required or not.
+        Both explicit and implicit RK methods can be described by Butcher tables. However, it is wasteful to use the Newton on a known explicit scheme, since it can be solved with a forward pass through the stages. Extend your general code to detect whether the Newton solver is required or not.
 
         .. hint::
             :class: dropdown
