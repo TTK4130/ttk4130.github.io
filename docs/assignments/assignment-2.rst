@@ -35,7 +35,7 @@ A general two-stage explicit Runge-Kutta method can be compactly described with 
 .. math::
 
     \begin{array}{c|cc}
-        0 & \\
+        0 & &\\
         c_2 & a_{21} & \\
         \hline
           & b_1 & b_2
