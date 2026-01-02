@@ -463,4 +463,4 @@ SymPy's `orient_explicit()` method implements a way of orienting frames explicit
 Further reading
 ===============
 
-There are many different ways of representing rotations. We'll take a closer look at the most commonly used way of representing orientation in the section :ref:`Quaternions (WIP)`.
+There are many different ways of representing rotations. We'll take a closer look at the most commonly used way of representing orientation in the section :ref:`quaternions`.

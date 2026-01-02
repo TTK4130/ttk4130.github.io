@@ -218,6 +218,10 @@ of our plot explicitly by :code:`set_lim()` for all axes.
 
     import matplotlib.pyplot as plt
 
+    # Just for website display
+    import matplotlib
+    matplotlib.rcParams['animation.embed_limit'] = 2**128
+
     fig = plt.figure()
     ax = fig.add_subplot(111, projection="3d")
     ax.set_xlim(-L, L)

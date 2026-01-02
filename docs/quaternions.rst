@@ -213,7 +213,7 @@ On this page we'll explore exactly what quaternions are and why they have this u
         if (isLock) {
             statusEl.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
             statusEl.style.animation = 'pulse 1.5s infinite';
-            statusEl.innerHTML = '🚨 GIMBAL LOCK';
+            statusEl.innerHTML = 'GIMBAL LOCK';
             desc.textContent = 'CRITICAL: X and Z axes are parallel! First and third rotations now do the same thing.';
             xGimbal.material.opacity = 1.0;
             zGimbal.material.opacity = 1.0;
@@ -221,7 +221,7 @@ On this page we'll explore exactly what quaternions are and why they have this u
         } else if (isNear) {
             statusEl.style.background = 'linear-gradient(135deg, #f39c12, #e67e22)';
             statusEl.style.animation = 'none';
-            statusEl.innerHTML = '⚠️ APPROACHING';
+            statusEl.innerHTML = 'APPROACHING';
             desc.textContent = 'WARNING: Y rotation nearing ±90°. X and Z axes becoming parallel.';
             xGimbal.material.opacity = 0.9;
             zGimbal.material.opacity = 0.9;

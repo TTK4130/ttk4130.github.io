@@ -1,3 +1,5 @@
+.. _example_project:
+
 Example Project: Bicycle (WIP)
 ===============================
 

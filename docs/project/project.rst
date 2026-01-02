@@ -13,7 +13,7 @@ The point is for you to be curious, inquisitive, creative and independent.
 **TL;DR**: Deepen your knowledge by modelling and analysing a system which you find interesting, and most of all exciting.
 
 For your convenience, we have provided you with an example project which details the process from picking a system all the way to delivering your final report.
-Please see :ref:`Example Project: Bicycle`.
+Please see :ref:`example_project`.
 
 Other example projects:
 

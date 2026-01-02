@@ -1,5 +1,5 @@
 
-.. _numerical-methods-for-odes
+.. _numerical-methods-for-odes:
 
 ==========================
 Numerical Methods for ODEs
