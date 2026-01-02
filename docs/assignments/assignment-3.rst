@@ -195,87 +195,9 @@ When :math:`x_2` no longer contributes much, when it has become small, :math:`x_
         (Optional) If you implemented an adaptive controller for the timestep in the previous assignment, try to use it to simulate the system and see what timesteps it selects. Are the selected timesteps reasonable?
 
 
-.. Problem 4 (optional) - Collocation methods and symplectic integrators
-.. =====================================================================
-
-.. Note: I abandoned this task since it became clear that it was less applicable to control problems than I thought.
-.. It is most useful for unconstrained Lagrangian/Hamiltonian systems, but in reality we often constrain our systems.
-.. The text is left here as a WIP so that the problem may be posed at some point, if someone thinks hard enough about it.
-
-.. There are two main reasons to care about collocation methods.
-.. The first is that if the collocation points are well chosen, the order to the method can be much higher than anticipated.
-.. Generally for an :math:`s`-stage Runge-Kutta method, we expect the accuracy or convergence to be of order :math:`s`.
-.. However, with the Gauss-Legendre collocation points, this increases to :math:`2s`.
-.. This is phenomenal, as we can get with two stages what an explicit method would require *four* stages to accomplish.
-.. Of course, we still have to solve a possibly non-linear system, so the computational cost may still be much higher than an explicit method.
-.. Typically it will be.
-
-.. The second reason to care about collocation methods is that they are also *symplectic integrators*, which means that they will approximately conserve the energy of a Hamiltonian system, if you were to use the method for simulating a Hamiltonian system.
-.. Hamiltonian dynamics is not something we will go into in this course, but it is a general result that all Lagrangian systems admit a Hamiltonian formulation.
-.. And we *will* go into Lagrangians in this course!
 
 
-.. .. admonition:: Tasks (I of II)
-
-..     a.
-
-..         If you have done the previous problems, you will have an implementation of the implicit Midpoint method, which is the one-stage Gauss-Legendre collocation method. Now, implement the two-stage Gauss-Legendre collocation method given in the Butcher table above.
-
-..     b.
-
-..         Verify that the orders of convergence actually are what we say it will be; that is second order for the implicit Midpoint method and fourth order for the two-stage Gauss-Legendre method.
-
-
-.. Both of these methods are implicit, but it would be nice to have an explicit symplectic integrator as well. Such methods do exist, and the simplest one is called the Størmer-Verlet method in reference to the french physicist Loup Verlet who used it for molecular dynamics in the 1960s and the Norwegian astrophysicist Carl Størmer who used it to study the trajectory of electrical particles in a magnetic field in 1907.
-
-.. Anyways, the Størmer-Verlet integrator (often also simply called the Verlet integrator) is meant for application to second order ODEs, for example those that arise from Newton's equations of motion. Explicit symplectic integrators can be developed for other systems, but we often find ourselves tinkering with Newton's laws, so it may make a fine addition to a cyberneticist's or control engineer's collection.
-
-.. One slight issue is that the scheme requires that we can write our system as a "decoupled" one, in the sense that
-
-.. .. math::
-
-..     \dot{x} = f(t, v),
-..     \quad
-..     \dot{v} = g(t, x).
-
-.. This rules out systems like the damped non-linear oscillator from the previous assignment specifically due to the damping term.
-.. However, the harmonic oscillator *does* admit such a formulation since
-
-.. .. math::
-
-..     \dot{x} = v,
-..     \quad
-..     \dot{v} = -\omega^2 x.
-
-.. .. important:: Semi-implicit Euler
-
-..     This is not the Størmer-Verlet integrator, but the Semi-implicit Euler scheme.
-
-..     The point with this problem should be to give some indication that splitting the update steps and generally doing clever things in the scheme may actually lead to useful additional properties.
-
-
-.. If we have a system with :math:`f` and :math:`g` as above, then the semi-implicit Euler scheme can be written as
-
-.. .. math::
-
-..     v_{n+1} = v_n + h \cdot g(t_n, x_n)
-..     \\
-..     x_{n+1} = x_n + h \cdot f(t_n, v_{n+1})
-
-
-
-.. .. admonition:: Tasks (II of II)
-
-..     c.
-
-..         Implement the Størmer-Verlet integrator and verify its order of convergence.
-
-..     d.
-
-..         Numerically verify that it is indeed symplectic by simulating the harmonic oscillator for a long time.
-
-
-Problem 4 (optional) - General IRK methods
+Problem 4 (Optional) - General IRK methods
 ==========================================
 
 By now, we have dealt with a large number of Runge-Kutta methods, all of which can be represented with a Butcher table.

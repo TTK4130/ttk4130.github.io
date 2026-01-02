@@ -36,8 +36,7 @@ Problem 1 - Mass-Damper-Spring
 
     b) Using Newton's second and third law, find an expression for all the forces acting on the mass
 
-    c) Using the expression in 1b), find the second order differential equation desribing
-    the position of the mass :math:`x`. The spring is relaxed when the wagon is at the position :math:`x=0`.
+    c) Using the expression in 1b), find the second order differential equation desribing the position of the mass :math:`x`. The spring is relaxed when the wagon is at the position :math:`x=0`.
 
     d) Transform the expression from 1c) into a set of first order ordinary differential equations.
 

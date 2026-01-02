@@ -143,9 +143,7 @@ and we way that the method is stable for :math:`z` if it is the case that :math:
 
             The timestep :math:`h` has to feature since the input to the stability function should be :math:`z = h\lambda`.
         
-    c.
-    
-        (Optional?) Plot the stability functions for each method. Also plot the stability function for the fourth order classical Runge-Kutta method given in the note below. The plot should distinguish between inputs where :math:`|R(z)| \leq 1` and :math:`|R(z)| > 1`.
+    c. Plot the stability functions for each method. Also plot the stability function for the fourth order classical Runge-Kutta method given in the note below. The plot should distinguish between inputs where :math:`|R(z)| \leq 1` and :math:`|R(z)| > 1`.
 
         .. note::
             :class: dropdown
@@ -239,7 +237,7 @@ with the initial conditions :math:`y_1(0) = \theta(0), y_2(0) = \dot{\theta}(0)`
 
 
 
-Problem 4 (optional) - Adaptive timestep control
+Problem 4 (Optional) - Adaptive timestep control
 ================================================
 
 All the methods we have seen so far have been so-called "fixed step methods".
