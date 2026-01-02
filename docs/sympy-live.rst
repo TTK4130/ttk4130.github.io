@@ -1,6 +1,6 @@
------------
+===========
 SymPy Live
------------
+===========
 
 Here you can try SymPy in your browser. This feature is experimental and might not support every browser.
 

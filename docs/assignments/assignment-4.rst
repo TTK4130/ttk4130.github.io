@@ -1,248 +1,204 @@
+========================================
+Assignment 4 - Kinematics
+========================================
+
+Problem 1 - Rotation transformations in 2D
+==========================================
+
+In this problem, we will study coordinate transformation in the two reference frames shown (in terms of their unit vectors) in the figure below.
+
+.. figure:: figures/ned_and_ship_frames.svg
+   :scale: 60%
+   :align: center
+
+   The orientation of the unit vectors of the NED-frame and the :math:`s`-frame.
+
+.. admonition:: Tasks
+
+    a) Express the unit vectors :math:`\mathbf{i_s}` and :math:`\mathbf{j_s}` of the :math:`s`-frame in terms of the unit vectors :math:`\mathbf{i_N}` and :math:`\mathbf{j_N}` of the NED-frame. Refer to the figure above for support.
+
+    b) Consider a vector
+
+       .. math::
+
+          \mathbf{v} = \xi_1 \mathbf{i_s} + \xi_2 \mathbf{j_s}
+
+       This vector can also be expressed through the unit vectors of the NED-frame as :math:`\mathbf{v} = \chi_1 \mathbf{i_N} + \chi_2 \mathbf{j_N}`. Your task is to express :math:`\chi_1` and :math:`\chi_2` as functions of :math:`\xi_1`, :math:`\xi_2`, and :math:`\psi`.
+
+    c) A more compact and practical way of transforming the coordinates of vectors between the component directions of the two reference frames (NED-frame and :math:`s`-frame) is to use coordinate vector notation and rotation matrices. Based on the results from the previous task, find the 2×2 matrix :math:`\mathbf{R}^N_s(\psi)` that is defined such that
+
+       .. math::
+
+          \mathbf{v}^N =
+          \begin{bmatrix} \chi_1 \\ \chi_2 \end{bmatrix}
+          = \mathbf{R}^N_s(\psi)
+          \begin{bmatrix} \xi_1 \\ \xi_2 \end{bmatrix}
+          = \mathbf{R}^N_s(\psi) \mathbf{v}^s
+
+Problem 2 - Barge with crane
 =============================
-Assignment 4 - Newton-Euler
-=============================
 
-.. note::
+:numref:`fig:lekter` shows a barge located some distance from a stationary platform. The stationary platform has a fixed reference frame attached to it, referred to as the NED-frame (for North, East, Down), whose axes are pointing northwards, eastwards, and downwards toward the center of the Earth.
 
-    Submit your assignment as a single PDF, including plots and source code (if any).
-    We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
-    This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
+.. _fig:lekter:
 
-This assignment is about the Newton-Euler method for developing a dynamic model of a mechanical system. This topic is treated in :cite:t:`Egeland2002` from chapter 6.13 to 7.3.
-
-Problem 1 - Satellite
-===========================
-
-.. note::
-
-    This problem contains a programming exercise.
-    Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
-    The relevant notebook is `assignment-4-satellite.ipynb`.
-
-.. admonition:: Animation code
-    :class: dropdown
-
-    .. jupyter-execute::
-
-        import pythreejs as pj
-        import numpy as np
-        import requests
-        import base64
-
-        def load_image_from_url(url):
-            response = requests.get(url)
-            if response.status_code == 200:
-                return f"data:image/png;base64,{base64.b64encode(response.content).decode('utf-8')}"
-            else:
-                raise Exception(f"Failed to load image from {url}")
-
-        # Cubemap texture URLs, because I'm lazy
-        texture_urls = [
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/px.png",  # Positive X
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/nx.png",  # Negative X
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/py.png",  # Positive Y
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/ny.png",  # Negative Y
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/pz.png",  # Positive Z
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/nz.png"   # Negative Z
-        ]
-
-        scene = pj.Scene()
-        camera = pj.PerspectiveCamera(position=[10, 6, 10], aspect=800/600)
-
-        skybox_geometry = pj.BoxGeometry(width=500, height=500, depth=500)
-        materials = [
-            pj.MeshBasicMaterial(
-                map=pj.ImageTexture(imageUri=load_image_from_url(url)),
-                side='BackSide'
-            ) for url in texture_urls
-        ]
-        skybox = pj.Mesh(skybox_geometry, materials)
-        scene.add(skybox)
-
-        cubesat = pj.Mesh(
-            pj.BoxGeometry(1, 1, 1),
-            pj.MeshStandardMaterial(color='red')
-        )
-        scene.add(cubesat)
-
-        axis_helper = pj.AxesHelper(size=5)
-        axis_helper.position = cubesat.position
-        axis_helper.quaternion = cubesat.quaternion
-
-        scene.add(axis_helper)
-
-        scene.add(pj.AmbientLight(color='#ffffff', intensity=1.0))
-        scene.add(pj.DirectionalLight(position=[0, 10, 0]))
-
-        controls = pj.OrbitControls(controlling=camera)
-        renderer = pj.Renderer(camera=camera, scene=scene, width=800, height=600, controls=[controls])
-
-
-.. jupyter-execute::
-
-     renderer
-
-
-In this task, we will consider a satellite orbiting Earth. We define an inertial reference frame with its origin at Earth's center and with an arbitrary and fixed orientation.
-
-We will consider two cases:
-
-1. The satellite is a cube of uniform, unitary density, having an edge of :math:`50\ cm`.
-2. The satellite is the cube mentioned above, with the addition of a punctual mass of :math:`m_o = 0.1\ kg` placed at one of the cube's corners.
-
-.. figure:: figures/Satellite.svg
+.. figure:: figures/lekter.png
    :width: 50%
    :align: center
-   :alt: Schematic of the satellite
 
-   Schematic of the satellite.
+   A barge with a crane.
 
-We will assume that the force of gravity is given by Newton's law of universal gravitation:
-
-.. math::
-    :label: newton
-
-    \vec{F} = - \frac{G\,m_\mathrm{T}\,m}{\|\vec r_\mathrm{c}\|^2} \cdot \frac{\vec r_\mathrm{c}}{\|\vec r_\mathrm{c}\|}
-
-The inertia matrix in the reference frame attached to the cube with its origin at the cube's center of mass and with the axes going through the center of the cube's faces is given by
-
-.. math::
-    :label: inertia-matrix
-
-    \frac{1}{6}ml^2 I
-
-where `m` is the mass, `l` is the length of the sides, and `I` is the 3-by-3 identity matrix.
-
-This exercise is about dynamics, but we still have to parameterize the kinematics of the satellite.
-
-We will describe the satellite's position by a vector from the world center to the satellite's center of mass given in the inertia frame :math:`\mathbf{r}_c^i`, and the orientation by the unit quaternion :math:`\mathbf{q}` corresponding to the rotation between the inertial and body frame, :math:`\mathbf{R}_b^i`.
+We also attach a reference system :math:`x_s, y_s, z_s` (i.e., the :math:`s`-frame) to the barge, as shown in the figure. The z-axis is pointing downwards in accordance with the right-hand rule. The location of the origin of the :math:`s`-frame relative to the origin of the NED-frame is given as:
 
 .. math::
 
-    \mathbf{q} \triangleq \left[ \begin{array}{l}
-    q_w \\
-    \mathbf{q}_v
-    \end{array} \right] = \left[ \begin{array}{l}
-    q_w \\
-    q_x \\
-    q_y \\
-    q_z
-    \end{array} \right]
+    \mathbf{r}_{s/n} = n \mathbf{i}_{n} + e \mathbf{j}_{n} + d \mathbf{k}_{n}
 
-The kinematics are given by:
+The position of the crane on the barge is given as:
 
 .. math::
 
-    \dot{\mathbf{r}}_c^i = \mathbf{v}_c^i
+    \mathbf{r}_{c/s} = a \mathbf{i}_{s} + b \mathbf{j}_{s} + c \mathbf{k}_{s}
+
+The angle between the :math:`x_s`-axis and the :math:`x_c`-axis is :math:`\alpha`.
+
+Finally, the distance from the origin of the crane-fixed reference frame to the tip of the crane is :math:`l`.
+
+.. note::
+
+   When we ask for a vector in this problem, your answer should be in the form:
+
+   .. math::
+
+      \mathbf{r} = g \mathbf{i}_{k} + h \mathbf{j}_{k}
+
+   or:
+
+   .. math::
+
+      \mathbf{r}^k =  \begin{bmatrix} g \\ h \end{bmatrix}
+
+   where we need expressions for :math:`g` and :math:`h`.
+
+   **The expressions should be formulated in terms of the parameters** :math:`(a, b, c, l)` **, the variables** :math:`(\psi, \alpha, n, e, d)` **and their time derivatives** :math:`(\dot{\psi}, \dot{\alpha}, \dot{n}, \dot{e}, \dot{d})`.
+
+
+.. admonition:: Tasks
+
+    a) Find an expression for the position of the origin of the barge-fixed reference frame relative to the origin of the NED-frame expressed in terms of the barge-fixed reference frame.
+
+    b) Find an expression for the position of the tip of the crane relative to the origin of the :math:`s`-frame as a function of :math:`\alpha`. Express the vector in terms of the :math:`s`-frame.
+
+    c) Find an expression for the position of the tip of the crane relative to the origin of the NED-frame. Express the vector in terms of the NED-frame.
+
+    d) What is the angular velocity of the crane when the barge has a turn rate of :math:`\dot{\psi}` and the crane base is rotating at the rate :math:`\dot{\alpha}`?
+
+    e) The vessel has a forward velocity :math:`u` and a sideways velocity of :math:`v` relative to the inertial reference frame (the NED-frame). Find expressions for :math:`\dot{n}` and :math:`\dot{e}` (i.e., the time derivatives of the components in the equation above).
+
+    f) What is the linear velocity of the crane tip? The vessel still moves with a forward velocity component :math:`u` and a sideways velocity component :math:`v`, and in addition, it has an angular speed of magnitude :math:`\dot{\psi}`. The crane has an angular speed with magnitude :math:`\dot{\alpha}`. You can express the answer in terms of the NED-frame.
+
+Problem 3 - Parameterizations of Rotations
+===========================================
+
+.. figure:: figures/zyx-euler.svg
+    :name: zyx-euler
+    :align: center
+
+    ZYX Euler Angles as three successive rotations around the intermediate :math:`z`, :math:`y` and :math:`x` axes.
+
+The ZYX Euler Angles is a parameterization of a rotation using three successive transformations around the intermediate :math:`z`, :math:`y` and :math:`x` axes (see :numref:`zyx-euler`). That is, the rotation matrix is given by
 
 .. math::
 
-    \dot{\mathbf{q}} = \frac{1}{2} \mathbf{q} \otimes \boldsymbol{\omega}_{b/i}^b = \frac{1}{2} \boldsymbol{\Omega}(\boldsymbol{\omega}_{b/i}^b) \mathbf{q}
+   \mathbf{R}_{\mathcal{B}}^{\mathcal{A}}(\theta,\phi,\psi) = \mathbf{R}_z(\psi) \mathbf{R}_y(\phi) \mathbf{R}_x(\theta)
 
-Where :math:`\mathbf{v}_c^i` is the velocity of the center of mass given in the inertial frame, :math:`\boldsymbol{\omega}_{b/i}^b` is the angular velocity of the satellite given in the body frame, and :math:`\boldsymbol{\Omega}(\boldsymbol{\omega})` is defined as:
+where :math:`\mathbf{R}_x`, :math:`\mathbf{R}_y`, and :math:`\mathbf{R}_z` represent the rotation matrix of the principal rotations around the :math:`z`, :math:`y` and :math:`x` axes, respectively.
 
 .. math::
 
-    \boldsymbol{\Omega}(\boldsymbol{\omega}) \triangleq [\boldsymbol{\omega}]_R = \left[ \begin{array}{cc}
-    0 & -\boldsymbol{\omega}^{\top} \\
-    \boldsymbol{\omega} & -[\boldsymbol{\omega}]_{\times}
-    \end{array} \right] = \left[ \begin{array}{cccc}
-    0 & -\omega_x & -\omega_y & -\omega_z \\
-    \omega_x & 0 & \omega_z & -\omega_y \\
-    \omega_y & -\omega_z & 0 & \omega_x \\
-    \omega_z & \omega_y & -\omega_x & 0
-    \end{array} \right]
+   \boldsymbol{\chi} =
+   \begin{bmatrix}
+       \theta \\
+       \phi \\
+       \psi
+   \end{bmatrix}
+
+are called the Euler Angles.
+
+.. admonition:: Tasks
+
+    a) Find the intermediate rotation matrices :math:`\mathbf{R}_{1}^{\mathcal{A}}`, :math:`\mathbf{R}_{2}^{1}`, and :math:`\mathbf{R}_{\mathcal{B}}^{2}` along with the relative angular velocities expressed in the local frame :math:`\boldsymbol{\omega}_{1/\mathcal{A}}^{\mathcal{A}}`, :math:`\boldsymbol{\omega}_{2/1}^{1}`, and :math:`\boldsymbol{\omega}_{\mathcal{B}/2}^{2}`.
+
+    b) Show that the angular velocity of frame :math:`\mathcal{B}` with respect to :math:`\mathcal{A}` expressed in frame :math:`\mathcal{A}` is given by
+
+    .. math::
+
+       \boldsymbol{\omega}_{\mathcal{B}/\mathcal{A}}^{\mathcal{A}} = \mathbf{E} \dot{\boldsymbol{\chi}}
+
+    where
+
+    .. math::
+
+       \mathbf{E} =
+       \left[\begin{array}{ccc}
+        \cos (\phi) \cos (\psi) & -\sin (\psi) & 0 \\
+        \cos (\phi) \sin (\psi)  &\cos (\psi) & 0\\
+        -\sin (\phi) & 0 & 1
+       \end{array}\right]
+
+    c) Show that the transformation :math:`\mathbf{E}` is singular at :math:`\phi = \frac{\pi}{2} + k\pi`, :math:`\forall k \in \mathbb{Z}`. Why does this make Euler Angles a bad choice when modelling rotating systems that can reach any orientation? What parameterization, which tackles this issue, is usually preferred?
+
+
+Problem 4 - Linked Mechanism
+==============================
+
+.. figure:: figures/mechanism.svg
+   :align: center
+   :scale: 100%
+   :name: Linked mechanism
+
+   Linked mechanism
+
+The linked mechanism in :numref:`Linked Mechanism` consists of the two rigid bodies AB and BC. Body AB rotates about the :math:`z_0`-axis at a rate :math:`\dot{q}_1`, and body BC rotates about the :math:`y_2`-axis at the rate :math:`\dot{q}_2`. The :math:`z_0`-axis is parallel to the :math:`z_1`-axis. The :math:`y_2`-axis is parallel to the :math:`y_1`-axis.
 
 .. hint::
     :class: dropdown
 
-    You will find the Python code template in the `code handout repository <https://github.com/TTK4130/code-handouts>`_ or on Blackboard.
+
+    Use `SymPy reference frames <https://docs.sympy.org/latest/modules/physics/vector/vectors.html#using-vectors-and-reference-frames>`_ to solve the following problems.
 
 .. admonition:: Tasks
 
-    a) Consider the satellite without the added mass. Use the Newton-Euler equations to derive the dynamics of the satellite, i.e., find expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
+    a) Find the position of the points B and C relative to point A, expressed in terms of the reference frame :math:`x_0y_0z_0`. The positions should be expressed as functions of :math:`\boldsymbol{q} = [q_1,\, q_2]^T`.
 
-    b) Now consider the added mass (case 2 above). The added mass will shift the center of mass of the system. Calculate the inertia matrix around this new center of mass and find the updated expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
+    b) Find the angular velocity of the bodies AB and BC, expressed in terms of the reference frame :math:`x_0y_0z_0`.
 
-    .. hint::
+    c) Find the linear velocity of the points B and C, expressed in terms of the reference frame :math:`x_0y_0z_0`.
 
-        Use the parallel axis theorem to find the new inertia matrix.
+    d) Express the linear velocity of point C in the form :math:`\boldsymbol{v}_C = \boldsymbol{J}(\boldsymbol{q})\dot{\boldsymbol{q}}`.
 
-    c) Simulate the two cases in parts 1 and 2. What differences do you observe?
 
-Problem 2 - Pendulum on an oscillator
-==========================================
+Problem 5 (optional) - Pendulum on rotating disk
+================================================
 
-.. figure:: figures/pendulum_osc.svg
-    :width: 30%
-    :name: pendulum
+.. figure:: figures/pendulum_on_disk.svg
+   :width: 60%
+   :align: center
+   :name: Pendulum on a rotating disk
 
-    Pendulum on a vertical oscillator
+   Pendulum on a rotating disk
 
-:numref:`pendulum` shows a pendulum with a point mass :math:`m_2` attached to a mass :math:`m_1` that can oscillate along a vertical axis. The pendulum rod has a length :math:`L` and the rod can be considered mass-less (i.e. the pendulum can be considered as a point mass at the end of a mass-less rod).
+The pendulum system shown in :numref:`Pendulum on a rotating disk` consists of a flat surface, a disk that can roll on the surface, and a pendulum attached to the rim of the disk.
 
-The oscillating mass is connected to a stationary construction through a spring with stiffness :math:`k`. The vertical position :math:`z` of the mass is defined such that :math:`z_0` when the spring is in its neutral position. The angular displacement of the pendulum rod is :math:`\theta`, as shown in the figure. For simplicity we also constrain body one to only move up or down, i.e no movement along the :math:`\text{y}_0` or :math:`\text{z}_0` axis.
+We have attached an inertial reference frame :math:`\theta` such that the :math:`x_0`-axis is aligned with the surface. We also have a moving reference frame at the center of the wheel. This reference frame will rotate with the wheel. Finally, we have attached a third reference frame to the hinge point of the pendulum such that the :math:`y_2`-axis always remains aligned with the pendulum rod. Note that the angle :math:`\theta` of the pendulum rod is given in terms of an axis that remains horizontal. You can assume no slip between the rim and the surface.
+
+.. hint::
+    :class: dropdown
+
+    Equations 6.409 and 6.410 at page 261 in :cite:t:`Egeland2002`, or Equations 60 and 77 in :cite:t:`lect2024`, might be useful.
 
 .. admonition:: Tasks
 
-    **a. Kinematics**
+    a) Find the linear (translational) velocity of point A. Your answer should be expressed in terms of the parameters of the system, and the variables :math:`\phi` and :math:`\theta` and their time derivatives.
 
-    We will start by expressing the kinematics of the system. Show that the acceleration of the COMs, :math:`\mathbf{\vec{a}}_1` and :math:`\mathbf{\vec{a}}_2` and the angular acceleration of body 2, :math:`\mathbf{\vec{\alpha}}`, is given by:
-
-    .. math::
-
-       \mathbf{a}_1 = \ddot{z} \mathbf{k}_0
-
-    .. math::
-
-       \mathbf{a}_2 = \left(L\ddot{\theta}\cos\theta - L\dot{\theta}^2\sin\theta\right) \mathbf{j}_0 + \left(\ddot{z} + L\dot{\theta}^2\cos\theta + L\ddot{\theta}\sin\theta\right)\mathbf{k}_0
-
-    .. math::
-
-       \mathbf{\alpha} = \ddot{\theta} \mathbf{i}_0
-
-    **b. Newton Euler equations**
-
-    Show that the Newton Euler equations for the two rigid bodies are given by:
-
-    .. math::
-
-       m_1 \mathbf{a}_1 = \mathbf{F}_{\text{spring}} + \mathbf{F}_{g1} + \mathbf{F}_{\text{joint}}
-
-    .. math::
-
-       m_2 \mathbf{a}_2 = \mathbf{F}_{g2} + \mathbf{F}_{\text{joint}}
-
-    .. math::
-
-       \mathbf{r}_{2/1} \times m_2 \mathbf{a}_2 = \boldsymbol{\tau}_{g2}
-
-    Where :math:`\mathbf{F}_{\text{spring}}` is the force acting from the spring, :math:`\mathbf{F}_{g1}` and :math:`\mathbf{F}_{g2}` are the gravitational forces acting on mass 1 and 2, :math:`\boldsymbol{\tau}_{g2}` is the torque induced by :math:`\mathbf{F}_{g2}` acting around the origin of frame 1, and :math:`\mathbf{F}_{\text{joint}}` is the joint force keeping the two bodies together.
-
-    **c. Equation of motion**
-
-
-    Using the results from part a and b, show that the equation of motion can be expressed as:
-
-    .. math::
-
-       (m_1+m_2)\ddot{z} + m_2 L \dot{\theta}^2 \cos\theta + m_2 L \ddot{\theta} \sin\theta + (m_1+m_2)g + kz = 0
-
-    .. math::
-
-       L^2 m_2 \ddot{\theta} + L m_2 \ddot{z} \sin\theta + L m_2 g \sin\theta = 0
-
-    .. hint::
-
-        Since the oscillating mass is constrained to move along the :math:`\text{z}_0` axis, this makes some simplifications to equations :eq:`newton` and :eq:`inertia-matrix`.
-
-    **d. Modeling with uniformly distributed mass**
-
-    Assume now that we were to remove the point mass :math:`m_2`, and instead model the pendulum as a rod with uniformly distributed mass :math:`m_2` with center of gravity at the midpoint of the rod, such that the moment of inertia about the center point is :math:`I_{xx} = \frac{L^2 m_2}{12}`. What are the equations of motion now?
-
-    **e. Parallel Axis Theorem**
-
-    In some cases, when dealing with moment balances of rigid bodies that are rotating about some point that is not their center of gravity, we may modify the moment of inertia expression by employing the parallel axis theorem. This adjustment allows us to simplify the modeling of motion as a pure rotation.
-
-    Why can we not simply use the parallel axis theorem in Task d) above, and model the pendulum as a pure rotation about the hinge point of the rod? What term would be missing in the model you derived in Task d)?
-
+    b) Find the linear acceleration of the point A of the parameters of the system, and the variables :math:`\phi` and :math:`\theta` and their first and second order time derivatives.

@@ -1,5 +1,5 @@
 ==============================
-Assignment 9 - Bond Graphs III
+Assignment 9 - Bond Graphs II
 ==============================
 
 .. note::

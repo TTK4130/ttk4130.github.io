@@ -1,6 +1,6 @@
-===================================
-Assignment 6 - Constrained Lagrange
-===================================
+=========================
+Assignment 6 - Lagrange
+=========================
 
 .. note::
 
@@ -8,148 +8,230 @@ Assignment 6 - Constrained Lagrange
     We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
     This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
 
-In this assignment we will study the modeling of complex mechanical systems using the constrained Lagrange equations.
-Since the calculations of the partial derivatives of the Lagrangian can be involved, we will once more outsource this task by using SymPy.
+In this assignment we will study the modeling of complex mechanical systems based on the Lagrange approach.
 
-
-Problem 1 - Hovering Mass
---------------------------
+Problem 1 - Ball on a Beam
+==========================
 
 .. note::
 
     This problem contains a programming exercise.
     Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
-    The relevant notebook is `assingment-6-hovering-mass.ipynb`.
+    The relevant notebook is `assingment-5-ball-and-beam.ipynb`.
 
-We consider a helicopter lifting a mass. We model this system as two point masses coupled by a rigid link with length :math:`L`. The masses are :math:`m_1` and :math:`m_2`, and their positions in space are given by :math:`\mathbf{p}_1 \in \mathbb{R}^3` and :math:`\mathbf{p}_2 \in \mathbb{R}^3`. We assume that an external force :math:`\mathbf{u} \in \mathbb{R}^3` is applied to :math:`m_1` (helicopter).
+.. admonition:: Animation code
+    :class: dropdown
+
+    .. jupyter-execute::
+
+        import pythreejs as pj
+        import numpy as np
+        import requests
+        import base64
+
+        def load_image_from_url(url):
+            response = requests.get(url)
+            if response.status_code == 200:
+                return f"data:image/png;base64,{base64.b64encode(response.content).decode('utf-8')}"
+            else:
+                raise Exception(f"Failed to load image from {url}")
+
+        # Cubemap texture URLs, because I'm lazy
+        texture_urls = [
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/px.png",  # Positive X
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/nx.png",  # Negative X
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/py.png",  # Positive Y
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/ny.png",  # Negative Y
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/pz.png",  # Positive Z
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/nz.png"   # Negative Z
+        ]
+
+        scene = pj.Scene()
+        camera = pj.PerspectiveCamera(position=[0, 0, 5], up=[0, 1, 0], aspect=1)
+        camera.lookAt([0, 0, 0])
+
+        skybox_geometry = pj.BoxGeometry(width=500, height=500, depth=500)
+
+        materials = [
+            pj.MeshBasicMaterial(
+                map=pj.ImageTexture(imageUri=load_image_from_url(url)),
+                side='BackSide'
+            ) for url in texture_urls
+        ]
+        skybox = pj.Mesh(skybox_geometry, materials)
+        scene.add(skybox)
+
+        ## Placeholder trajectory
+
+        ys = np.zeros((4, 100), dtype=np.float32)
+        ts = np.zeros((1, 100), dtype=np.float32)
+
+        ## Setting up objects
+        ball_radius = 0.25
+        beam_length, beam_width, beam_height = 3, .5, .1
+
+        ball = pj.Mesh(
+            pj.SphereGeometry(ball_radius, 32, 16),
+            pj.MeshStandardMaterial(color="blue"))
+        beam = pj.Mesh(
+            pj.BoxGeometry(beam_length, beam_height, beam_width),
+            pj.MeshStandardMaterial(color="red"))
+
+        ## Position and rotation
+        ball_pos = np.zeros((3, ys.shape[1]), dtype=np.float32)
+        ball_pos[0, :] = ys[0, :]
+        ball_pos[1, :] = (ball_radius + 0.5 * beam_height) * np.ones((len(ts)))
+
+        from scipy.spatial.transform import Rotation
+        exaggeration_coefficient = 10
+        beam_rot = Rotation.from_euler("z", exaggeration_coefficient * ys[1, :], degrees=True).as_quat().astype(np.float32).T
+
+        beam.position = (0, 0, 0)
+        ball.position = tuple(ball_pos[:, 0])
+
+        ## Collecting in a group for correct rotation animation
+        pivot = pj.Group()
+        pivot.add(beam)  # this becomes pivot.children[0]
+        pivot.add(ball)  # this becomes pivot.children[1]
+        pivot.quaternion = tuple(beam_rot[:, 0])
+        scene.add(pivot)
+
+        ## Setting up the animation
+        ball_position_track = pj.VectorKeyframeTrack(name=".children[1].position", times = ts, values = ball_pos.T)
+        pivot_rotation_track = pj.QuaternionKeyframeTrack(name=".quaternion", times = ts, values = beam_rot.T)
+        pivot_clip = pj.AnimationClip(tracks = [ball_position_track, pivot_rotation_track])
+        pivot_action = pj.AnimationAction(pj.AnimationMixer(pivot), pivot_clip, pivot)
+
+        ## Setting the scene
+        view_width, view_height = 800, 600
+        camera = pj.PerspectiveCamera(position=[0, 1, 4], aspect = view_width/view_height)
+        ambient_light = pj.AmbientLight(color="#ffffff", intensity=1.0)
+        key_light = pj.DirectionalLight(position=[0, 10, 0])
+        scene.add(ambient_light)
+        scene.add(key_light)
+
+        ## Making the renderer
+        controls = pj.OrbitControls(controlling = camera)
+        renderer = pj.Renderer(camera=camera, scene=scene, width=view_width, height=view_height, controls=[controls])
 
 
-.. admonition:: a. Classical Lagrange Approach
 
-    We will first model this system using the classical Lagrange approach, where the number of coordinates equals the number of degrees of freedom. The position of the helicopter is described by :math:`\mathbf{p}_1 \in \mathbb{R}^3`, and the position of the hovering mass is described by the two angles :math:`\theta, \phi`, which give the orientation of the rigid link (spherical coordinates). Hence, the generalized coordinates are:
+.. jupyter-execute::
 
-    .. math::
-        \mathbf{q} = \begin{bmatrix} \mathbf{p}_1 \\ \theta \\ \phi \end{bmatrix} \in \mathbb{R}^5.
+    renderer
 
-    The fully assembled model takes the form:
+.. jupyter-execute::
 
-    .. math::
-        \begin{aligned}
-            \dot{\mathbf{q}} &= \mathbf{v},\\
-            M(\mathbf{q})\dot{\mathbf{v}} &= \mathbf{b}(\mathbf{q},\dot{\mathbf{q}},\mathbf{u}).
-        \end{aligned}
+    pivot_action
 
-    Complete the template `assingment-6-hovering-mass.ipynb` (found in the `code handout repository <https://github.com/TTK4130/code-handouts>`_) by performing the following tasks:
+We consider here a solid ball on a beam system as depicted in :numref:`bob`.
+The ball rolls without slipping (pure rotation) on a beam that is articulated without friction in the middle.
+A torque :math:`T` acts on the beam joint.
+We will use the following numerical values: The rotational inertia of the rail around its joint is :math:`J = 1\ \text{kg} \cdot \text{m}^2`, the mass of the ball is :math:`M = 10\ \text{kg}` and its radius is :math:`R = 0.25\ \text{m}`.
+The position of the ball with respect to the joint of the rail will be labeled by :math:`x`.
 
-    1. Write the expression for the position :math:`\mathbf{p}_2` of mass :math:`m_2` from :math:`\mathbf{q}`.
-    2. Write the expression for the generalized forces.
-    3. Write the expression for the kinetic energy.
-    4. Write the expression for the potential energy.
-    5. Write the expression for the Lagrangian.
-    6. Run the routine to obtain the expressions for :math:`M` and :math:`\mathbf{b}`.
+A rotation with :math:`\dot{\theta}>0` obeys the right-hand rule for reference frames :math:`\mathbf{a}` and :math:`\mathbf{b}`, while a displacement with :math:`\dot{x}>0` moves the ball in the direction :math:`\mathbf{b}_1` (see :numref:`bob`).
 
-    Include the equations and the implemented code in your answer.
+Here, we will use the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T`.
 
 
-.. admonition:: b. Constrained Lagrange Approach
+.. figure:: figures/BallOnBeam.svg
+    :width: 80%
+    :align: center
+    :name: bob
 
-    We now use the constrained Lagrange approach to model the system dynamics. The generalized coordinates in this case are:
+    Schematic of the ball on a beam.
 
-    .. math::
-
-        \mathbf{q} = \begin{bmatrix} \mathbf{p}_1 \\ \mathbf{p}_2 \end{bmatrix} \in \mathbb{R}^6,
-
-    and the scalar constraint is given by:
-
-    .. math::
-
-        C = \frac{1}{2} \left( \mathbf{e}^\top \mathbf{e} - L^2 \right), \quad \text{where} \quad \mathbf{e} = \mathbf{p}_1 - \mathbf{p}_2.
-
-    The system dynamics are:
-
-    .. math::
-
-        \begin{aligned}
-            \frac{\mathrm{d}}{\mathrm{d}t} \frac{\partial \mathcal{L}}{\partial \dot{\mathbf{q}}}(\mathbf{q},\dot{\mathbf{q}}) - \frac{\partial \mathcal{L}}{\partial \mathbf{q}}(\mathbf{q},\dot{\mathbf{q}}) - z \nabla C(\mathbf{q}) &= \mathbf{Q},\\
-            C(\mathbf{q}) &= 0.
-        \end{aligned}
-
-    The fully assembled model takes the form:
-
-    .. math::
-
-        \begin{aligned}
-            \dot{\mathbf{q}} &= \mathbf{v},\\
-            M(\mathbf{q}) \dot{\mathbf{v}} &= \mathbf{b}(\mathbf{q},\mathbf{z},\mathbf{u}),\\
-            0 &= C(\mathbf{q}).
-        \end{aligned}
-
-    Perform the following tasks:
-
-    1. Derive the model matrices :math:`M(\mathbf{q})` and :math:`\mathbf{b}(\mathbf{q}, \dot{\mathbf{q}}, \mathbf{u})`.
-    2. Compare the complexity of the models from part (a) and (b) in terms of symbolic expressions for :math:`M` and :math:`\mathbf{b}`. What do you conclude?
-
-Problem 2 - Delta-Robot
------------------------
-
-
-Delta-robots are common in ultra-fast packaging applications.
-Figure :numref:`fig-system` illustrates a Delta-robot.
-The three yellow arms of length :math:`l` are actuated and can pivot in their vertical planes.
-These arms drive the three double thin rods of length :math:`L` (typically made of ultra-light carbon fiber), connected to the nacelle (triangular shape at the bottom).
-The geometry imposes that the nacelle always remains horizontal.
-Moreover, the pivots on the nacelle are forced to remain at a distance :math:`L` from the pivot at the extremities of the yellow arms.
-
-In order to express the Lagrange function and the constraints, the following parameters and variables are defined:
-The Cartesian frame has its origin at the center of the upper platform, with the :math:`x`-axis aligned with the frontal robot arm, and the :math:`z`-axis pointing up.
-The position of the pivots of the yellow arms in this Cartesian frame, :math:`\mathbf{p}_{1,2,3}`, are given by
-
-.. math::
-   \mathbf{p}_k= R_k\begin{bmatrix}d+l\cos\alpha_k \\ 0 \\ -l\sin\alpha_k \end{bmatrix},\quad R_k = \begin{bmatrix}\cos \gamma_k & -\sin\gamma_k & 0 \\
-   \sin \gamma_k & \cos\gamma_k & 0 \\
-   0 & 0 & 1\end{bmatrix},
-
-where :math:`\gamma_{1,2,3} = \left\{0, \frac{2\pi}{3},\frac{4\pi}{3}\right\}`, :math:`d` is the constant distance from the center of the upper platform to the axis of the motors (black in the figure), and :math:`\alpha_k` are the angles of the yellow arms with respect to the horizontal plane.
-The yellow arms together with the motors have an inertia :math:`J`, i.e. their kinetic energy is :math:`T_k = \frac{1}{2}J\dot\alpha_k^2`.
-The nacelle has a mass :math:`m`.
-For simplicity, we will assume that the nacelle is just a point where the long arms are all connected. This is a simplification.
-
-.. figure:: ./figures/Delta.svg
-   :width: 100%
-   :align: center
-   :name: fig-system
-
-   Illustration of the Delta-robot. The yellow arms (length :math:`l`) are actuated by the motors on the upper platform (black boxes).
 
 .. admonition:: Tasks
 
-    **a. Classical Unconstrained Lagrange Approach**
+    a) What is the position of the ball's center as a function of the generalized coordinates?
 
-    Assume that we use the classical unconstrained Lagrange approach with the angles :math:`\alpha_{1,2,3}` as the generalized coordinates. Explain what is the challenge with this approach in this particular case.
+    b) The total movement of the ball is the result of its movement with respect to the beam, in addition to the movement of the beam.
 
-    *Hint: How would you find the position of the nacelle as a function of the generalized coordinates?*
+       What is then the angular velocity of the ball as a function of the generalized coordinates?
+
+    c) The ball is a rigid body that both experiences translation and rotation.
+
+       What is the expression for the kinetic energy of the ball?
+
+    d) The beam is also a rigid body, but it only rotates.
+
+       What is the expression for the kinetic energy of the beam?
+
+    e) Complete the Jupyter notebook `assingment-5-ball-and-beam.ipynb` (found in the `code handout repository <https://github.com/TTK4130/code-handouts>`_) by doing the following tasks:
+
+       - Define the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T` as a symbolic variable.
+       - Define a symbolic variable for the derivative of the generalized coordinates.
+       - Write the expression for the position of the ball's center.
+       - Complete the expressions for the kinetic and potential energies.
+       - Write the expression for the Lagrangian function.
+       - Run the routine.
+
+       Add the implemented code to your answer.
+
+       The Lagrange equations can be written in state-space form as given by
+
+       .. math::
+
+          \mathbf{x} = \begin{bmatrix} \mathbf{q} \\ \dot{\mathbf{q}} \end{bmatrix},\qquad \dot{\mathbf{x}} = \begin{bmatrix} \dot{\mathbf{q}} \\  \left(\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}\right)^{-1}\left(\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}} \right) \end{bmatrix}.
+
+       The routine implemented in part (e) exports two Matlab functions.
+       One that gives the position of the ball's center, while the other returns the terms :math:`\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}` and :math:`\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}}`.
+
+    f) Assume that the external torque :math:`T` is given by the PD control law:
+
+       .. math::
+            :label: ODE
+
+            T = 200 (x-\theta) + 70 (\dot{x} - \dot{\theta})
+
+       Write a function that gives the dynamics of the state-space model :eq:`ODE` by using the `get_W` and `get_RHS` functions and the PD control law.
+       In other words, this function should return the value of the right-hand side of :eq:`ODE` as a function of the states and the parameters.
+
+    g) **(Optional task)** Complete the delivered Jupyter notebook in order to make an animation of the simulation results.
+
+       Simulate your system using e.g. :math:`x(0) = 1,\, \theta(0) = 0` as initial conditions with initial velocities at rest.
+
+       Run the animation.
+
+       What do you observe? Are these results reasonable? Explain.
+
+       *Hint: The function that returns the position of the ball's center can come in handy here.*
 
 
-    We choose the following generalized coordinates for the Delta-robot:
+Problem 2 - Pendulum on a Vertical Oscillator
+==============================================
 
-    .. math::
+In this problem, we will derive equations of motion for the same system analyzed in Assignment 4. Previously, we used the Newton-Euler approach; now, we will use the Lagrange method. Depending on your choice of generalized coordinates, you may obtain the same equations as in Assignment 4.
 
-        \mathbf{q} = \begin{bmatrix}\alpha_1 \\ \alpha_2 \\ \alpha_3 \\ \mathbf{p}\end{bmatrix},
+.. figure:: ./figures/pendulum_osc.svg
+   :width: 30%
+   :align: center
 
-    where :math:`\mathbf{p}\in\mathbb{R}^3` is the position of the nacelle.
+   Pendulum on a vertical oscillator
+
+Figure above shows a pendulum with a point mass :math:`m_2` attached to a mass :math:`m_1` that can oscillate along a vertical axis. The pendulum rod has a length :math:`L` and is considered massless (i.e., the pendulum can be modeled as a point mass at the end of a massless rod).
+
+The oscillating mass is connected to a stationary structure via a spring with stiffness :math:`k`. The vertical position :math:`z` of the mass is defined such that :math:`z_0` corresponds to the neutral position of the spring. The angular displacement of the pendulum rod is :math:`\theta`, as indicated in the figure. For simplicity, body one is constrained to move only along the vertical axis, with no motion along the :math:`y_0` or :math:`z_0` directions.
+
+.. admonition:: Tasks
+
+    a) Select a set of generalized coordinates that uniquely describe the configuration of the system. Ensure the number of coordinates corresponds to the degrees of freedom of the system.
+
+    b) Find the kinetic energy of the system and express it in terms of the generalized coordinates and their time derivatives.
+
+    c) Find the potential energy of the system and express it in terms of the generalized coordinates.
+
+    d) Derive the equations of motion for the system using the Lagrange method.
 
 
-    **b. Lagrange Function and Constraints**
+    **Hints:**
 
-    Write down the Lagrange function :math:`\mathcal{L}` of the Delta-robot, as well as the associated constraints :math:`\mathbf{c}`.
+    - Express the coordinates of both masses in terms of the generalized coordinates before differentiating.
+    - Consider the contributions to the kinetic and potential energy separately for each mass.
+    - Apply the Euler-Lagrange equation to derive the equations of motion:
 
-
-    **c. Differential Index of the DAE**
-
-    What is the differential index of the DAE that results from :math:`\mathcal{L}` and :math:`\mathbf{c}`?
-
-
-    **d. Consistency Conditions**
-
-    What are the consistency conditions of the Delta-robot? The explicit expression is not needed, only the abstract form.
+      .. math::
+          \frac{d}{dt} \left( \frac{\partial T}{\partial \dot{q}_i} \right) - \frac{\partial T}{\partial q_i} + \frac{\partial V}{\partial q_i} = 0
 

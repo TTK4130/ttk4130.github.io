@@ -1,6 +1,6 @@
-==========================
-Assignment 7 - Bond Graphs
-==========================
+===================================
+Assignment 7 - Constrained Lagrange
+===================================
 
 .. note::
 
@@ -8,153 +8,148 @@ Assignment 7 - Bond Graphs
     We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
     This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
 
-In this assignment we will study how we can use power bonds to connect submodel into a system model.
+In this assignment we will study the modeling of complex mechanical systems using the constrained Lagrange equations.
+Since the calculations of the partial derivatives of the Lagrangian can be involved, we will once more outsource this task by using SymPy.
 
-Problem 1 - Steering mechanism
-------------------------------
 
-.. figure:: ./figures/assignment_7/Steeringmechanism.png
-    :width: 100%
-    :align: center
-    :name: steering
+Problem 1 - Hovering Mass
+--------------------------
 
-    Simple model of a steering mechanism.
+.. note::
 
-.. figure:: ./figures/assignment_7/word_bg_steering_mech.png
-    :width: 100%
-    :align: center
-    :name: bond_graph_steering
-    
-    Word bond graph for the steering mechanism.
+    This problem contains a programming exercise.
+    Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
+    The relevant notebook is `assingment-6-hovering-mass.ipynb`.
 
-Figure :numref:`steering` shows a simple model of a steering mechanism for a vehicle,
-while figure :numref:`bond_graph_steering` shows a *word bond graph* for the same
-steering mechanism.
+We consider a helicopter lifting a mass. We model this system as two point masses coupled by a rigid link with length :math:`L`. The masses are :math:`m_1` and :math:`m_2`, and their positions in space are given by :math:`\mathbf{p}_1 \in \mathbb{R}^3` and :math:`\mathbf{p}_2 \in \mathbb{R}^3`. We assume that an external force :math:`\mathbf{u} \in \mathbb{R}^3` is applied to :math:`m_1` (helicopter).
 
-.. admonition:: Tasks
 
-    a) Draw a block diagram of the system based on the word bond graph and the causality assignment given to it.
-    
-    .. hint::
-        :class: dropdown
-        
-        Recall that the causal stroke is on the submodel where the effort is 
-        input and the flow is output.
+.. admonition:: a. Classical Lagrange Approach
 
-    b) The following information is given about each submodel:
+    We will first model this system using the classical Lagrange approach, where the number of coordinates equals the number of degrees of freedom. The position of the helicopter is described by :math:`\mathbf{p}_1 \in \mathbb{R}^3`, and the position of the hovering mass is described by the two angles :math:`\theta, \phi`, which give the orientation of the rigid link (spherical coordinates). Hence, the generalized coordinates are:
 
-    - **Battery**:
-        Gives a constant voltage.
-    - **DC motor**:
-        A DC-motor can be described by the following equations
-        
-        .. math::
-            L_a \frac{di_a}{dt} = -R_a i_a - K_t \omega_m + u_a
-            \\
-            J \dot{\omega}_m = K_T i_a - \tau
-        
-        where :math:`L_a` is the armature inductance, 
-        :math:`i_a` is the armature current, 
-        :math:`R_a` is the resistance in the armature circuit, 
-        :math:`K_T` is a constant, 
-        :math:`\omega_m` is the speed of the motor, 
-        :math:`u_a` is the armature voltage,
-        and the torque :math:`\tau` is the load.
-    - **Flexible shaft**: 
-        A flexible shaft may have a slight difference in the angular velocity :math:`\omega_1`
-        and :math: `\omega_2` of each side, resulting also in a slight difference
-        :math:`\Delta \theta = \int_{t_0}^t (\omega_2 - \omega_1) dt` in the angular
-        displacement on each side.
-        We can think of the flexible shaft as an angular spring with a
-        linear relation between the angular displacement and the torque, such that :math:`\tau = k_s \Delta \theta`.
-        The moment of inertia for the shaft is small compared to the moment of inertia of the DC-motor
-        and the rack, so we may consider it as massless.
-    - **Gear (or pinion)**:
-        The gear is modelled as massless and loss-less
-        (i.e. it does not remove energy from the system).
-        Its function in this system is to transform between the angular velocity
-        and torque on one port, and linear velocity and a force on the other port.
-        The relationship between the linear velocity and the angular velocity is :math:`v = r\omega`. 
-        Since it is loss-less, we also have that the power on each port is identical.
-        In equation form this can be stated as :math:`\omega \tau = v F`.
-    - **Rack**:
-        The rack can be modelled as mass m that can move with one degree of freedom.
-        This mass is governed by the equation: :math:`ma = \sum F` .
-    - **Spring**: 
-        The spring gives a linear relation between the force and the displacement, such that
-        the spring force :math:`F_s`  is given as :math:`F_s = kx` , where :math:`x = \int_{t_0}^t v dt`.
-    - **Damper**:
-        The damper (or dashpot) is governed by the law: :math:`F_d = k_d v`.
-
-    Use the block diagram you made together with the information given above and the word bond
-    graph to show that the system equations for the steering mechanism can be written as
-    
     .. math::
-        L_a \frac{di_a}{dt} &= -R_a i_a - K_t \omega_1 + u_a
-        \\
-        J \dot{\omega}_m &= K_T i_a - k_s \Delta \theta
-        \\
-        \dot{\Delta \theta} &= \frac{1}{r} v - \omega_1
-        \\
-        \dot{x} &= v
-        \\
-        m \dot{v} &= - kx - dv + \frac1{r} k_s \Delta \theta
-    
-    .. hint::
-        :class: dropdown
-        
-        Recall that the direction of the half arrows in the word bond graph
-        defines which direction of positive power (energy flow).
-        This means that the half arrows will be useful in defining the sign of
-        efforts and flows in the final set of differential equations.
+        \mathbf{q} = \begin{bmatrix} \mathbf{p}_1 \\ \theta \\ \phi \end{bmatrix} \in \mathbb{R}^5.
 
-Problem 2 - Two rotating shafts
--------------------------------
+    The fully assembled model takes the form:
 
-.. figure:: ./figures/assignment_7/two_rotating_masses.png
-    :width: 100%
-    :align: center
-    :name: two_rotating_masses
+    .. math::
+        \begin{aligned}
+            \dot{\mathbf{q}} &= \mathbf{v},\\
+            M(\mathbf{q})\dot{\mathbf{v}} &= \mathbf{b}(\mathbf{q},\dot{\mathbf{q}},\mathbf{u}).
+        \end{aligned}
 
-    Two rotating shafts connected by a gearbox
+    Complete the template `assingment-6-hovering-mass.ipynb` (found in the `code handout repository <https://github.com/TTK4130/code-handouts>`_) by performing the following tasks:
 
-.. figure:: ./figures/assignment_7/word_bg_flywheels.png
-    :width: 100%
-    :align: center
-    :name: bond_graph_two_rotating_masses
+    1. Write the expression for the position :math:`\mathbf{p}_2` of mass :math:`m_2` from :math:`\mathbf{q}`.
+    2. Write the expression for the generalized forces.
+    3. Write the expression for the kinetic energy.
+    4. Write the expression for the potential energy.
+    5. Write the expression for the Lagrangian.
+    6. Run the routine to obtain the expressions for :math:`M` and :math:`\mathbf{b}`.
 
-    Word bond graph of the system
+    Include the equations and the implemented code in your answer.
 
-Figure :numref:`two_rotating_masses` shows two rotating flywheels connected by a gearbox. 
-The gearbox is friction-less. 
-There are two torques :math:`T_1` and :math:`T_2` applied to the two flywheels. 
-The left flywheel rotates with the angular speed :math:`\omega_1` and has moment of inertia :math:`J_1`,
-while the right-hand flywheel rotates with an angular speed :math:`\omega_2` and has moment of inertia :math:`J_2`. 
-A system model is shown in the form of a word bond graph in figure :numref:`bond_graph_two_rotating_masses`.
 
+.. admonition:: b. Constrained Lagrange Approach
+
+    We now use the constrained Lagrange approach to model the system dynamics. The generalized coordinates in this case are:
+
+    .. math::
+
+        \mathbf{q} = \begin{bmatrix} \mathbf{p}_1 \\ \mathbf{p}_2 \end{bmatrix} \in \mathbb{R}^6,
+
+    and the scalar constraint is given by:
+
+    .. math::
+
+        C = \frac{1}{2} \left( \mathbf{e}^\top \mathbf{e} - L^2 \right), \quad \text{where} \quad \mathbf{e} = \mathbf{p}_1 - \mathbf{p}_2.
+
+    The system dynamics are:
+
+    .. math::
+
+        \begin{aligned}
+            \frac{\mathrm{d}}{\mathrm{d}t} \frac{\partial \mathcal{L}}{\partial \dot{\mathbf{q}}}(\mathbf{q},\dot{\mathbf{q}}) - \frac{\partial \mathcal{L}}{\partial \mathbf{q}}(\mathbf{q},\dot{\mathbf{q}}) - z \nabla C(\mathbf{q}) &= \mathbf{Q},\\
+            C(\mathbf{q}) &= 0.
+        \end{aligned}
+
+    The fully assembled model takes the form:
+
+    .. math::
+
+        \begin{aligned}
+            \dot{\mathbf{q}} &= \mathbf{v},\\
+            M(\mathbf{q}) \dot{\mathbf{v}} &= \mathbf{b}(\mathbf{q},\mathbf{z},\mathbf{u}),\\
+            0 &= C(\mathbf{q}).
+        \end{aligned}
+
+    Perform the following tasks:
+
+    1. Derive the model matrices :math:`M(\mathbf{q})` and :math:`\mathbf{b}(\mathbf{q}, \dot{\mathbf{q}}, \mathbf{u})`.
+    2. Compare the complexity of the models from part (a) and (b) in terms of symbolic expressions for :math:`M` and :math:`\mathbf{b}`. What do you conclude?
+
+Problem 2 - Delta-Robot
+-----------------------
+
+
+Delta-robots are common in ultra-fast packaging applications.
+Figure :numref:`fig-system` illustrates a Delta-robot.
+The three yellow arms of length :math:`l` are actuated and can pivot in their vertical planes.
+These arms drive the three double thin rods of length :math:`L` (typically made of ultra-light carbon fiber), connected to the nacelle (triangular shape at the bottom).
+The geometry imposes that the nacelle always remains horizontal.
+Moreover, the pivots on the nacelle are forced to remain at a distance :math:`L` from the pivot at the extremities of the yellow arms.
+
+In order to express the Lagrange function and the constraints, the following parameters and variables are defined:
+The Cartesian frame has its origin at the center of the upper platform, with the :math:`x`-axis aligned with the frontal robot arm, and the :math:`z`-axis pointing up.
+The position of the pivots of the yellow arms in this Cartesian frame, :math:`\mathbf{p}_{1,2,3}`, are given by
+
+.. math::
+   \mathbf{p}_k= R_k\begin{bmatrix}d+l\cos\alpha_k \\ 0 \\ -l\sin\alpha_k \end{bmatrix},\quad R_k = \begin{bmatrix}\cos \gamma_k & -\sin\gamma_k & 0 \\
+   \sin \gamma_k & \cos\gamma_k & 0 \\
+   0 & 0 & 1\end{bmatrix},
+
+where :math:`\gamma_{1,2,3} = \left\{0, \frac{2\pi}{3},\frac{4\pi}{3}\right\}`, :math:`d` is the constant distance from the center of the upper platform to the axis of the motors (black in the figure), and :math:`\alpha_k` are the angles of the yellow arms with respect to the horizontal plane.
+The yellow arms together with the motors have an inertia :math:`J`, i.e. their kinetic energy is :math:`T_k = \frac{1}{2}J\dot\alpha_k^2`.
+The nacelle has a mass :math:`m`.
+For simplicity, we will assume that the nacelle is just a point where the long arms are all connected. This is a simplification.
+
+.. figure:: ./figures/Delta.svg
+   :width: 100%
+   :align: center
+   :name: fig-system
+
+   Illustration of the Delta-robot. The yellow arms (length :math:`l`) are actuated by the motors on the upper platform (black boxes).
 
 .. admonition:: Tasks
 
-    a)
-        Draw a block diagram for the system based on the word bond graph and the causality defined by
-        the causal strokes.
+    **a. Classical Unconstrained Lagrange Approach**
 
-    b)
-        While it is tempting to use two differential equations on the form
+    Assume that we use the classical unconstrained Lagrange approach with the angles :math:`\alpha_{1,2,3}` as the generalized coordinates. Explain what is the challenge with this approach in this particular case.
 
-        .. math::
-            J_i \dot{\omega}_i = \sum T
+    *Hint: How would you find the position of the nacelle as a function of the generalized coordinates?*
 
-        this is not viable because the two flywheels are not able to rotate independently of each other.
-        If we know :math:`\omega_1`, we also know :math:`\omega_2`
-        (and if we know :math:`\dot{\omega_1}` we know :math:`\dot{\omega_2}`).
-        In particular, :math:`r \omega_1 = \omega_2` and :math:`\tau_1 = r \tau_2`.
-        Therefore we only need a single differential equation to describe both of them.
-        Show that the equation of motion for the two flywheels can be written as
 
-        .. math::
-            \left( J_1 + r^2 J_2 \right) \dot{\omega}_1 = T_1 + r T_2
+    We choose the following generalized coordinates for the Delta-robot:
 
-    c)
-        Derive the same expression using Lagrange mechanics with your generalized coordinate
-        :math:`q = \theta_1` and :math:`\dot{q} = \omega_1`.
+    .. math::
+
+        \mathbf{q} = \begin{bmatrix}\alpha_1 \\ \alpha_2 \\ \alpha_3 \\ \mathbf{p}\end{bmatrix},
+
+    where :math:`\mathbf{p}\in\mathbb{R}^3` is the position of the nacelle.
+
+
+    **b. Lagrange Function and Constraints**
+
+    Write down the Lagrange function :math:`\mathcal{L}` of the Delta-robot, as well as the associated constraints :math:`\mathbf{c}`.
+
+
+    **c. Differential Index of the DAE**
+
+    What is the differential index of the DAE that results from :math:`\mathcal{L}` and :math:`\mathbf{c}`?
+
+
+    **d. Consistency Conditions**
+
+    What are the consistency conditions of the Delta-robot? The explicit expression is not needed, only the abstract form.
+

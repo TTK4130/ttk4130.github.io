@@ -1,6 +1,6 @@
-=========================
-Assignment 5 - Lagrange
-=========================
+=============================
+Assignment 5 - Newton-Euler
+=============================
 
 .. note::
 
@@ -8,16 +8,16 @@ Assignment 5 - Lagrange
     We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
     This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
 
-In this assignment we will study the modeling of complex mechanical systems based on the Lagrange approach.
+This assignment is about the Newton-Euler method for developing a dynamic model of a mechanical system. This topic is treated in :cite:t:`Egeland2002` from chapter 6.13 to 7.3.
 
-Problem 1 - Ball on a Beam
-==========================
+Problem 1 - Satellite
+===========================
 
 .. note::
 
     This problem contains a programming exercise.
     Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
-    The relevant notebook is `assingment-5-ball-and-beam.ipynb`.
+    The relevant notebook is `assignment-4-satellite.ipynb`.
 
 .. admonition:: Animation code
     :class: dropdown
@@ -38,20 +38,18 @@ Problem 1 - Ball on a Beam
 
         # Cubemap texture URLs, because I'm lazy
         texture_urls = [
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/px.png",  # Positive X
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/nx.png",  # Negative X
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/py.png",  # Positive Y
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/ny.png",  # Negative Y
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/pz.png",  # Positive Z
-            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/ceiling_lights_cubemap/nz.png"   # Negative Z
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/px.png",  # Positive X
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/nx.png",  # Negative X
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/py.png",  # Positive Y
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/ny.png",  # Negative Y
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/pz.png",  # Positive Z
+            "https://raw.githubusercontent.com/TTK4130/ttk4130.github.io/refs/heads/main/docs/_static/space_cubemap/nz.png"   # Negative Z
         ]
 
         scene = pj.Scene()
-        camera = pj.PerspectiveCamera(position=[0, 0, 5], up=[0, 1, 0], aspect=1)
-        camera.lookAt([0, 0, 0])
+        camera = pj.PerspectiveCamera(position=[10, 6, 10], aspect=800/600)
 
         skybox_geometry = pj.BoxGeometry(width=500, height=500, depth=500)
-
         materials = [
             pj.MeshBasicMaterial(
                 map=pj.ImageTexture(imageUri=load_image_from_url(url)),
@@ -61,177 +59,190 @@ Problem 1 - Ball on a Beam
         skybox = pj.Mesh(skybox_geometry, materials)
         scene.add(skybox)
 
-        ## Placeholder trajectory
+        cubesat = pj.Mesh(
+            pj.BoxGeometry(1, 1, 1),
+            pj.MeshStandardMaterial(color='red')
+        )
+        scene.add(cubesat)
 
-        ys = np.zeros((4, 100), dtype=np.float32)
-        ts = np.zeros((1, 100), dtype=np.float32)
+        axis_helper = pj.AxesHelper(size=5)
+        axis_helper.position = cubesat.position
+        axis_helper.quaternion = cubesat.quaternion
 
-        ## Setting up objects
-        ball_radius = 0.25
-        beam_length, beam_width, beam_height = 3, .5, .1
+        scene.add(axis_helper)
 
-        ball = pj.Mesh(
-            pj.SphereGeometry(ball_radius, 32, 16),
-            pj.MeshStandardMaterial(color="blue"))
-        beam = pj.Mesh(
-            pj.BoxGeometry(beam_length, beam_height, beam_width),
-            pj.MeshStandardMaterial(color="red"))
+        scene.add(pj.AmbientLight(color='#ffffff', intensity=1.0))
+        scene.add(pj.DirectionalLight(position=[0, 10, 0]))
 
-        ## Position and rotation
-        ball_pos = np.zeros((3, ys.shape[1]), dtype=np.float32)
-        ball_pos[0, :] = ys[0, :]
-        ball_pos[1, :] = (ball_radius + 0.5 * beam_height) * np.ones((len(ts)))
-
-        from scipy.spatial.transform import Rotation
-        exaggeration_coefficient = 10
-        beam_rot = Rotation.from_euler("z", exaggeration_coefficient * ys[1, :], degrees=True).as_quat().astype(np.float32).T
-
-        beam.position = (0, 0, 0)
-        ball.position = tuple(ball_pos[:, 0])
-
-        ## Collecting in a group for correct rotation animation
-        pivot = pj.Group()
-        pivot.add(beam)  # this becomes pivot.children[0]
-        pivot.add(ball)  # this becomes pivot.children[1]
-        pivot.quaternion = tuple(beam_rot[:, 0])
-        scene.add(pivot)
-
-        ## Setting up the animation
-        ball_position_track = pj.VectorKeyframeTrack(name=".children[1].position", times = ts, values = ball_pos.T)
-        pivot_rotation_track = pj.QuaternionKeyframeTrack(name=".quaternion", times = ts, values = beam_rot.T)
-        pivot_clip = pj.AnimationClip(tracks = [ball_position_track, pivot_rotation_track])
-        pivot_action = pj.AnimationAction(pj.AnimationMixer(pivot), pivot_clip, pivot)
-
-        ## Setting the scene
-        view_width, view_height = 800, 600
-        camera = pj.PerspectiveCamera(position=[0, 1, 4], aspect = view_width/view_height)
-        ambient_light = pj.AmbientLight(color="#ffffff", intensity=1.0)
-        key_light = pj.DirectionalLight(position=[0, 10, 0])
-        scene.add(ambient_light)
-        scene.add(key_light)
-
-        ## Making the renderer
-        controls = pj.OrbitControls(controlling = camera)
-        renderer = pj.Renderer(camera=camera, scene=scene, width=view_width, height=view_height, controls=[controls])
-
+        controls = pj.OrbitControls(controlling=camera)
+        renderer = pj.Renderer(camera=camera, scene=scene, width=800, height=600, controls=[controls])
 
 
 .. jupyter-execute::
 
-    renderer
-
-.. jupyter-execute::
-
-    pivot_action
-
-We consider here a solid ball on a beam system as depicted in :numref:`bob`.
-The ball rolls without slipping (pure rotation) on a beam that is articulated without friction in the middle.
-A torque :math:`T` acts on the beam joint.
-We will use the following numerical values: The rotational inertia of the rail around its joint is :math:`J = 1\ \text{kg} \cdot \text{m}^2`, the mass of the ball is :math:`M = 10\ \text{kg}` and its radius is :math:`R = 0.25\ \text{m}`.
-The position of the ball with respect to the joint of the rail will be labeled by :math:`x`.
-
-A rotation with :math:`\dot{\theta}>0` obeys the right-hand rule for reference frames :math:`\mathbf{a}` and :math:`\mathbf{b}`, while a displacement with :math:`\dot{x}>0` moves the ball in the direction :math:`\mathbf{b}_1` (see :numref:`bob`).
-
-Here, we will use the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T`.
+     renderer
 
 
-.. figure:: figures/BallOnBeam.svg
-    :width: 80%
-    :align: center
-    :name: bob
+In this task, we will consider a satellite orbiting Earth. We define an inertial reference frame with its origin at Earth's center and with an arbitrary and fixed orientation.
 
-    Schematic of the ball on a beam.
+We will consider two cases:
 
+1. The satellite is a cube of uniform, unitary density, having an edge of :math:`50\ cm`.
+2. The satellite is the cube mentioned above, with the addition of a punctual mass of :math:`m_o = 0.1\ kg` placed at one of the cube's corners.
 
-.. admonition:: Tasks
-
-    a) What is the position of the ball's center as a function of the generalized coordinates?
-
-    b) The total movement of the ball is the result of its movement with respect to the beam, in addition to the movement of the beam.
-
-       What is then the angular velocity of the ball as a function of the generalized coordinates?
-
-    c) The ball is a rigid body that both experiences translation and rotation.
-
-       What is the expression for the kinetic energy of the ball?
-
-    d) The beam is also a rigid body, but it only rotates.
-
-       What is the expression for the kinetic energy of the beam?
-
-    e) Complete the Jupyter notebook `assingment-5-ball-and-beam.ipynb` (found in the `code handout repository <https://github.com/TTK4130/code-handouts>`_) by doing the following tasks:
-
-       - Define the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T` as a symbolic variable.
-       - Define a symbolic variable for the derivative of the generalized coordinates.
-       - Write the expression for the position of the ball's center.
-       - Complete the expressions for the kinetic and potential energies.
-       - Write the expression for the Lagrangian function.
-       - Run the routine.
-
-       Add the implemented code to your answer.
-
-       The Lagrange equations can be written in state-space form as given by
-
-       .. math::
-
-          \mathbf{x} = \begin{bmatrix} \mathbf{q} \\ \dot{\mathbf{q}} \end{bmatrix},\qquad \dot{\mathbf{x}} = \begin{bmatrix} \dot{\mathbf{q}} \\  \left(\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}\right)^{-1}\left(\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}} \right) \end{bmatrix}.
-
-       The routine implemented in part (e) exports two Matlab functions.
-       One that gives the position of the ball's center, while the other returns the terms :math:`\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}` and :math:`\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}}`.
-
-    f) Assume that the external torque :math:`T` is given by the PD control law:
-
-       .. math::
-            :label: ODE
-
-            T = 200 (x-\theta) + 70 (\dot{x} - \dot{\theta})
-
-       Write a function that gives the dynamics of the state-space model :eq:`ODE` by using the `get_W` and `get_RHS` functions and the PD control law.
-       In other words, this function should return the value of the right-hand side of :eq:`ODE` as a function of the states and the parameters.
-
-    g) **(Optional task)** Complete the delivered Jupyter notebook in order to make an animation of the simulation results.
-
-       Simulate your system using e.g. :math:`x(0) = 1,\, \theta(0) = 0` as initial conditions with initial velocities at rest.
-
-       Run the animation.
-
-       What do you observe? Are these results reasonable? Explain.
-
-       *Hint: The function that returns the position of the ball's center can come in handy here.*
-
-
-Problem 2 - Pendulum on a Vertical Oscillator
-==============================================
-
-In this problem, we will derive equations of motion for the same system analyzed in Assignment 4. Previously, we used the Newton-Euler approach; now, we will use the Lagrange method. Depending on your choice of generalized coordinates, you may obtain the same equations as in Assignment 4.
-
-.. figure:: ./figures/pendulum_osc.svg
-   :width: 30%
+.. figure:: figures/Satellite.svg
+   :width: 50%
    :align: center
+   :alt: Schematic of the satellite
 
-   Pendulum on a vertical oscillator
+   Schematic of the satellite.
 
-Figure above shows a pendulum with a point mass :math:`m_2` attached to a mass :math:`m_1` that can oscillate along a vertical axis. The pendulum rod has a length :math:`L` and is considered massless (i.e., the pendulum can be modeled as a point mass at the end of a massless rod).
+We will assume that the force of gravity is given by Newton's law of universal gravitation:
 
-The oscillating mass is connected to a stationary structure via a spring with stiffness :math:`k`. The vertical position :math:`z` of the mass is defined such that :math:`z_0` corresponds to the neutral position of the spring. The angular displacement of the pendulum rod is :math:`\theta`, as indicated in the figure. For simplicity, body one is constrained to move only along the vertical axis, with no motion along the :math:`y_0` or :math:`z_0` directions.
+.. math::
+    :label: newton
+
+    \vec{F} = - \frac{G\,m_\mathrm{T}\,m}{\|\vec r_\mathrm{c}\|^2} \cdot \frac{\vec r_\mathrm{c}}{\|\vec r_\mathrm{c}\|}
+
+The inertia matrix in the reference frame attached to the cube with its origin at the cube's center of mass and with the axes going through the center of the cube's faces is given by
+
+.. math::
+    :label: inertia-matrix
+
+    \frac{1}{6}ml^2 I
+
+where `m` is the mass, `l` is the length of the sides, and `I` is the 3-by-3 identity matrix.
+
+This exercise is about dynamics, but we still have to parameterize the kinematics of the satellite.
+
+We will describe the satellite's position by a vector from the world center to the satellite's center of mass given in the inertia frame :math:`\mathbf{r}_c^i`, and the orientation by the unit quaternion :math:`\mathbf{q}` corresponding to the rotation between the inertial and body frame, :math:`\mathbf{R}_b^i`.
+
+.. math::
+
+    \mathbf{q} \triangleq \left[ \begin{array}{l}
+    q_w \\
+    \mathbf{q}_v
+    \end{array} \right] = \left[ \begin{array}{l}
+    q_w \\
+    q_x \\
+    q_y \\
+    q_z
+    \end{array} \right]
+
+The kinematics are given by:
+
+.. math::
+
+    \dot{\mathbf{r}}_c^i = \mathbf{v}_c^i
+
+.. math::
+
+    \dot{\mathbf{q}} = \frac{1}{2} \mathbf{q} \otimes \boldsymbol{\omega}_{b/i}^b = \frac{1}{2} \boldsymbol{\Omega}(\boldsymbol{\omega}_{b/i}^b) \mathbf{q}
+
+Where :math:`\mathbf{v}_c^i` is the velocity of the center of mass given in the inertial frame, :math:`\boldsymbol{\omega}_{b/i}^b` is the angular velocity of the satellite given in the body frame, and :math:`\boldsymbol{\Omega}(\boldsymbol{\omega})` is defined as:
+
+.. math::
+
+    \boldsymbol{\Omega}(\boldsymbol{\omega}) \triangleq [\boldsymbol{\omega}]_R = \left[ \begin{array}{cc}
+    0 & -\boldsymbol{\omega}^{\top} \\
+    \boldsymbol{\omega} & -[\boldsymbol{\omega}]_{\times}
+    \end{array} \right] = \left[ \begin{array}{cccc}
+    0 & -\omega_x & -\omega_y & -\omega_z \\
+    \omega_x & 0 & \omega_z & -\omega_y \\
+    \omega_y & -\omega_z & 0 & \omega_x \\
+    \omega_z & \omega_y & -\omega_x & 0
+    \end{array} \right]
+
+.. hint::
+    :class: dropdown
+
+    You will find the Python code template in the `code handout repository <https://github.com/TTK4130/code-handouts>`_ or on Blackboard.
 
 .. admonition:: Tasks
 
-    a) Select a set of generalized coordinates that uniquely describe the configuration of the system. Ensure the number of coordinates corresponds to the degrees of freedom of the system.
+    a) Consider the satellite without the added mass. Use the Newton-Euler equations to derive the dynamics of the satellite, i.e., find expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
 
-    b) Find the kinetic energy of the system and express it in terms of the generalized coordinates and their time derivatives.
+    b) Now consider the added mass (case 2 above). The added mass will shift the center of mass of the system. Calculate the inertia matrix around this new center of mass and find the updated expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
 
-    c) Find the potential energy of the system and express it in terms of the generalized coordinates.
+    .. hint::
 
-    d) Derive the equations of motion for the system using the Lagrange method.
+        Use the parallel axis theorem to find the new inertia matrix.
+
+    c) Simulate the two cases in parts 1 and 2. What differences do you observe?
+
+Problem 2 - Pendulum on an oscillator
+==========================================
+
+.. figure:: figures/pendulum_osc.svg
+    :width: 30%
+    :name: pendulum
+
+    Pendulum on a vertical oscillator
+
+:numref:`pendulum` shows a pendulum with a point mass :math:`m_2` attached to a mass :math:`m_1` that can oscillate along a vertical axis. The pendulum rod has a length :math:`L` and the rod can be considered mass-less (i.e. the pendulum can be considered as a point mass at the end of a mass-less rod).
+
+The oscillating mass is connected to a stationary construction through a spring with stiffness :math:`k`. The vertical position :math:`z` of the mass is defined such that :math:`z_0` when the spring is in its neutral position. The angular displacement of the pendulum rod is :math:`\theta`, as shown in the figure. For simplicity we also constrain body one to only move up or down, i.e no movement along the :math:`\text{y}_0` or :math:`\text{z}_0` axis.
+
+.. admonition:: Tasks
+
+    **a. Kinematics**
+
+    We will start by expressing the kinematics of the system. Show that the acceleration of the COMs, :math:`\mathbf{\vec{a}}_1` and :math:`\mathbf{\vec{a}}_2` and the angular acceleration of body 2, :math:`\mathbf{\vec{\alpha}}`, is given by:
+
+    .. math::
+
+       \mathbf{a}_1 = \ddot{z} \mathbf{k}_0
+
+    .. math::
+
+       \mathbf{a}_2 = \left(L\ddot{\theta}\cos\theta - L\dot{\theta}^2\sin\theta\right) \mathbf{j}_0 + \left(\ddot{z} + L\dot{\theta}^2\cos\theta + L\ddot{\theta}\sin\theta\right)\mathbf{k}_0
+
+    .. math::
+
+       \mathbf{\alpha} = \ddot{\theta} \mathbf{i}_0
+
+    **b. Newton Euler equations**
+
+    Show that the Newton Euler equations for the two rigid bodies are given by:
+
+    .. math::
+
+       m_1 \mathbf{a}_1 = \mathbf{F}_{\text{spring}} + \mathbf{F}_{g1} + \mathbf{F}_{\text{joint}}
+
+    .. math::
+
+       m_2 \mathbf{a}_2 = \mathbf{F}_{g2} + \mathbf{F}_{\text{joint}}
+
+    .. math::
+
+       \mathbf{r}_{2/1} \times m_2 \mathbf{a}_2 = \boldsymbol{\tau}_{g2}
+
+    Where :math:`\mathbf{F}_{\text{spring}}` is the force acting from the spring, :math:`\mathbf{F}_{g1}` and :math:`\mathbf{F}_{g2}` are the gravitational forces acting on mass 1 and 2, :math:`\boldsymbol{\tau}_{g2}` is the torque induced by :math:`\mathbf{F}_{g2}` acting around the origin of frame 1, and :math:`\mathbf{F}_{\text{joint}}` is the joint force keeping the two bodies together.
+
+    **c. Equation of motion**
 
 
-    **Hints:**
+    Using the results from part a and b, show that the equation of motion can be expressed as:
 
-    - Express the coordinates of both masses in terms of the generalized coordinates before differentiating.
-    - Consider the contributions to the kinetic and potential energy separately for each mass.
-    - Apply the Euler-Lagrange equation to derive the equations of motion:
+    .. math::
 
-      .. math::
-          \frac{d}{dt} \left( \frac{\partial T}{\partial \dot{q}_i} \right) - \frac{\partial T}{\partial q_i} + \frac{\partial V}{\partial q_i} = 0
+       (m_1+m_2)\ddot{z} + m_2 L \dot{\theta}^2 \cos\theta + m_2 L \ddot{\theta} \sin\theta + (m_1+m_2)g + kz = 0
+
+    .. math::
+
+       L^2 m_2 \ddot{\theta} + L m_2 \ddot{z} \sin\theta + L m_2 g \sin\theta = 0
+
+    .. hint::
+
+        Since the oscillating mass is constrained to move along the :math:`\text{z}_0` axis, this makes some simplifications to equations :eq:`newton` and :eq:`inertia-matrix`.
+
+    **d. Modeling with uniformly distributed mass**
+
+    Assume now that we were to remove the point mass :math:`m_2`, and instead model the pendulum as a rod with uniformly distributed mass :math:`m_2` with center of gravity at the midpoint of the rod, such that the moment of inertia about the center point is :math:`I_{xx} = \frac{L^2 m_2}{12}`. What are the equations of motion now?
+
+    **e. Parallel Axis Theorem**
+
+    In some cases, when dealing with moment balances of rigid bodies that are rotating about some point that is not their center of gravity, we may modify the moment of inertia expression by employing the parallel axis theorem. This adjustment allows us to simplify the modeling of motion as a pure rotation.
+
+    Why can we not simply use the parallel axis theorem in Task d) above, and model the pendulum as a pure rotation about the hinge point of the rod? What term would be missing in the model you derived in Task d)?
 

@@ -1,6 +1,6 @@
-========================================
-Assignment 3 - Kinematics Part 2
-========================================
+=========================================
+Assignment 3 - Implicit Numerical Solvers
+=========================================
 
 .. note::
 
@@ -8,110 +8,270 @@ Assignment 3 - Kinematics Part 2
     We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
     This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
 
-
-
-Problem 1 - Parameterizations of Rotations
-===========================================
-
-.. figure:: figures/zyx-euler.svg
-    :name: zyx-euler
-    :align: center
-
-    ZYX Euler Angles as three successive rotations around the intermediate :math:`z`, :math:`y` and :math:`x` axes.
-
-The ZYX Euler Angles is a parameterization of a rotation using three successive transformations around the intermediate :math:`z`, :math:`y` and :math:`x` axes (see :numref:`zyx-euler`). That is, the rotation matrix is given by
+In this exercise we will look at implicit solvers, which can roughly be identified as solvers where the next step :math:`y_{n+1}` is dependent on *itself*.
+The simplest of these is the *backward Euler*, also called the *implicit Euler* method.
+We can look at the forward and the backward Euler methods side by side, given as:
 
 .. math::
 
-   \mathbf{R}_{\mathcal{B}}^{\mathcal{A}}(\theta,\phi,\psi) = \mathbf{R}_z(\psi) \mathbf{R}_y(\phi) \mathbf{R}_x(\theta)
+    \text{Forward Euler: } y_{n+1} = y_n + h f(t_n, y_n)
 
-where :math:`\mathbf{R}_x`, :math:`\mathbf{R}_y`, and :math:`\mathbf{R}_z` represent the rotation matrix of the principal rotations around the :math:`z`, :math:`y` and :math:`x` axes, respectively.
+    \text{Backward Euler: } y_{n+1} = y_n + h f(t_{n+1}, y_{n+1})
+
+Notice that :math:`y_{n+1}` appears on both sides of the equality, this is the essence of what makes it *implicit*.
+
+.. important:: Link to the "Numerical Methods for ODEs" on the website
+
+    Both here and in the previous assignment, we go over things that may already be stated in :ref:`numerical-methods-for-odes`.
+    Instead of repeating it here, we should either link to the relevant section on that page, or expand that page to include the general material we need and *then* link it.
+
+
+Problem 1 - Newton solver
+=========================
+
+When dealing with implicit solvers, we have to do something to shake the solution out.
+If we have a linear system, this generally means that we have to invert a matrix.
+Consider for instance the linear system :math:`\dot{y} = Ay` with the implicit Euler method.
+This can be written in the matrix-equation form
 
 .. math::
 
-   \boldsymbol{\chi} =
-   \begin{bmatrix}
-       \theta \\
-       \phi \\
-       \psi
-   \end{bmatrix}
+    (I + hA) y_{n+1} = y_n
 
-are called the Euler Angles.
+which can be solved by finding the inverse of the matrix :math:`I - hA`.
+However, for a non-linear system, where we really need to evaluate some right-hand side function :math:`f(t_{n+1}, y_{n+1})`, we're not so lucky.
+But all is not lost, Isaac Newton and Joseph Raphson found a nice numerical algorithm that can be used to solve *even* non-linear systems.
+There are many other methods that can do this, that is, other fixed point methods and root finding algorithms, but Newton-Raphson is a simple but effective one, and usually sufficient and performant for the systems we investigate.
 
 .. admonition:: Tasks
 
-    a) Find the intermediate rotation matrices :math:`\mathbf{R}_{1}^{\mathcal{A}}`, :math:`\mathbf{R}_{2}^{1}`, and :math:`\mathbf{R}_{\mathcal{B}}^{2}` along with the relative angular velocities expressed in the local frame :math:`\boldsymbol{\omega}_{1/\mathcal{A}}^{\mathcal{A}}`, :math:`\boldsymbol{\omega}_{2/1}^{1}`, and :math:`\boldsymbol{\omega}_{\mathcal{B}/2}^{2}`.
+    a. 
+    
+        Implement the Newton-Raphson method (also simply known as Newton's method) for an arbitrary function :math:`f(t, y)`. The inputs to the function should include the initial guess :math:`(t_0, x_0)`, the function :math:`f(t, x)` and its Jacobian :math:`J_f(t, x)`.
 
-    b) Show that the angular velocity of frame :math:`\mathcal{B}` with respect to :math:`\mathcal{A}` expressed in frame :math:`\mathcal{A}` is given by
+        .. hint::
+            :class: dropdown
 
-    .. math::
+            In order to verify that you have implemented the method correctly, you can try to find the roots of a polynomial you know the answer to. For instance, the polynomial
 
-       \boldsymbol{\omega}_{\mathcal{B}/\mathcal{A}}^{\mathcal{A}} = \mathbf{E} \dot{\boldsymbol{\chi}}
+            .. math::
 
-    where
+                (x_1 + 1)^3 + (x_2 + 1)^3 + (x_3 + 1)^3
 
-    .. math::
-
-       \mathbf{E} =
-       \left[\begin{array}{ccc}
-        \cos (\phi) \cos (\psi) & -\sin (\psi) & 0 \\
-        \cos (\phi) \sin (\psi)  &\cos (\psi) & 0\\
-        -\sin (\phi) & 0 & 1
-       \end{array}\right]
-
-    c) Show that the transformation :math:`\mathbf{E}` is singular at :math:`\phi = \frac{\pi}{2} + k\pi`, :math:`\forall k \in \mathbb{Z}`. Why does this make Euler Angles a bad choice when modelling rotating systems that can reach any orientation? What parameterization, which tackles this issue, is usually preferred?
+            should have all its roots at :math:`x_1 = x_2 = x_3 = -1`. Since it is a polynomial, the analytical evaluation of the Jacobian should be straightforward to compute.
 
 
-Problem 2 - Pendulum on rotating disk
-=========================================
+Problem 2 - Implicit Euler and Midpoint
+=======================================
 
-.. figure:: figures/pendulum_on_disk.svg
-   :width: 60%
-   :align: center
-   :name: Pendulum on a rotating disk
+With a working Newton solver, we can continue with implementing implicit solvers.
+The two we are going to take a look at are the implicit Euler method and the implicit Midpoint method.
+These methods have Butcher tables
 
-   Pendulum on a rotating disk
+.. math::
 
-The pendulum system shown in :numref:`Pendulum on a rotating disk` consists of a flat surface, a disk that can roll on the surface, and a pendulum attached to the rim of the disk.
+    \text{Implicit Euler:}\quad
+    \begin{array}{c|c}
+        1 & 1 \\
+        \hline
+        & 1
+    \end{array}
+    \\
+    \text{Implicit Midpoint:}\quad
+    \begin{array}{c|c}
+        \frac12 & \frac12\\
+        \hline
+         & 1
+    \end{array}
 
-We have attached an inertial reference frame :math:`\theta` such that the :math:`x_0`-axis is aligned with the surface. We also have a moving reference frame at the center of the wheel. This reference frame will rotate with the wheel. Finally, we have attached a third reference frame to the hinge point of the pendulum such that the :math:`y_2`-axis always remains aligned with the pendulum rod. Note that the angle :math:`\theta` of the pendulum rod is given in terms of an axis that remains horizontal. You can assume no slip between the rim and the surface.
+When you test your implementation of these solvers, use the harmonic oscillator as a test-case.
+The harmonic oscillator is a simplification of the damped non-linear oscillator from the previous assignment, where we remove the damping term and use the small-angle approximation (:math:`\sin(\theta) = \theta`) to remove the non-linearity.
+This leaves us with the equation
 
-.. hint::
+.. math::
+
+    \ddot{\theta} + \omega^2 \theta = 0
+
+With initial conditions :math:`\theta(0) = 1, \dot{\theta}(0) = 0`, we get that the analytical solution is simply
+
+.. math::
+
+    y(t) = \cos(\omega t)
+
+This allows us to use the analytical solution directly when determining the error and convergence order of the implemented methods, even when the simulation time is very long.
+To make things even simpler, we will set :math:`\omega = 1`.
+
+.. note::
     :class: dropdown
 
-    Equations 6.409 and 6.410 at page 261 in :cite:t:`Egeland2002`, or Equations 60 and 77 in :cite:t:`lect2024`, might be useful.
+    You may have observed that this is actually a linear system, and thus we could "just invert the matrix" to get the answer and not bother with the non-linear solver. 
+    This is correct, but developing a general non-linear solver will be useful for future assignments where things may not longer be the case.
+
 
 .. admonition:: Tasks
 
-    a) Find the linear (translational) velocity of point A. Your answer should be expressed in terms of the parameters of the system, and the variables :math:`\phi` and :math:`\theta` and their time derivatives.
+    a. 
+    
+        Implement implicit Euler using the Newton solver you programmed in the previous problem.
 
-    b) Find the linear acceleration of the point A of the parameters of the system, and the variables :math:`\phi` and :math:`\theta` and their first and second order time derivatives.
+    b. 
+    
+        Implement implicit Midpoint using the Newton solver you programmed in the previous problem.
+
+        .. hint::
+            :class: dropdown
+
+            The half-step in the implicit Midpoint can be a bit tricky to figure out. It turns out it is possible to think of the implicit midpoint as an implicit Euler half-step from :math:`y_n` to :math:`y_{n+\frac12}`, and then an *explicit* Euler half-step from :math:`y_{n+\frac12}` to :math:`y_{n+1}`. This is really where the midpoint method gets its name, since :math:`y_{n+\frac12}` *is* the midpoint.
+    
+    c. 
+    
+        (Optional? Or even remove?) Find the experimental order of convergence for both methods. Is this unexpected considering that both methods are one-stage methods?
+
+    d. 
+    
+        Simulate the harmonic oscillator with a fairly large timestep (maybe :math:`h = 0.1`) and for a "long" time (maybe :math:`t_f = 10`). Do this for both the explicit Euler, the implicit Euler and the implicit Midpoint method, then compare each solution with the analytical solution. What do the different methods do? Are they able to simulate the system for those solver parameters?
+        
+        .. The behavior of the implicit Midpoint method is qualitatively different as it is a collocation method and thus a symplectic integrator. This means that it numerically preserves the energy of a perturbed Hamiltonian and since the harmonic oscillator admits a Hamiltonian formulation (or equivalently an unconstrained Lagrangian formulation due to the Legendre transform) and thus its long term behavior is quite different. We could expand slightly on this if we want to, but I suspect that control engineers more often work with constrained Lagrangians, hence their systems do not *have* a symplectic geometry, rendering this point irrelevant. Though it is quite nice. 
 
 
-Problem 3 - Linked Mechanism
-==============================
+Problem 3 - Stability and stiff systems
+=======================================
 
-.. figure:: figures/mechanism.svg
-   :align: center
-   :scale: 100%
-   :name: Linked mechanism
+In the previous assignment, we looked at the stability of explicit methods.
+With a similar treatment of implicit methods, we hope it will be clear why one might be interested in implicit methods.
+Not only that, but maybe you will get an intuition for what separates A- and L-stability.
 
-   Linked mechanism
+In this problem, we will look at a known stiff system described by
 
-The linked mechanism in :numref:`Linked Mechanism` consists of the two rigid bodies AB and BC. Body AB rotates about the :math:`z_0`-axis at a rate :math:`\dot{q}_1`, and body BC rotates about the :math:`y_2`-axis at the rate :math:`\dot{q}_2`. The :math:`z_0`-axis is parallel to the :math:`z_1`-axis. The :math:`y_2`-axis is parallel to the :math:`y_1`-axis.
+.. math::
+    \dot{x}_1 = - 0.5 x_1 + 20 x_2
+    \\
+    \dot{x}_2 = - 20 x_2
 
-.. hint::
-    :class: dropdown
+with initial conditions :math:`x_1(0) = 0, x_2(0) = 1`.
 
+One way to observe that it is stiff is that the behavior of the system will be very different when :math:`x_2` is large and when it is small.
+It is the case that :math:`x_2` will decay very quickly due to the coefficient :math:`-20`, but during the decay :math:`x_1` will increase roughly as fast as :math:`x_2` decays.
+When :math:`x_2` no longer contributes much, when it has become small, :math:`x_1` will also decay, but much slower due to the coefficient :math:`-0.5`.
 
-    Use `SymPy reference frames <https://docs.sympy.org/latest/modules/physics/vector/vectors.html#using-vectors-and-reference-frames>`_ to solve the following problems.
 
 .. admonition:: Tasks
 
-    a) Find the position of the points B and C relative to point A, expressed in terms of the reference frame :math:`x_0y_0z_0`. The positions should be expressed as functions of :math:`\boldsymbol{q} = [q_1,\, q_2]^T`.
+    a. 
+    
+        Define stiff systems in your own words.
 
-    b) Find the angular velocity of the bodies AB and BC, expressed in terms of the reference frame :math:`x_0y_0z_0`.
+        .. hint::
+            :class: dropdown
 
-    c) Find the linear velocity of the points B and C, expressed in terms of the reference frame :math:`x_0y_0z_0`.
+            There is no precise mathematical definition of stiffness, and most attempts at defining it defer to general statements about when the "phenomenon of stiffness" appears in a numerical solution.
+            Reflect over what you think it means for a system to "be stiff".
+    
+    b. 
+    
+        Find the stability functions for the implicit Euler and the implicit Midpoint method.
 
-    d) Express the linear velocity of point C in the form :math:`\boldsymbol{v}_C = \boldsymbol{J}(\boldsymbol{q})\dot{\boldsymbol{q}}`.
+    c. 
+    
+        Plot the stability functions for both methods and conclude whether they are A-stable. Also, are any of the methods L-stable?
+
+    d. 
+    
+        Use both the explicit Euler, implicit Euler and the implicit Midpoint methods to numerically solve the stiff system
+        Increase the stepsize from :math:`h = 0.01` to :math:`h = 0.1` and describe what you observe.
+        Include a plot of :math:`x_1` over time for each of the methods for :math:`h = 0.1`.
+    
+    e. 
+    
+        What do you think is the main concerns one should address when choosing a numerical solver?
+
+        .. hint::
+            :class: dropdown
+
+            Some keywords may be *accuracy*, *stability*, *computational cost* and *solver properties*.
+    
+    f.
+
+        (Optional) If you implemented an adaptive controller for the timestep in the previous assignment, try to use it to simulate the system and see what timesteps it selects. Are the selected timesteps reasonable?
+
+
+
+
+Problem 4 (Optional) - General IRK methods
+==========================================
+
+By now, we have dealt with a large number of Runge-Kutta methods, all of which can be represented with a Butcher table.
+Maybe the time is right to implement a general routine that can take any Butcher table and perform the corresponding RK method?
+In general, an RK method will then look like
+
+.. math::
+
+    \begin{array}{c|c}
+    \vec{c} & A \\
+    \hline
+     & \vec{b}
+    \end{array}
+
+where :math:`A` defines the linear combination of the stages inside the ODE right-hand side evaluations, :math:`b` is the final linear combination of stages to get the next step and :math:`c` is the vector of appropriate time offsets.
+Until now, the time offsets have not been very important, since our systems have been *autonomous*, but often in real life, the forces we're subjected to change not only in space, but also time, so it *is* important.
+
+Let us consider the system
+
+.. math::
+
+    \dot{x}_1 = -\lambda_1 x_1 + A_1 \cos(\omega_1 t),
+    \\
+    \dot{x_2} = -\lambda_2 x_2 + A_2 \cos(\omega_2 t).
+
+It is not a system of homogeneous ODEs since it has the cosine driving term, which makes it non-autonomous.
+The ODEs are decoupled, so they can be solved one at a time using an integrating factor, which gives the solution
+
+.. math::
+
+    x_i(t) = \frac{A_i (\lambda_i \cos(\omega_i t) + \omega_i \sin(\omega_i t))}{\lambda_i^2 + \omega_i^2} + e^{-\lambda_i t} \left( y_0 - \frac{A_i\lambda_i}{\lambda_i^2 + \omega_i^2} \right)
+
+To test that the general IRK implementation is correct, you may of course compare the performance between your hard-coded previous implementations to the general scheme, but you may also test it on an RK method you haven't implemented yet: the two-stage Gauss-Legendre collocation method.
+This method is given by the vectors and matrices:
+
+.. math::
+
+    A = \begin{pmatrix}
+    \frac14 & \frac14 - \frac{\sqrt3}{6} \\
+    \frac14 + \frac{\sqrt3}{6} & \frac 14
+    \end{pmatrix},
+    \quad
+    \vec{b} = \begin{pmatrix}
+    \frac12 \\ \frac12
+    \end{pmatrix},
+    \quad
+    \vec{c} = \begin{pmatrix}
+    \frac12 - \frac{\sqrt3}{6} \\ \frac12 + \frac{\sqrt3}{6}
+    \end{pmatrix}.
+
+Since it is a collocation method, it should have twice the convergence order one would expect.
+As a two-stage method, it should then be a fourth order accurate method, which you can numerically verify by computing the experimental order of convergence.
+
+.. admonition:: Tasks
+
+    a.
+
+        Implement a function that applies a general IRK method to a system defined by its right-hand side function :math:`f(t, x)` and the Jacobian of this function :math:`J_f(t, x)`. The general IRK function should handle state vectors of arbitrary dimensions and an arbitrary number of implicit or explicit stages.
+    
+    b.
+
+        Both explicit and implicit RK methods can be described by Butcher tables. However, it is wasteful to use the Newton on a known explicit scheme, since it can be solved with a forward pass through the stages. Extend your general code to detect whether the Newton solver is required or not.
+
+        .. hint::
+            :class: dropdown
+
+            One only needs to investigate the :math:`A`-matrix do determine whether the RK method is implicit or explicit. What is the condition :math:`A` must satisfy? 
+
+    c.
+
+        There is a third "type" of Runge-Kutta methods hidden in this general approach, the so-called *diagonally-implicit Runge-Kutta* methods, or DIRK among friends. The major innovation here is that while the DIRK is implicit, any stage :math:`p` is only dependent on the :math:`p-1` stages *before* it. This means that we do not need to solve for all stages simultaneous, but can solve one at a time, until we get to the last one. Extend your general IRK function to handle this case, as well, possibly saving some precious computational time.
+
+        .. hint::
+            :class: dropdown
+
+            There is also a special condition the :math:`A`-matrix must satisfy here if the scheme is to be a DIRK. What is it?
+

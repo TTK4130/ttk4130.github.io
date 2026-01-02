@@ -1,3 +1,6 @@
+
+.. _numerical-methods-for-odes:
+
 ==========================
 Numerical Methods for ODEs
 ==========================
