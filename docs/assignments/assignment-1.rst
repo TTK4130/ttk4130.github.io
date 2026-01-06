@@ -168,13 +168,10 @@ where the constants are determined from the initial conditions as
 
        - the numerical simulator (via your ``y_dot`` function from Problem 2), and
        - the analytical solution from Task a).
+      
+      Simulate the system and plot the numerical solution and analytical solution for the position :math:`x(t)` in
+      the same figure.
 
-    c) Using your Euler forward integrator from Problem 2, simulate the system and plot
-       the numerical solution and analytical solution for the position :math:`x(t)` in
-       the same figure.
-
-    d) Compute and plot the error between the numerical and analytical solutions as a
-       function of time.
-
-    e) Repeat the comparison for at least two different values of the damping coefficient
+    c) Compute and plot the error between the numerical and analytical solutions as a
+       function of time, and repeat the comparison for at least two different values of the damping coefficient
        :math:`d`. Comment briefly on how the damping influences the numerical error.
