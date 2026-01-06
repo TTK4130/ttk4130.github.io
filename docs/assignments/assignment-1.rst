@@ -90,13 +90,24 @@ parameters :math:`m`, :math:`d` and :math:`k`:
 
 Here, :math:`\omega_n` is the undamped natural frequency and :math:`\zeta` is the damping ratio.
 
-For the *underdamped* case (:math:`0 \le \zeta < 1`), define the damped natural frequency
+Depending on the value of :math:`\zeta`, the system is classified as
+
+- *underdamped* (:math:`0 \le \zeta < 1`),
+- *critically damped* (:math:`\zeta = 1`),
+- *overdamped* (:math:`\zeta > 1`).
+
+The analytical solution for the position of the mass differs between these cases.
+
+Underdamped case
+^^^^^^^^^^^^^^^^
+
+For the underdamped case (:math:`0 \le \zeta < 1`), define the damped natural frequency
 
 .. math::
 
    \omega_d = \omega_n \sqrt{1 - \zeta^2}.
 
-The analytical solution for the position of the mass is then given by
+The analytical solution for the position is
 
 .. math::
 
@@ -106,6 +117,37 @@ The analytical solution for the position of the mass is then given by
    \frac{v_0 + \zeta \omega_n x_0}{\omega_d} \sin(\omega_d t)
    \right].
 
+Critically damped case
+^^^^^^^^^^^^^^^^^^^^^^
+
+For the critically damped case (:math:`\zeta = 1`), the solution is given by
+
+.. math::
+
+   x(t) = \left(x_0 + (v_0 + \omega_n x_0)t\right)e^{-\omega_n t}.
+
+Overdamped case
+^^^^^^^^^^^^^^^
+
+For the overdamped case (:math:`\zeta > 1`), define the characteristic exponents
+
+.. math::
+
+   r_{1,2} = -\zeta\omega_n \pm \omega_n\sqrt{\zeta^2 - 1}.
+
+The analytical solution is
+
+.. math::
+
+   x(t) = C_1 e^{r_1 t} + C_2 e^{r_2 t},
+
+where the constants are determined from the initial conditions as
+
+.. math::
+
+   C_1 = \frac{v_0 - r_2 x_0}{r_1 - r_2}, \qquad
+   C_2 = x_0 - C_1.
+
 .. admonition:: Tasks
 
     a) Write a Python function that computes the analytical solution :math:`x(t)` for the
@@ -114,8 +156,12 @@ The analytical solution for the position of the mass is then given by
        - take the time vector :math:`t`, initial conditions :math:`x_0` and :math:`v_0`,
          and the parameter dictionary ``params`` as input,
        - compute :math:`\omega_n` and :math:`\zeta` from ``params``,
-       - automatically select and apply the correct analytical solution based on the
-         damping regime.
+       - select and apply the correct analytical expression based on the damping regime.
+
+       Use a small numerical tolerance when checking whether :math:`\zeta \approx 1` to avoid
+       misclassification due to floating-point round-off errors and to prevent division by
+       zero in expressions involving :math:`\omega_d`.
+
 
     b) Write a simulation script where the parameters :math:`m`, :math:`d` and :math:`k`
        are defined once in ``params`` and used consistently in both:
