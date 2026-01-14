@@ -2,16 +2,11 @@
 Assignment 2 - Explicit Numerical Solvers
 =========================================
 
-.. note::
-
-    Submit your assignment as a single PDF, including plots and source code (if any).
-    We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
-    This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
-
 In the last exercise, we looked at the forward/explicit Euler method, which is a first order method.
 It is perhaps the simplest numerical integrator or solver one can come up with and it is quite effective in its own right.
 However, for complicated systems one may need to break out heavier machinery to perform calculations accurately enough.
 The forward Euler method is a first-order-in-time method, meaning that the local error it commits in each step is linear in the timestep.
+
 When numerically solving systems in Matlab, one often uses `ode45`, which is an adaptive method combining a fourth and fifth order method.
 This means that if one halves the length of the timestep, the error typically decreases with a factor 16.
 With the right mathematical framework, one can develop methods that have any convergence order one could wish for, but the trade-off is that more accurate methods typically require more computation per timestep.
@@ -54,55 +49,62 @@ This can also be written for a step from :math:`y_n = y(t_n)` to :math:`y_{n+1} 
 
 .. admonition:: Tasks
 
-    a) Find the Taylor expansion of :math:`y(t_n + h)` to the second order in :math:`h`.
-
-    .. hint::
-        :class: dropdown
-
-        You may use that
-
-        .. math::
-
-            \ddot{y} = \frac{\partial f}{\partial t} + \frac{\partial f}{\partial y} f = f_t + f_y f
-
-    b) Find the Taylor expansion of the 2-stage RK expression for :math:`y_{n+1}`.
-
-    c) Find what the coefficients :math:`a_{21}, b_1, b_2` and :math:`c_2` must be for the Taylor expansions to agree to the second order.
-
-    .. hint::
-        :class: dropdown
-
-        By "agree" we mean that the :math:`h`- and :math:`h^2`-terms in both Taylor expansions should have the same values.
+    a) 
     
-    d) Verify that Heun's method (also called modified/improved Euler) and the Midpoint method satisfy the conditions in task c.
+        Find the Taylor expansion of :math:`y(t_n + h)` to the second order in :math:`h`.
 
-    .. note::
-        :class: dropdown
+        .. hint::
+            :class: dropdown
 
-        .. math::
+            You may use that
 
-            \text{Heun's method:}\quad
-            \begin{array}{c|cc}
-                0 & \\
-                1 & 1 & \\
-                \hline
-                & \frac12 & \frac12
-            \end{array}
-            \\
-            \text{Midpoint method:}\quad
-            \begin{array}{c|cc}
-                0 & \\
-                \frac12 & \frac12 & \\
-                \hline
-                & 0 & 1
-            \end{array}
+            .. math::
+
+                \ddot{y} = \frac{\partial f}{\partial t} + \frac{\partial f}{\partial y} f = f_t + f_y f
+
+    b) 
+    
+        Find the Taylor expansion of the 2-stage RK expression for :math:`y_{n+1}`.
+
+    c) 
+    
+        Find what the coefficients :math:`a_{21}, b_1, b_2` and :math:`c_2` must be for the Taylor expansions to agree to the second order.
+
+        .. hint::
+            :class: dropdown
+
+            By "agree" we mean that the :math:`h`- and :math:`h^2`-terms in both Taylor expansions should have the same values.
+    
+    d) 
+    
+        Verify that Heun's method (also called modified/improved Euler) and the Midpoint method satisfy the conditions in task c.
+
+        .. note::
+            :class: dropdown
+
+            .. math::
+
+                \text{Heun's method:}\quad
+                \begin{array}{c|cc}
+                    0 & \\
+                    1 & 1 & \\
+                    \hline
+                    & \frac12 & \frac12
+                \end{array}
+                \\
+                \text{Midpoint method:}\quad
+                \begin{array}{c|cc}
+                    0 & \\
+                    \frac12 & \frac12 & \\
+                    \hline
+                    & 0 & 1
+                \end{array}
 
 .. note::
 
     There is a lot of algebra involved with developing these expressions, so we will not try to do this by hand for higher order methods.
     However, if we wanted to, we could compute higher order terms in the Taylor expansions and get more accurate methods.
     Typically, we would need to calculate more stages, since we need additional terms to match the coefficients in the Taylor series of :math:`y(t_n + h)`.
-
 
 
 Problem 2 - Stability of explicit methods
@@ -143,7 +145,9 @@ and we way that the method is stable for :math:`z` if it is the case that :math:
 
             The timestep :math:`h` has to feature since the input to the stability function should be :math:`z = h\lambda`.
         
-    c. Plot the stability functions for each method. Also plot the stability function for the fourth order classical Runge-Kutta method given in the note below. The plot should distinguish between inputs where :math:`|R(z)| \leq 1` and :math:`|R(z)| > 1`.
+    c. 
+    
+        Plot the stability functions for each method. Also plot the stability function for the fourth order classical Runge-Kutta method given in the note below. The plot should distinguish between inputs where :math:`|R(z)| \leq 1` and :math:`|R(z)| > 1`.
 
         .. note::
             :class: dropdown
@@ -215,24 +219,24 @@ with the initial conditions :math:`y_1(0) = \theta(0), y_2(0) = \dot{\theta}(0)`
 
     c.
 
-        Compute solutions for :math:`h = 2^{-i}` for some integers :math:`i`, with both explicit Euler, Heun's and Midpoint.
-        Typically, we want .5, .25, .125, .0625 and so on...
-        Compute also the error :math:`E(h) = \|y_{num}(T) - y_{ref}(T)\|` in the :math:`\infty`-norm and 2-norm.
-        Plot the errors for each method on a  log-log plot, observe roughly what convergence rate the methods have.
+        Verify the convergence orders of the implemented methods. For computing errors, use the 2-norm.
 
+        .. note::
+
+            We can do this by computing the numerical solution for different stepsizes, for instance :math:`h \in \{0.5, 0.25, 0.125, 0.0625\}` (which is really :math:`h = 2^{-i}` for :math:`i \in \{1, 2, 3, 4\}`), and compare with our reference solution/analytical solution.
+
+            These errors can be plotted in a log-log plot and we may then read of the order of convergence as the slope of the "error vs. stepsize"-curve.
+        
         .. hint::
             :class: dropdown
 
-            For a :math:`p`-th order method, the error should follow the relation :math:`E(h) \approx C h^p`, where :math:`C` is some constant that only depends on which exact method is being used (but not on the stepsize itself).
-            If this is the case, then one can compute the `empirical convergence order` with the formula
+            For a :math:`p`-th order method, the error follows the relation :math:`E(h) \approx C h^p`, where :math:`C` is some constant that only depends on which exact method is being used (but not on the stepsize itself).
+
+            We can use this to compute the `empirical convergence order` with the formula
 
             .. math::
 
-                p \approx \frac{\log(E(h_1) / E(h_2))}{\log(h_1 / h_2)} 
-
-
-
-
+                p \approx \frac{\log(E(h_1) / E(h_2))}{\log(h_1 / h_2)}
 
 
 
