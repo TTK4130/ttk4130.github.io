@@ -2,12 +2,6 @@
 Assignment 3 - Implicit Numerical Solvers
 =========================================
 
-.. note::
-
-    Submit your assignment as a single PDF, including plots and source code (if any).
-    We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
-    This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
-
 In this exercise we will look at implicit solvers, which can roughly be identified as solvers where the next step :math:`y_{n+1}` is dependent on *itself*.
 The simplest of these is the *backward Euler*, also called the *implicit Euler* method.
 We can look at the forward and the backward Euler methods side by side, given as:
@@ -20,10 +14,9 @@ We can look at the forward and the backward Euler methods side by side, given as
 
 Notice that :math:`y_{n+1}` appears on both sides of the equality, this is the essence of what makes it *implicit*.
 
-.. important:: Link to the "Numerical Methods for ODEs" on the website
+.. hint::
 
-    Both here and in the previous assignment, we go over things that may already be stated in :ref:`numerical-methods-for-odes`.
-    Instead of repeating it here, we should either link to the relevant section on that page, or expand that page to include the general material we need and *then* link it.
+    Have you read the code examples in :ref:`numerical-methods-for-odes`?
 
 
 Problem 1 - Newton solver
@@ -121,11 +114,14 @@ To make things even simpler, we will set :math:`\omega = 1`.
         .. hint::
             :class: dropdown
 
-            The half-step in the implicit Midpoint can be a bit tricky to figure out. It turns out it is possible to think of the implicit midpoint as an implicit Euler half-step from :math:`y_n` to :math:`y_{n+\frac12}`, and then an *explicit* Euler half-step from :math:`y_{n+\frac12}` to :math:`y_{n+1}`. This is really where the midpoint method gets its name, since :math:`y_{n+\frac12}` *is* the midpoint.
+            The half-step in the implicit Midpoint can be a bit tricky to figure out. 
+            It turns out it is possible to think of the implicit midpoint as an implicit Euler half-step from :math:`y_n` to :math:`y_{n+\frac12}`, and then an *explicit* Euler half-step from :math:`y_{n+\frac12}` to :math:`y_{n+1}`. 
+            This is really where the midpoint method gets its name, since :math:`y_{n+\frac12}` *is* the midpoint.
     
     c. 
     
-        (Optional? Or even remove?) Find the experimental order of convergence for both methods. Is this unexpected considering that both methods are one-stage methods?
+        Find the experimental order of convergence for both methods. 
+        Is this unexpected considering that both methods are one-stage methods?
 
     d. 
     
