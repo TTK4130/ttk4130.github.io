@@ -2,12 +2,6 @@
 Assignment 7 - Constrained Lagrange
 ===================================
 
-.. note::
-
-    Submit your assignment as a single PDF, including plots and source code (if any).
-    We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
-    This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
-
 In this assignment we will study the modeling of complex mechanical systems using the constrained Lagrange equations.
 Since the calculations of the partial derivatives of the Lagrangian can be involved, we will once more outsource this task by using SymPy.
 
@@ -24,74 +18,79 @@ Problem 1 - Hovering Mass
 We consider a helicopter lifting a mass. We model this system as two point masses coupled by a rigid link with length :math:`L`. The masses are :math:`m_1` and :math:`m_2`, and their positions in space are given by :math:`\mathbf{p}_1 \in \mathbb{R}^3` and :math:`\mathbf{p}_2 \in \mathbb{R}^3`. We assume that an external force :math:`\mathbf{u} \in \mathbb{R}^3` is applied to :math:`m_1` (helicopter).
 
 
-.. admonition:: a. Classical Lagrange Approach
+.. admonition:: Tasks
 
-    We will first model this system using the classical Lagrange approach, where the number of coordinates equals the number of degrees of freedom. The position of the helicopter is described by :math:`\mathbf{p}_1 \in \mathbb{R}^3`, and the position of the hovering mass is described by the two angles :math:`\theta, \phi`, which give the orientation of the rigid link (spherical coordinates). Hence, the generalized coordinates are:
+    a.
 
-    .. math::
-        \mathbf{q} = \begin{bmatrix} \mathbf{p}_1 \\ \theta \\ \phi \end{bmatrix} \in \mathbb{R}^5.
+        **Classical Lagrange Approach**
 
-    The fully assembled model takes the form:
+        We will first model this system using the classical Lagrange approach, where the number of coordinates equals the number of degrees of freedom. The position of the helicopter is described by :math:`\mathbf{p}_1 \in \mathbb{R}^3`, and the position of the hovering mass is described by the two angles :math:`\theta, \phi`, which give the orientation of the rigid link (spherical coordinates). Hence, the generalized coordinates are:
 
-    .. math::
-        \begin{aligned}
-            \dot{\mathbf{q}} &= \mathbf{v},\\
-            M(\mathbf{q})\dot{\mathbf{v}} &= \mathbf{b}(\mathbf{q},\dot{\mathbf{q}},\mathbf{u}).
-        \end{aligned}
+        .. math::
+            \mathbf{q} = \begin{bmatrix} \mathbf{p}_1 \\ \theta \\ \phi \end{bmatrix} \in \mathbb{R}^5.
 
-    Complete the template `assingment-6-hovering-mass.ipynb` (found in the `code handout repository <https://github.com/TTK4130/code-handouts>`_) by performing the following tasks:
+        The fully assembled model takes the form:
 
-    1. Write the expression for the position :math:`\mathbf{p}_2` of mass :math:`m_2` from :math:`\mathbf{q}`.
-    2. Write the expression for the generalized forces.
-    3. Write the expression for the kinetic energy.
-    4. Write the expression for the potential energy.
-    5. Write the expression for the Lagrangian.
-    6. Run the routine to obtain the expressions for :math:`M` and :math:`\mathbf{b}`.
+        .. math::
+            \begin{aligned}
+                \dot{\mathbf{q}} &= \mathbf{v},\\
+                M(\mathbf{q})\dot{\mathbf{v}} &= \mathbf{b}(\mathbf{q},\dot{\mathbf{q}},\mathbf{u}).
+            \end{aligned}
 
-    Include the equations and the implemented code in your answer.
+        Complete the template `assingment-6-hovering-mass.ipynb` (found in the `code handout repository <https://github.com/TTK4130/code-handouts>`_) by doing the following tasks:
 
+        1. Write the expression for the position :math:`\mathbf{p}_2` of mass :math:`m_2` from :math:`\mathbf{q}`.
+        2. Write the expression for the generalized forces.
+        3. Write the expression for the kinetic energy.
+        4. Write the expression for the potential energy.
+        5. Write the expression for the Lagrangian.
+        6. Run the routine to obtain the expressions for :math:`M` and :math:`\mathbf{b}`.
 
-.. admonition:: b. Constrained Lagrange Approach
+        Include the equations and the implemented code in your answer.
 
-    We now use the constrained Lagrange approach to model the system dynamics. The generalized coordinates in this case are:
+    b.
 
-    .. math::
+        **Constrained Lagrange Approach**
 
-        \mathbf{q} = \begin{bmatrix} \mathbf{p}_1 \\ \mathbf{p}_2 \end{bmatrix} \in \mathbb{R}^6,
+        We now use the constrained Lagrange approach to model the system dynamics. The generalized coordinates in this case are:
 
-    and the scalar constraint is given by:
+        .. math::
 
-    .. math::
+            \mathbf{q} = \begin{bmatrix} \mathbf{p}_1 \\ \mathbf{p}_2 \end{bmatrix} \in \mathbb{R}^6,
 
-        C = \frac{1}{2} \left( \mathbf{e}^\top \mathbf{e} - L^2 \right), \quad \text{where} \quad \mathbf{e} = \mathbf{p}_1 - \mathbf{p}_2.
+        and the scalar constraint is given by:
 
-    The system dynamics are:
+        .. math::
 
-    .. math::
+            C = \frac{1}{2} \left( \mathbf{e}^\top \mathbf{e} - L^2 \right), \quad \text{where} \quad \mathbf{e} = \mathbf{p}_1 - \mathbf{p}_2.
 
-        \begin{aligned}
-            \frac{\mathrm{d}}{\mathrm{d}t} \frac{\partial \mathcal{L}}{\partial \dot{\mathbf{q}}}(\mathbf{q},\dot{\mathbf{q}}) - \frac{\partial \mathcal{L}}{\partial \mathbf{q}}(\mathbf{q},\dot{\mathbf{q}}) - z \nabla C(\mathbf{q}) &= \mathbf{Q},\\
-            C(\mathbf{q}) &= 0.
-        \end{aligned}
+        The system dynamics are:
 
-    The fully assembled model takes the form:
+        .. math::
 
-    .. math::
+            \begin{aligned}
+                \frac{\mathrm{d}}{\mathrm{d}t} \frac{\partial \mathcal{L}}{\partial \dot{\mathbf{q}}}(\mathbf{q},\dot{\mathbf{q}}) - \frac{\partial \mathcal{L}}{\partial \mathbf{q}}(\mathbf{q},\dot{\mathbf{q}}) - z \nabla C(\mathbf{q}) &= \mathbf{Q},\\
+                C(\mathbf{q}) &= 0.
+            \end{aligned}
 
-        \begin{aligned}
-            \dot{\mathbf{q}} &= \mathbf{v},\\
-            M(\mathbf{q}) \dot{\mathbf{v}} &= \mathbf{b}(\mathbf{q},\mathbf{z},\mathbf{u}),\\
-            0 &= C(\mathbf{q}).
-        \end{aligned}
+        The fully assembled model takes the form:
 
-    Perform the following tasks:
+        .. math::
 
-    1. Derive the model matrices :math:`M(\mathbf{q})` and :math:`\mathbf{b}(\mathbf{q}, \dot{\mathbf{q}}, \mathbf{u})`.
-    2. Compare the complexity of the models from part (a) and (b) in terms of symbolic expressions for :math:`M` and :math:`\mathbf{b}`. What do you conclude?
+            \begin{aligned}
+                \dot{\mathbf{q}} &= \mathbf{v},\\
+                M(\mathbf{q}) \dot{\mathbf{v}} &= \mathbf{b}(\mathbf{q},\mathbf{z},\mathbf{u}),\\
+                0 &= C(\mathbf{q}).
+            \end{aligned}
+
+        Do the following tasks:
+
+        1. Derive the model matrices :math:`M(\mathbf{q})` and :math:`\mathbf{b}(\mathbf{q}, \dot{\mathbf{q}}, \mathbf{u})`.
+        2. Compare the complexity of the models from part (a) and (b) in terms of symbolic expressions for :math:`M` and :math:`\mathbf{b}`. What do you conclude?
+
 
 Problem 2 - Delta-Robot
 -----------------------
-
 
 Delta-robots are common in ultra-fast packaging applications.
 Figure :numref:`fig-system` illustrates a Delta-robot.
@@ -123,33 +122,41 @@ For simplicity, we will assume that the nacelle is just a point where the long a
 
 .. admonition:: Tasks
 
-    **a. Classical Unconstrained Lagrange Approach**
+    a.
 
-    Assume that we use the classical unconstrained Lagrange approach with the angles :math:`\alpha_{1,2,3}` as the generalized coordinates. Explain what is the challenge with this approach in this particular case.
+        **Classical Unconstrained Lagrange Approach**
 
-    *Hint: How would you find the position of the nacelle as a function of the generalized coordinates?*
+        Assume that we use the classical unconstrained Lagrange approach with the angles :math:`\alpha_{1,2,3}` as the generalized coordinates. Explain what is the challenge with this approach in this particular case.
 
-
-    We choose the following generalized coordinates for the Delta-robot:
-
-    .. math::
-
-        \mathbf{q} = \begin{bmatrix}\alpha_1 \\ \alpha_2 \\ \alpha_3 \\ \mathbf{p}\end{bmatrix},
-
-    where :math:`\mathbf{p}\in\mathbb{R}^3` is the position of the nacelle.
+        *Hint: How would you find the position of the nacelle as a function of the generalized coordinates?*
 
 
-    **b. Lagrange Function and Constraints**
+        We choose the following generalized coordinates for the Delta-robot:
 
-    Write down the Lagrange function :math:`\mathcal{L}` of the Delta-robot, as well as the associated constraints :math:`\mathbf{c}`.
+        .. math::
+
+            \mathbf{q} = \begin{bmatrix}\alpha_1 \\ \alpha_2 \\ \alpha_3 \\ \mathbf{p}\end{bmatrix},
+
+        where :math:`\mathbf{p}\in\mathbb{R}^3` is the position of the nacelle.
 
 
-    **c. Differential Index of the DAE**
+    b.
 
-    What is the differential index of the DAE that results from :math:`\mathcal{L}` and :math:`\mathbf{c}`?
+        **Lagrange Function and Constraints**
+
+        Write down the Lagrange function :math:`\mathcal{L}` of the Delta-robot, as well as the associated constraints :math:`\mathbf{c}`.
 
 
-    **d. Consistency Conditions**
+    c.
 
-    What are the consistency conditions of the Delta-robot? The explicit expression is not needed, only the abstract form.
+        **Differential Index of the DAE**
+
+        What is the differential index of the DAE that results from :math:`\mathcal{L}` and :math:`\mathbf{c}`?
+
+
+    d.
+
+        **Consistency Conditions**
+
+        What are the consistency conditions of the Delta-robot? The explicit expression is not needed, only the abstract form.
 

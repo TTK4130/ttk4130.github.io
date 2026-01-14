@@ -1,14 +1,11 @@
+.. _assignment-newton-euler:
+
 =============================
 Assignment 5 - Newton-Euler
 =============================
 
-.. note::
-
-    Submit your assignment as a single PDF, including plots and source code (if any).
-    We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
-    This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
-
 This assignment is about the Newton-Euler method for developing a dynamic model of a mechanical system. This topic is treated in :cite:t:`Egeland2002` from chapter 6.13 to 7.3.
+
 
 Problem 1 - Satellite
 ===========================
@@ -153,25 +150,31 @@ Where :math:`\mathbf{v}_c^i` is the velocity of the center of mass given in the 
     \omega_z & \omega_y & -\omega_x & 0
     \end{array} \right]
 
-.. hint::
-    :class: dropdown
-
-    You will find the Python code template in the `code handout repository <https://github.com/TTK4130/code-handouts>`_ or on Blackboard.
-
 .. admonition:: Tasks
 
-    a) Consider the satellite without the added mass. Use the Newton-Euler equations to derive the dynamics of the satellite, i.e., find expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
+    a.
+    
+        Consider the satellite without the added mass. Use the Newton-Euler equations to derive the dynamics of the satellite, i.e., find expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
 
-    b) Now consider the added mass (case 2 above). The added mass will shift the center of mass of the system. Calculate the inertia matrix around this new center of mass and find the updated expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
+    b.
+    
+        Now consider the added mass (case 2 above).
+        The added mass will shift the center of mass of the system.
+        Calculate the inertia matrix around this new center of mass and find the updated expressions for :math:`\dot{\mathbf{v}}_c^i` and :math:`\dot{\boldsymbol{\omega}}_b^i`.
 
-    .. hint::
+        .. hint::
+            :class: dropdown
 
-        Use the parallel axis theorem to find the new inertia matrix.
+            Use the parallel axis theorem to find the new inertia matrix.
 
-    c) Simulate the two cases in parts 1 and 2. What differences do you observe?
+    c.
+    
+        Simulate the two cases in parts 1 and 2.
+        What differences do you observe?
+
 
 Problem 2 - Pendulum on an oscillator
-==========================================
+=====================================
 
 .. figure:: figures/pendulum_osc.svg
     :width: 30%
@@ -179,70 +182,85 @@ Problem 2 - Pendulum on an oscillator
 
     Pendulum on a vertical oscillator
 
-:numref:`pendulum` shows a pendulum with a point mass :math:`m_2` attached to a mass :math:`m_1` that can oscillate along a vertical axis. The pendulum rod has a length :math:`L` and the rod can be considered mass-less (i.e. the pendulum can be considered as a point mass at the end of a mass-less rod).
+:numref:`pendulum` shows a pendulum with a point mass :math:`m_2` attached to a mass :math:`m_1` that can oscillate along a vertical axis.
+The pendulum rod has a length :math:`L` and the rod can be considered mass-less (i.e. the pendulum can be considered as a point mass at the end of a mass-less rod).
 
-The oscillating mass is connected to a stationary construction through a spring with stiffness :math:`k`. The vertical position :math:`z` of the mass is defined such that :math:`z_0` when the spring is in its neutral position. The angular displacement of the pendulum rod is :math:`\theta`, as shown in the figure. For simplicity we also constrain body one to only move up or down, i.e no movement along the :math:`\text{y}_0` or :math:`\text{z}_0` axis.
+The oscillating mass is connected to a stationary construction through a spring with stiffness :math:`k`.
+The vertical position :math:`z` of the mass is defined such that :math:`z_0` when the spring is in its neutral position.
+The angular displacement of the pendulum rod is :math:`\theta`, as shown in the figure.
+For simplicity we also constrain body one to only move up or down, i.e no movement along the :math:`\text{y}_0` or :math:`\text{z}_0` axis.
 
 .. admonition:: Tasks
 
-    **a. Kinematics**
+    a. 
+    
+        **Kinematics**
 
-    We will start by expressing the kinematics of the system. Show that the acceleration of the COMs, :math:`\mathbf{\vec{a}}_1` and :math:`\mathbf{\vec{a}}_2` and the angular acceleration of body 2, :math:`\mathbf{\vec{\alpha}}`, is given by:
+        We will start by expressing the kinematics of the system. Show that the acceleration of the COMs, :math:`\mathbf{\vec{a}}_1` and :math:`\mathbf{\vec{a}}_2` and the angular acceleration of body 2, :math:`\mathbf{\vec{\alpha}}`, is given by:
 
-    .. math::
+        .. math::
 
-       \mathbf{a}_1 = \ddot{z} \mathbf{k}_0
+            \mathbf{a}_1 = \ddot{z} \mathbf{k}_0
 
-    .. math::
+        .. math::
 
-       \mathbf{a}_2 = \left(L\ddot{\theta}\cos\theta - L\dot{\theta}^2\sin\theta\right) \mathbf{j}_0 + \left(\ddot{z} + L\dot{\theta}^2\cos\theta + L\ddot{\theta}\sin\theta\right)\mathbf{k}_0
+            \mathbf{a}_2 = \left(L\ddot{\theta}\cos\theta - L\dot{\theta}^2\sin\theta\right) \mathbf{j}_0 + \left(\ddot{z} + L\dot{\theta}^2\cos\theta + L\ddot{\theta}\sin\theta\right)\mathbf{k}_0
 
-    .. math::
+        .. math::
 
-       \mathbf{\alpha} = \ddot{\theta} \mathbf{i}_0
+            \mathbf{\alpha} = \ddot{\theta} \mathbf{i}_0
 
-    **b. Newton Euler equations**
+    b.
+    
+        **Newton Euler equations**
 
-    Show that the Newton Euler equations for the two rigid bodies are given by:
+        Show that the Newton Euler equations for the two rigid bodies are given by:
 
-    .. math::
+        .. math::
 
-       m_1 \mathbf{a}_1 = \mathbf{F}_{\text{spring}} + \mathbf{F}_{g1} + \mathbf{F}_{\text{joint}}
+            m_1 \mathbf{a}_1 = \mathbf{F}_{\text{spring}} + \mathbf{F}_{g1} + \mathbf{F}_{\text{joint}}
 
-    .. math::
+        .. math::
 
-       m_2 \mathbf{a}_2 = \mathbf{F}_{g2} + \mathbf{F}_{\text{joint}}
+            m_2 \mathbf{a}_2 = \mathbf{F}_{g2} + \mathbf{F}_{\text{joint}}
 
-    .. math::
+        .. math::
 
-       \mathbf{r}_{2/1} \times m_2 \mathbf{a}_2 = \boldsymbol{\tau}_{g2}
+            \mathbf{r}_{2/1} \times m_2 \mathbf{a}_2 = \boldsymbol{\tau}_{g2}
 
-    Where :math:`\mathbf{F}_{\text{spring}}` is the force acting from the spring, :math:`\mathbf{F}_{g1}` and :math:`\mathbf{F}_{g2}` are the gravitational forces acting on mass 1 and 2, :math:`\boldsymbol{\tau}_{g2}` is the torque induced by :math:`\mathbf{F}_{g2}` acting around the origin of frame 1, and :math:`\mathbf{F}_{\text{joint}}` is the joint force keeping the two bodies together.
+        Where :math:`\mathbf{F}_{\text{spring}}` is the force acting from the spring, :math:`\mathbf{F}_{g1}` and :math:`\mathbf{F}_{g2}` are the gravitational forces acting on mass 1 and 2, :math:`\boldsymbol{\tau}_{g2}` is the torque induced by :math:`\mathbf{F}_{g2}` acting around the origin of frame 1, and :math:`\mathbf{F}_{\text{joint}}` is the joint force keeping the two bodies together.
 
-    **c. Equation of motion**
+    c. 
+    
+        **Equation of motion**
 
 
-    Using the results from part a and b, show that the equation of motion can be expressed as:
+        Using the results from part a and b, show that the equation of motion can be expressed as:
 
-    .. math::
+        .. math::
 
-       (m_1+m_2)\ddot{z} + m_2 L \dot{\theta}^2 \cos\theta + m_2 L \ddot{\theta} \sin\theta + (m_1+m_2)g + kz = 0
+            (m_1+m_2)\ddot{z} + m_2 L \dot{\theta}^2 \cos\theta + m_2 L \ddot{\theta} \sin\theta + (m_1+m_2)g + kz = 0
 
-    .. math::
+        .. math::
 
-       L^2 m_2 \ddot{\theta} + L m_2 \ddot{z} \sin\theta + L m_2 g \sin\theta = 0
+            L^2 m_2 \ddot{\theta} + L m_2 \ddot{z} \sin\theta + L m_2 g \sin\theta = 0
 
-    .. hint::
+        .. hint::
+            :class: dropdown
 
-        Since the oscillating mass is constrained to move along the :math:`\text{z}_0` axis, this makes some simplifications to equations :eq:`newton` and :eq:`inertia-matrix`.
+            Since the oscillating mass is constrained to move along the :math:`\text{z}_0` axis, this makes some simplifications to equations :eq:`newton` and :eq:`inertia-matrix`.
 
-    **d. Modeling with uniformly distributed mass**
+    d. 
+    
+        **Modeling with uniformly distributed mass**
 
-    Assume now that we were to remove the point mass :math:`m_2`, and instead model the pendulum as a rod with uniformly distributed mass :math:`m_2` with center of gravity at the midpoint of the rod, such that the moment of inertia about the center point is :math:`I_{xx} = \frac{L^2 m_2}{12}`. What are the equations of motion now?
+        Assume now that we were to remove the point mass :math:`m_2`, and instead model the pendulum as a rod with uniformly distributed mass :math:`m_2` with center of gravity at the midpoint of the rod, such that the moment of inertia about the center point is :math:`I_{xx} = \frac{L^2 m_2}{12}`. What are the equations of motion now?
 
-    **e. Parallel Axis Theorem**
+    e. 
+    
+        **Parallel Axis Theorem**
 
-    In some cases, when dealing with moment balances of rigid bodies that are rotating about some point that is not their center of gravity, we may modify the moment of inertia expression by employing the parallel axis theorem. This adjustment allows us to simplify the modeling of motion as a pure rotation.
+        In some cases, when dealing with moment balances of rigid bodies that are rotating about some point that is not their center of gravity, we may modify the moment of inertia expression by employing the parallel axis theorem. This adjustment allows us to simplify the modeling of motion as a pure rotation.
 
-    Why can we not simply use the parallel axis theorem in Task d) above, and model the pendulum as a pure rotation about the hinge point of the rod? What term would be missing in the model you derived in Task d)?
+        Why can we not simply use the parallel axis theorem in Task d) above, and model the pendulum as a pure rotation about the hinge point of the rod? What term would be missing in the model you derived in Task d)?
 

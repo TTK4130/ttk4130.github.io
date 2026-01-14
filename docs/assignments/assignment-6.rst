@@ -2,12 +2,6 @@
 Assignment 6 - Lagrange
 =========================
 
-.. note::
-
-    Submit your assignment as a single PDF, including plots and source code (if any).
-    We expect academic honesty. Collaboration is encouraged, but must be declared. Any use of AI must be declared along with any other sources used.
-    This is not an exam. Do your best and show that you put in effort and the assignment will be approved.
-
 In this assignment we will study the modeling of complex mechanical systems based on the Lagrange approach.
 
 Problem 1 - Ball on a Beam
@@ -145,65 +139,83 @@ Here, we will use the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T
 
 .. admonition:: Tasks
 
-    a) What is the position of the ball's center as a function of the generalized coordinates?
+    a.
 
-    b) The total movement of the ball is the result of its movement with respect to the beam, in addition to the movement of the beam.
+        What is the position of the ball's center as a function of the generalized coordinates?
 
-       What is then the angular velocity of the ball as a function of the generalized coordinates?
+    b.
 
-    c) The ball is a rigid body that both experiences translation and rotation.
+        The total movement of the ball is the result of its movement with respect to the beam, in addition to the movement of the beam.
+        What is then the angular velocity of the ball as a function of the generalized coordinates?
 
-       What is the expression for the kinetic energy of the ball?
+    c.
 
-    d) The beam is also a rigid body, but it only rotates.
+        The ball is a rigid body that both experiences translation and rotation.
+        What is the expression for the kinetic energy of the ball?
 
-       What is the expression for the kinetic energy of the beam?
+    d.
 
-    e) Complete the Jupyter notebook `assingment-5-ball-and-beam.ipynb` (found in the `code handout repository <https://github.com/TTK4130/code-handouts>`_) by doing the following tasks:
+        The beam is also a rigid body, but it only rotates.
+        What is the expression for the kinetic energy of the beam?
 
-       - Define the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T` as a symbolic variable.
-       - Define a symbolic variable for the derivative of the generalized coordinates.
-       - Write the expression for the position of the ball's center.
-       - Complete the expressions for the kinetic and potential energies.
-       - Write the expression for the Lagrangian function.
-       - Run the routine.
+    e.
 
-       Add the implemented code to your answer.
+        Complete the Jupyter notebook `assingment-5-ball-and-beam.ipynb` (found in the `code handout repository <https://github.com/TTK4130/code-handouts>`_) by doing the following tasks:
 
-       The Lagrange equations can be written in state-space form as given by
+        - Define the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T` as a symbolic variable.
+        - Define a symbolic variable for the derivative of the generalized coordinates.
+        - Write the expression for the position of the ball's center.
+        - Complete the expressions for the kinetic and potential energies.
+        - Write the expression for the Lagrangian function.
+        - Run the routine.
 
-       .. math::
+        Add the implemented code to your answer.
 
-          \mathbf{x} = \begin{bmatrix} \mathbf{q} \\ \dot{\mathbf{q}} \end{bmatrix},\qquad \dot{\mathbf{x}} = \begin{bmatrix} \dot{\mathbf{q}} \\  \left(\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}\right)^{-1}\left(\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}} \right) \end{bmatrix}.
+        The Lagrange equations can be written in state-space form as given by
 
-       The routine implemented in part (e) exports two Matlab functions.
-       One that gives the position of the ball's center, while the other returns the terms :math:`\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}` and :math:`\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}}`.
+        .. math::
 
-    f) Assume that the external torque :math:`T` is given by the PD control law:
+            \mathbf{x} = \begin{bmatrix} \mathbf{q} \\ \dot{\mathbf{q}} \end{bmatrix},\qquad \dot{\mathbf{x}} = \begin{bmatrix} \dot{\mathbf{q}} \\  \left(\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}\right)^{-1}\left(\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}} \right) \end{bmatrix}.
 
-       .. math::
-            :label: ODE
+        The routine implemented in part (e) exports two Matlab functions.
+        One that gives the position of the ball's center, while the other returns the terms :math:`\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}` and :math:`\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}}`.
 
-            T = 200 (x-\theta) + 70 (\dot{x} - \dot{\theta})
+    f.
 
-       Write a function that gives the dynamics of the state-space model :eq:`ODE` by using the `get_W` and `get_RHS` functions and the PD control law.
-       In other words, this function should return the value of the right-hand side of :eq:`ODE` as a function of the states and the parameters.
+        Assume that the external torque :math:`T` is given by the PD control law:
 
-    g) **(Optional task)** Complete the delivered Jupyter notebook in order to make an animation of the simulation results.
+        .. math::
+                :label: ODE
 
-       Simulate your system using e.g. :math:`x(0) = 1,\, \theta(0) = 0` as initial conditions with initial velocities at rest.
+                T = 200 (x-\theta) + 70 (\dot{x} - \dot{\theta})
 
-       Run the animation.
+        Write a function that gives the dynamics of the state-space model :eq:`ODE` by using the `get_W` and `get_RHS` functions and the PD control law.
+        In other words, this function should return the value of the right-hand side of :eq:`ODE` as a function of the states and the parameters.
 
-       What do you observe? Are these results reasonable? Explain.
+    g.
 
-       *Hint: The function that returns the position of the ball's center can come in handy here.*
+        **(Optional task)** Complete the delivered Jupyter notebook in order to make an animation of the simulation results.
+
+        Simulate your system using e.g. :math:`x(0) = 1,\, \theta(0) = 0` as initial conditions with initial velocities at rest.
+
+        Run the animation.
+
+        What do you observe? Are these results reasonable? Explain.
+
+        .. hint::
+            :class: dropdown
+
+            The function that returns the position of the ball's center can come in handy here.
 
 
-Problem 2 - Pendulum on a Vertical Oscillator
-==============================================
 
-In this problem, we will derive equations of motion for the same system analyzed in Assignment 4. Previously, we used the Newton-Euler approach; now, we will use the Lagrange method. Depending on your choice of generalized coordinates, you may obtain the same equations as in Assignment 4.
+
+Problem 2 - Pendulum on an oscillator
+=====================================
+
+In this problem, we will derive equations of motion for the same system analyzed in :ref:`assignment-newton-euler`.
+Previously, we used the Newton-Euler approach; now, we will use the Lagrange method.
+Depending on your choice of generalized coordinates, you may obtain the same equations as before.
 
 .. figure:: ./figures/pendulum_osc.svg
    :width: 30%
@@ -217,21 +229,29 @@ The oscillating mass is connected to a stationary structure via a spring with st
 
 .. admonition:: Tasks
 
-    a) Select a set of generalized coordinates that uniquely describe the configuration of the system. Ensure the number of coordinates corresponds to the degrees of freedom of the system.
+    a.
 
-    b) Find the kinetic energy of the system and express it in terms of the generalized coordinates and their time derivatives.
+        Select a set of generalized coordinates that uniquely describe the configuration of the system.
+        Ensure the number of coordinates corresponds to the degrees of freedom of the system.
 
-    c) Find the potential energy of the system and express it in terms of the generalized coordinates.
+    b.
 
-    d) Derive the equations of motion for the system using the Lagrange method.
+        Find the kinetic energy of the system and express it in terms of the generalized coordinates and their time derivatives.
 
+    c.
 
-    **Hints:**
+        Find the potential energy of the system and express it in terms of the generalized coordinates.
 
-    - Express the coordinates of both masses in terms of the generalized coordinates before differentiating.
-    - Consider the contributions to the kinetic and potential energy separately for each mass.
-    - Apply the Euler-Lagrange equation to derive the equations of motion:
+    d.
 
-      .. math::
-          \frac{d}{dt} \left( \frac{\partial T}{\partial \dot{q}_i} \right) - \frac{\partial T}{\partial q_i} + \frac{\partial V}{\partial q_i} = 0
+        Derive the equations of motion for the system using the Lagrange method.
 
+        .. hint::
+            :class: dropdown
+
+            - Express the coordinates of both masses in terms of the generalized coordinates before differentiating.
+            - Consider the contributions to the kinetic and potential energy separately for each mass.
+            - Apply the Euler-Lagrange equation to derive the equations of motion:
+
+            .. math::
+                \frac{d}{dt} \left( \frac{\partial T}{\partial \dot{q}_i} \right) - \frac{\partial T}{\partial q_i} + \frac{\partial V}{\partial q_i} = 0
