@@ -43,17 +43,21 @@ Problem 2 - Integrator
 ==================================
 
 Most ODE systems it is not practical or possible to find analytical solutions.
-Therefore, in ordre to find its solution/trajectory we rely on numerical integrators
+Therefore, in order to find its solution/trajectory we rely on numerical integrators
 to approximate a solution for us. The simplest method for numerical integration is the
 Explicit Euler method, also known as forward Euler. In this task, we develop such an
 integrator, and use it to solve the system defined in Problem 1.
 
 .. admonition:: Tasks
 
-    a) Explain, in your own words, how the forward Euler integration method works.
-    In particular, describe how information from the differential equation is used to advance the solution in time.
+    a) 
+    
+      Explain, in your own words, how the forward Euler integration method works.
+      In particular, describe how information from the differential equation is used to advance the solution in time.
 
-    b) Write a Python function of the system of ordinary differential equations derived for the mass-damper-spring system in problem 1. The function must have the following canonical form
+    b) 
+    
+      Write a Python function of the system of ordinary differential equations derived for the mass-damper-spring system in problem 1. The function must have the following canonical form
 
         .. code:: python
 
@@ -63,15 +67,17 @@ integrator, and use it to solve the system defined in Problem 1.
                 dydt_2 = function_of(y_1, y_2, t)
                 return [dydt_1, dydt_2] # Must have same shape as y
 
-    c) Write a code for simulating the system equations from Problem 1 using the Euler forward integration method with a step size of :math:`\Delta t = 0.01` and plot the results. Let the friction coefficient remain zero.
+    c) 
+    
+      Write a code for simulating the system equations from Problem 1 using the Euler forward integration method with a step size of :math:`\Delta t = 0.01` and plot the results. Let the friction coefficient remain zero.
 
 
 
 
-Problem 3 – Analytical solution and comparison
+Problem 3 - Analytical solution and comparison
 ===============================================
 
-In Problem 2, you implemented a numerical simulator for the mass–damper–spring system
+In Problem 2, you implemented a numerical simulator for the mass-damper-spring system
 based on the system of first-order ordinary differential equations derived in Problem 1.
 In this problem, you will compare your numerical results with the analytical
 (closed-form) solution of the same system.
@@ -79,7 +85,7 @@ In this problem, you will compare your numerical results with the analytical
 Analytical solution
 -------------------
 
-The analytical solution of the mass–damper–spring system depends on the amount of damping.
+The analytical solution of the mass-damper-spring system depends on the amount of damping.
 To describe this, we introduce the following quantities, defined in terms of the physical
 parameters :math:`m`, :math:`d` and :math:`k`:
 
@@ -150,28 +156,34 @@ where the constants are determined from the initial conditions as
 
 .. admonition:: Tasks
 
-    a) Write a Python function that computes the analytical solution :math:`x(t)` for the
-       mass–damper–spring system. The function shall:
+    a) 
+    
+      Write a Python function that computes the analytical solution :math:`x(t)` for the
+      mass-damper-spring system. The function shall:
 
-       - take the time vector :math:`t`, initial conditions :math:`x_0` and :math:`v_0`,
-         and the parameter dictionary ``params`` as input,
-       - compute :math:`\omega_n` and :math:`\zeta` from ``params``,
-       - select and apply the correct analytical expression based on the damping regime.
+      - take the time vector :math:`t`, initial conditions :math:`x_0` and :math:`v_0`,
+        and the parameter dictionary ``params`` as input,
+      - compute :math:`\omega_n` and :math:`\zeta` from ``params``,
+      - select and apply the correct analytical expression based on the damping regime.
 
-       Use a small numerical tolerance when checking whether :math:`\zeta \approx 1` to avoid
-       misclassification due to floating-point round-off errors and to prevent division by
-       zero in expressions involving :math:`\omega_d`.
+      Use a small numerical tolerance when checking whether :math:`\zeta \approx 1` to avoid
+      misclassification due to floating-point round-off errors and to prevent division by
+      zero in expressions involving :math:`\omega_d`.
 
 
-    b) Write a simulation script where the parameters :math:`m`, :math:`d` and :math:`k`
-       are defined once in ``params`` and used consistently in both:
+    b) 
+    
+      Write a simulation script where the parameters :math:`m`, :math:`d` and :math:`k`
+      are defined once in ``params`` and used consistently in both:
 
-       - the numerical simulator (via your ``y_dot`` function from Problem 2), and
-       - the analytical solution from Task a).
+      - the numerical simulator (via your ``y_dot`` function from Problem 2), and
+      - the analytical solution from Task a).
       
       Simulate the system and plot the numerical solution and analytical solution for the position :math:`x(t)` in
       the same figure.
 
-    c) Compute and plot the error between the numerical and analytical solutions as a
-       function of time, and repeat the comparison for at least two different values of the damping coefficient
-       :math:`d`. Comment briefly on how the damping influences the numerical error.
+    c) 
+    
+      Compute and plot the error between the numerical and analytical solutions as a
+      function of time, and repeat the comparison for at least two different values of the damping coefficient
+      :math:`d`. Comment briefly on how the damping influences the numerical error.
