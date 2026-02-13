@@ -10,7 +10,95 @@ This installation guide assumes you are using VSCode as your IDE. Some of you ma
 consult the all-knowing web or your preferred ChatGPT-like AI before reaching out about your issue. Errors or bugs
 with the provided steps below are directed to `Github <https://github.com/orgs/TTK4130/discussions/2>`_.
 
-Alternative 1: Miniconda
+Alternative 1 (best): Pixi
+====================================
+
+.. tab-set::
+
+        .. tab-item:: Windows
+            :sync: windows
+
+            1. Install Pixi via `this link here <https://pixi.prefix.dev/latest/installation/>`_ (https://pixi.prefix.dev/latest/installation/)
+            2. Set up the course environment
+            
+               * Download the `code handouts <https://github.com/TTK4130/code-handouts/>`_ (https://github.com/TTK4130/code-handouts/) repository to get the dependencies, or just download the dependency file `here <https://github.com/TTK4130/code-handouts/blob/main/pixi.toml>`_.
+               * Navigate to the directory (folder) that contains the :code:`pixi.toml` file, e.g. :code:`path/to/code-handouts/`
+               * Run :code:`pixi install` to install all the dependencies in one command
+            
+            3. Install Visual Studio Code (VSCode) via `the download page <https://code.visualstudio.com/download>`_ (https://code.visualstudio.com/download)
+            4. Use Jupyter notebooks
+
+               **Option A**: Command Line (easiest)
+
+               * Run :code:`pixi run jupyter` from the terminal (must be same folder as :code:`pixi.toml`) to launch Jupyter notebook
+            
+               **Option B**: VSCode integration
+               
+               * In VSCode, open the Command Palette (Ctrl + Shift + P)
+               * Choose "Python: Select Interpreter"
+               * Choose the interpreter at :code:`Scripts\python.exe`
+               * Install the following list of VSCode extensions (See `this guide on managing VSCode extensions <https://code.visualstudio.com/docs/editor/extension-marketplace>`_): `Jupyter Extension <https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter>`_, `Python Extension <https://marketplace.visualstudio.com/items?itemName=ms-python.python>`_
+
+        .. tab-item:: Mac OSX
+            :sync: osx
+
+            1. Install Pixi via `this link here <https://pixi.prefix.dev/latest/installation/>`_ (https://pixi.prefix.dev/latest/installation/)
+            2. Set up the course environment
+            
+               * Download the `code handouts <https://github.com/TTK4130/code-handouts/>`_ (https://github.com/TTK4130/code-handouts/) repository to get the dependencies, or just download the dependency file `here <https://github.com/TTK4130/code-handouts/blob/main/pixi.toml>`_.
+               * Navigate to the directory (folder) that contains the :code:`pixi.toml` file, e.g. :code:`path/to/code-handouts/`
+               * Run :code:`pixi install` to install all the dependencies in one command
+            
+            3. Install Visual Studio Code (VSCode) via `the download page <https://code.visualstudio.com/download>`_ (https://code.visualstudio.com/download)
+            4. Use Jupyter notebooks
+
+               **Option A**: Command Line (easiest)
+
+               * Run :code:`pixi run jupyter` from the terminal (must be same folder as :code:`pixi.toml`) to launch Jupyter notebook
+            
+               **Option B**: VSCode integration
+               
+               * In VSCode, open the Command Palette (Ctrl + Shift + P)
+               * Choose "Python: Select Interpreter"
+               * Choose the interpreter at :code:`.pixi/envs/default/bin/python`
+               * Install the following list of VSCode extensions (See `this guide on managing VSCode extensions <https://code.visualstudio.com/docs/editor/extension-marketplace>`_): `Jupyter Extension <https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter>`_, `Python Extension <https://marketplace.visualstudio.com/items?itemName=ms-python.python>`_
+
+        .. tab-item:: GNU/Linux
+            :sync: linux
+
+            1. Install Pixi via `this link here <https://pixi.prefix.dev/latest/installation/>`_ (https://pixi.prefix.dev/latest/installation/)
+            2. Set up the course environment
+            
+               * Download the `code handouts <https://github.com/TTK4130/code-handouts/>`_ (https://github.com/TTK4130/code-handouts/) repository to get the dependencies, or just download the dependency file `here <https://github.com/TTK4130/code-handouts/blob/main/pixi.toml>`_.
+               * Navigate to the directory (folder) that contains the :code:`pixi.toml` file, e.g. :code:`path/to/code-handouts/`
+               * Run :code:`pixi install` to install all the dependencies in one command
+            
+            3. Install Visual Studio Code (VSCode) via `the download page <https://code.visualstudio.com/download>`_ (https://code.visualstudio.com/download)
+            4. Use Jupyter notebooks
+
+               **Option A**: Command Line (easiest)
+
+               * Run :code:`pixi run jupyter` from the terminal (must be same folder as :code:`pixi.toml`) to launch Jupyter notebook
+            
+               **Option B**: VSCode integration
+               
+               * In VSCode, open the Command Palette (Ctrl + Shift + P)
+               * Choose "Python: Select Interpreter"
+               * Choose the interpreter at :code:`.pixi/envs/default/bin/python`
+               * Install the following list of VSCode extensions (See `this guide on managing VSCode extensions <https://code.visualstudio.com/docs/editor/extension-marketplace>`_): `Jupyter Extension <https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter>`_, `Python Extension <https://marketplace.visualstudio.com/items?itemName=ms-python.python>`_
+
+
+
+
+Troubleshooting
+----------------
+
+General tips:
+
+- Make sure you're using the correct installer for your system architecture
+- Restart your terminal or VSCode after installation to make sure the changes take effect
+
+Alternative 2 (old): Miniconda 
 ====================================
 
 .. tab-set::
@@ -66,67 +154,6 @@ Alternative 1: Miniconda
             5. Install the following list of VSCode extensions (See `this guide on managing VSCode extensions <https://code.visualstudio.com/docs/editor/extension-marketplace>`_): `Jupyter Extension <https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter>`_, `Python Extension <https://marketplace.visualstudio.com/items?itemName=ms-python.python>`_
             6. Open or create a notebook file by opening the Command Palette (Ctrl+Shift+P) and select Jupyter: Create New Jupyter Notebook.
 
-Troubleshooting
-----------------
-
-General tips:
-
-- Make sure you're using the correct installer for your system architecture
-- Run the Miniconda installer with admin/sudo privileges if needed
-- Manually activate the coda environment in VSCode if it's not detected
-- Restart your terminal or VSCode after installation to make sure the changes take effect
-
-Common issues with ``conda`` are documented on the `official Anaconda troubleshooting page <https://docs.anaconda.com/reference/troubleshooting/#conda-command-not-found-on-macos-linux>`_.
-
-
-Alternative 2: Manual Python Installation
-=========================================
-
-The steps for manual installation can vary a lot, hence I will only provide some hints that might help you.
-
-.. tab-set::
-
-        .. tab-item:: Windows
-            :sync: windows
-
-            (Being updated)
-
-        .. tab-item:: Mac OSX
-            :sync: osx
-
-            Step 1. Install Homebrew Follow the guide on the Homebrew website via this link here(https://brew.sh/).
-
-            Step 2. Install Python and PIP. The current supported Python version is Python 3.11.*.
-
-            :code:`brew install python@3.11`
-
-            Check the install location with
-
-            :code:`brew info python@3.11`
-
-            Which should print out ``/opt/homebrew/bin/python3.11``. We do not need this python version as the default python version on your path, but we just need to know the install location.
-
-            Step 3. Create and activate a virtual environment in a directory (folder) of your choice
-
-            :code:`/opt/homebrew/bin/python3.11 -m venv ./ttk4130_env`
-
-            This will activate the environment
-
-            :code:`source ttk4130_env/bin/activate`
-
-            To exit the virtual environment press ``Ctrl + d``
-
-            Step 4. Install requirements. Make sure you are at the root of this repository and you have activated the virtual environment. Run the following to install the requrirements
-
-            :code:`pip install sympy numpy scipy matplotlib ipython jupyter pythreejs`
-
-            You can now activate your new Python environment in VSCode
-
-
-        .. tab-item:: GNU/Linux
-            :sync: linux
-
-            (Being updated)
 
 
 Software Versions
