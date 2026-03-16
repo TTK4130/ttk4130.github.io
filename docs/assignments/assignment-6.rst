@@ -174,6 +174,7 @@ Here, we will use the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T
         The Lagrange equations can be written in state-space form as given by
 
         .. math::
+            :label: ODE
 
             \mathbf{x} = \begin{bmatrix} \mathbf{q} \\ \dot{\mathbf{q}} \end{bmatrix},\qquad \dot{\mathbf{x}} = \begin{bmatrix} \dot{\mathbf{q}} \\  \left(\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}\right)^{-1}\left(\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}} \right) \end{bmatrix}.
 
@@ -185,7 +186,6 @@ Here, we will use the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T
         Assume that the external torque :math:`T` is given by the PD control law:
 
         .. math::
-                :label: ODE
 
                 T = 200 (x-\theta) + 70 (\dot{x} - \dot{\theta})
 
