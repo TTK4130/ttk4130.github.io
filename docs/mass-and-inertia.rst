@@ -1,8 +1,8 @@
 .. _mass-and-inertia:
 
-================
+======================
 Mass and Inertia (WIP)
-================
+======================
 
 Learning Objectives
 ===================
@@ -37,25 +37,31 @@ motion for a rigid body in 3D.
 A spinning top
 --------------
 
-Throughout this chapter we use a **spinning top**, a solid cone with a short cylindrical
-stem, as our running example, building up its inertia properties step by step.
+Throughout this chapter we use a **spinning top** (often just referred to as "top"), 
+a solid cone with a short cylindrical stem, as our running example, 
+building up its inertia properties step by step.
 
+.. Define top dimensions
 .. jupyter-execute::
 
     import numpy as np
 
-    # --- spinning top parameters (used throughout this page) ---
-    m_c = 0.4    # kg  — cone mass
-    R   = 0.04   # m   — cone base radius
-    H_c = 0.06   # m   — cone height
+    # Cone (body)
+    m_cone = 0.4    # kg
+    R_cone = 0.04   # m
+    H_cone = 0.06   # m
 
-    m_s = 0.1    # kg  — stem (cylinder) mass
-    r_s = 0.008  # m   — stem radius
-    L_s = 0.04   # m   — stem length
+    # Stem (handle)
+    m_stem = 0.1    # kg
+    R_stem = 0.008  # m
+    L_stem = 0.04   # m
 
-    m_bolt  = 0.02                   # kg  — small bolt (used later to break symmetry)
-    r_bolt  = np.array([R, 0, H_c])  # position on the cone rim
+    # Bolt (used in some examples to break symmetry)
+    m_bolt  = 0.02                           # kg
+    r_bolt  = np.array([R_cone, 0, H_cone])  # m
+..
 
+.. Top animation help functions
 .. jupyter-execute::
     :hide-code:
 
@@ -77,10 +83,10 @@ stem, as our running example, building up its inertia properties step by step.
 
     def make_top_animation(quats, times, width=600, height=400, show_bolt=False):
         s   = 10          # visual scale factor (metres → display units)
-        R_v = R   * s
-        H_v = H_c * s
-        r_v = r_s * s
-        L_v = L_s * s
+        R_v = R_cone * s
+        H_v = H_cone * s
+        r_v = R_stem * s
+        L_v = L_stem * s
 
         # Two half-cones with different color
         cone_a = pj.Mesh(
@@ -148,11 +154,18 @@ stem, as our running example, building up its inertia properties step by step.
         action = pj.AnimationAction(pj.AnimationMixer(top), clip, top)
 
         return renderer, action
+..
+
+.. Spinning top demonstration
+.. jupyter-execute::
+    :hide-code:
 
     # Demo trajectory: 6 rad/s spin about z (Z-up), converted to Y-up for display
     t_demo     = np.linspace(0, 4, 240)
     r_demo     = _Rotation.from_euler('z', 6.0 * t_demo)
-    quats_demo = (_R_zup_to_yup * r_demo * _R_zup_to_yup.inv()).as_quat()  # [x,y,z,w]
+
+    _R_zup_to_yup = _Rotation.from_euler('x', -90, degrees=True)
+    quats_demo = (_R_zup_to_yup * r_demo * _R_zup_to_yup.inv()).as_quat()
 
     renderer_demo, action_demo = make_top_animation(quats_demo, t_demo)
     renderer_demo
@@ -161,6 +174,7 @@ stem, as our running example, building up its inertia properties step by step.
     :hide-code:
 
     action_demo
+..
 
 
 Mass and Center of Mass
@@ -169,23 +183,29 @@ Mass and Center of Mass
 Before tackling the full inertia matrix, let us recall the simpler scalar quantities.
 The total mass of a body is obtained by integrating the mass density over the body's volume:
 
+.. Define mass
 .. math::
 
     m = \int dm
+..
 
 The **center of mass** is the mass-weighted average position:
 
+.. Define center of mass
 .. math::
 
     \mathbf{r}_c = \frac{1}{m} \int \mathbf{r} \, dm
+..
 
 For a system of :math:`N` discrete point masses :math:`m_k` at positions :math:`\mathbf{r}_k`, these
 integrals become sums:
 
+.. Discrete mass and center of mass
 .. math::
 
     m = \sum_{k=1}^{N} m_k, \qquad
     \mathbf{r}_c = \frac{1}{m} \sum_{k=1}^{N} m_k \mathbf{r}_k
+..
 
 The center of mass is special: the Newton-Euler equations take their simplest form when we measure
 rotation relative to this point.
@@ -194,37 +214,41 @@ Our spinning top is a solid cone (the body) with a short cylindrical stem (the h
 The cone's tip rests on the surface at the origin, and the spin axis points along :math:`z`.
 Both components are axisymmetric, so their centers of mass lie on the :math:`z`-axis.
 We can therefore find the combined center of mass by treating each component as a point
-mass located at its own center of mass:
+mass located at its own center of mass.
 
-- **Cone**: CM at :math:`z_c = \tfrac{3}{4} H_c` above the tip
-- **Stem**: CM at :math:`z_s = H_c + \tfrac{1}{2} L_s`
-
+.. EXAMPLE: Center of mass
 .. jupyter-execute::
 
     # Centers of mass of each component
-    z_cm_cone = 3 * H_c / 4
+    z_cm_cone = 3 * H_cone / 4
     r_cm_cone = np.array([0, 0, z_cm_cone])
-    z_cm_stem = H_c + L_s / 2
+    z_cm_stem = H_cone + L_stem / 2
     r_cm_stem = np.array([0, 0, z_cm_stem])
 
-    masses    = np.array([m_c, m_s])
+    masses    = np.array([m_cone, m_stem])
     positions = np.array([r_cm_cone, r_cm_stem])
 
     m_total = np.sum(masses)
-    r_cm    = np.average(positions, axis=0, weights=masses)
-    z_cm    = r_cm[2]     # scalar CoM height above tip (reused in later blocks)
+    r_cm_top    = np.average(positions, axis=0, weights=masses)
+    z_cm_top    = r_cm_top[2]
 
     print(f"Total mass:                {m_total:.2f} kg")
     print(f"Cone CoM (above tip):      z = {z_cm_cone:.4f} m")
     print(f"Stem CoM (above tip):      z = {z_cm_stem:.4f} m")
-    print(f"Combined CoM (above tip):  z = {z_cm:.4f} m")
+    print(f"Combined CoM (above tip):  z = {z_cm_top:.4f} m")
+..
 
+.. EXERCISE: Center of mass
 .. admonition:: Exercise
     :class: dropdown
 
-    A small mounting bolt of mass :math:`m_\text{bolt} = 0.02\,\text{kg}` is attached at the
-    rim of the cone at its top (where the stem meets the cone), i.e. at position
-    :math:`[R,\, 0,\, H_c]^\top`.
+    A small mounting bolt of mass is attached at the rim of the cone at its top.
+
+    .. jupyter-execute::
+
+        print(f"Bolt mass (kg):          {m_bolt}")
+        print(f"Bolt position (m):       {r_bolt}")
+
     Find the center of mass of the combined system (cone + stem + bolt).
     By how many millimetres does the bolt shift the CoM in the :math:`x`-direction?
 
@@ -233,23 +257,13 @@ mass located at its own center of mass:
 
     .. jupyter-execute::
 
-        import numpy as np
+        masses    = np.array([m_cone, m_stem, m_bolt])
+        positions = np.array([r_cm_cone, r_cm_stem, r_bolt])
 
-        # Top parameters (same as above)
-        m_c, R, H_c = 0.4, 0.04, 0.06
-        m_s, L_s    = 0.1, 0.04
-        m_bolt      = 0.02
-
-        masses    = np.array([m_c, m_s, m_bolt])
-        positions = np.array([
-            [0.0,  0.0, 3*H_c/4        ],   # cone CoM
-            [0.0,  0.0, H_c + L_s/2    ],   # stem CoM
-            [R,    0.0, H_c            ],   # bolt position (top of cone)
-        ])
-
-        r_cm = np.average(positions, axis=0, weights=masses)
-        print(f"Center of mass: {r_cm}")
-        print(f"x-shift due to bolt: {r_cm[0]*1000:.3f} mm")
+        r_cm_top = np.average(positions, axis=0, weights=masses)
+        print(f"Center of mass: {r_cm_top}")
+        print(f"x-shift due to bolt: {r_cm_top[0]*1000:.3f} mm")
+..
 
 
 The Inertia Matrix
@@ -261,6 +275,7 @@ Definition via Integral
 For rotation, the role of scalar mass is played by the **inertia matrix** :math:`\mathbf{M}_{b/c}`,
 which encodes how the mass of body :math:`b` is distributed around its center of mass :math:`c`.
 
+.. Define inertia matrix
 .. admonition:: Inertia Matrix
 
     The inertia matrix of body :math:`b` about center of mass :math:`c`, expressed in frame :math:`i`, is
@@ -277,9 +292,11 @@ which encodes how the mass of body :math:`b` is distributed around its center of
     frame :math:`i`, and :math:`[\mathbf{r}]^\times` is the skew-symmetric cross-product matrix such
     that :math:`[\mathbf{r}]^\times \mathbf{v} = \mathbf{r} \times \mathbf{v}` for any vector
     :math:`\mathbf{v}`.
+..
 
 The skew-symmetric matrix of a vector :math:`\mathbf{r} = [x, y, z]^\top` is:
 
+.. Define skew symmetric matrix
 .. math::
 
     [\mathbf{r}]^\times =
@@ -288,10 +305,19 @@ The skew-symmetric matrix of a vector :math:`\mathbf{r} = [x, y, z]^\top` is:
          z &  0 & -x \\
         -y &  x &  0
     \end{bmatrix}
+..
 
 Let us build this in SymPy and compute the inertia contribution of a single point mass at a
 general position :math:`(x, y, z)`:
 
+.. Degine single-point inertia contribution
+.. math::
+
+    m \left[ (\mathbf{r})^\top \mathbf{r} \, \mathbf{I} - 
+    \mathbf{r} (\mathbf{r})^\top \right]
+..
+
+.. Single-point inertia contribution
 .. jupyter-execute::
 
     import sympy as sm
@@ -300,25 +326,39 @@ general position :math:`(x, y, z)`:
     x, y, z, m = sm.symbols('x y z m', real=True)
     r = sm.Matrix([x, y, z])
 
-    # Inertia contribution of a single point mass: m * (|r|^2 I - r r^T)
     M_point = m * (r.dot(r) * sm.eye(3) - r * r.T)
     M_point
+..
 
-We can verify this equals the skew-matrix formula :math:`-m[\mathbf{r}]^\times[\mathbf{r}]^\times`:
+We can verify this equals the skew-matrix formula:
 
+.. Degine single-point inertia contribution
+.. math::
+
+    -m [\mathbf{r}]^\times [\mathbf{r}]^\times
+..
+
+.. Alternative single-point inertia contribution
 .. jupyter-execute::
 
-    def skew(v):
-        """Return the 3x3 skew-symmetric (cross-product) matrix of vector v."""
+    def skew_sm(v):
         return sm.Matrix([
             [    0, -v[2],  v[1]],
             [ v[2],     0, -v[0]],
             [-v[1],  v[0],     0],
         ])
+    
 
-    r_cross     = skew(r)
+    def skew_np(v):
+        return np.array([[    0, -v[2],  v[1]],
+                         [ v[2],     0, -v[0]],
+                         [-v[1],  v[0],     0]])
+    
+
+    r_cross     = skew_sm(r)
     M_from_skew = -m * r_cross * r_cross
     sm.simplify(M_from_skew)
+..
 
 
 Symmetry and Positive Definiteness
@@ -327,13 +367,44 @@ Symmetry and Positive Definiteness
 The inertia matrix is always **symmetric** (follows directly from the definition) and
 **positive definite**, meaning the rotational kinetic energy is always strictly positive:
 
+.. Rotational kinetic energy is always strictly positive
 .. math::
 
     T_\text{rot} = \frac{1}{2} \boldsymbol{\omega}^\top \mathbf{M}_{b/c} \, \boldsymbol{\omega} > 0
     \qquad \forall \, \boldsymbol{\omega} \neq \mathbf{0}
+..
 
-Positive definiteness guarantees all eigenvalues of :math:`\mathbf{M}` are strictly positive —
-a property we will exploit when finding principal axes.
+Positive definiteness guarantees all eigenvalues of :math:`\mathbf{M}` are strictly positive.
+Let's ensure that this is the case for our spinning top:
+
+.. EXAMPLE: Spinning top inertia matrix
+.. jupyter-execute::
+
+    # Cone and stem inertia formulas
+    Izz_cone = 3 * m_cone * R_cone**2 / 10
+    Ixx_cone = Iyy_cone = 3 * m_cone * (4*R_cone**2 + H_cone**2) / 80
+    Izz_stem = m_stem * R_stem**2 / 2
+    Ixx_stem = Iyy_stem = m_stem * (3*R_stem**2 + L_stem**2) / 12
+
+    # Define the body-frame inertia for the cone and stem, respectively
+    # Axisymmetric cone and stem -> All off-diagonal elements are zero
+    M_cone = np.diag([Ixx_cone, Iyy_cone, Izz_cone])
+    M_stem = np.diag([Ixx_stem, Iyy_stem, Izz_stem])
+
+    # Vectors from the top's cm to each component's cm
+    r_top_to_cone = r_cm_cone - r_cm_top
+    r_top_to_stem = r_cm_stem - r_cm_top
+
+    # Use the parallel axis theorem calculate the total top inertia matrix
+    # The theorem will be discussed in greater detail later
+    M_top = (
+        M_cone + m_cone * skew_np(r_top_to_cone) @ skew_np(r_top_to_cone) +
+        M_stem + m_stem * skew_np(r_top_to_stem) @ skew_np(r_top_to_stem)
+    )
+
+    print("Top inertia in the body frame (kg·m²):")
+    print(np.round(M_top * 1e6, 2), "  (×10⁻⁶)")
+..
 
 
 Frame Transformations
@@ -341,31 +412,25 @@ Frame Transformations
 
 The inertia matrix depends on which frame the position vectors :math:`\mathbf{r}^i` are expressed in.
 The body frame :math:`b` is usually the most convenient for computation (the geometry is fixed), but the
-Newton-Euler equations are written in the inertial frame :math:`i`. The transformation between the two is:
+Newton-Euler equations are defined in the inertial frame :math:`i`. The transformation between the two is:
 
+.. Inertia fram transform
 .. math::
     :label: inertia-frame-transform
 
     \mathbf{M}^i_{b/c} = \mathbf{R}^b_i \, \mathbf{M}^b_{b/c} \, \mathbf{R}^i_b
+..
 
 where :math:`\mathbf{R}^b_i` is the rotation matrix from frame :math:`i` to frame :math:`b`, and
 :math:`\mathbf{R}^i_b = (\mathbf{R}^b_i)^\top`.
 
-A rotation never changes the physical mass distribution, so the eigenvalues (principal moments) of the
-inertia matrix are frame-independent. Let us verify this:
+A rotation never changes the physical mass distribution, so the eigenvalues of the
+inertia matrix are frame-independent. Let us verify this by comparing the inertia of the 
+spinning top's body in the body frame with its inertia in the inertial frame after being
+tilted 30° about the y-axis:
 
+.. EXAMPLE: Spinning top rotated inertia matrix
 .. jupyter-execute::
-
-    # Cone and stem inertia formulas
-    Izz_cone = 3 * m_c * R**2 / 10
-    Ixx_cone = 3 * m_c * (4*R**2 + H_c**2) / 80
-    Izz_stem = m_s * r_s**2 / 2
-    Ixx_stem = m_s * (3*r_s**2 + L_s**2) / 12
-
-    # Axisymmetric cone: Ixx = Iyy, all off-diagonal elements zero
-    M_cone = np.diag([Ixx_cone, Ixx_cone, Izz_cone])
-    print("Cone inertia in body frame (kg·m²):")
-    print(np.round(M_cone * 1e6, 2), "  (×10⁻⁶)")
 
     # Tilt the top 30° about the y-axis
     theta = np.radians(30)
@@ -375,14 +440,15 @@ inertia matrix are frame-independent. Let us verify this:
         [-np.sin(theta), 0.0, np.cos(theta)],
     ])
 
-    M_inertial = Ry.T @ M_cone @ Ry
+    M_top_inertial = Ry.T @ M_top @ Ry
     print("\nInertia in inertial frame after 30° tilt (kg·m²):")
-    print(np.round(M_inertial * 1e6, 2), "  (×10⁻⁶)")
+    print(np.round(M_top_inertial * 1e6, 2), "  (×10⁻⁶)")
 
-    eigs_body     = np.sort(np.linalg.eigvalsh(M_cone))
-    eigs_inertial = np.sort(np.linalg.eigvalsh(M_inertial))
+    eigs_body     = np.sort(np.linalg.eigvalsh(M_top))
+    eigs_inertial = np.sort(np.linalg.eigvalsh(M_top_inertial))
     print(f"\nEigenvalues body frame:     {np.round(eigs_body*1e6, 4)} (×10⁻⁶)")
     print(f"Eigenvalues inertial frame: {np.round(eigs_inertial*1e6, 4)} (×10⁻⁶)")
+..
 
 
 Angular Momentum
@@ -394,12 +460,14 @@ About the Center of Mass
 Angular momentum is the rotational analogue of linear momentum :math:`\mathbf{p} = m\mathbf{v}`.
 The angular momentum of body :math:`b` about its center of mass :math:`c` is:
 
+.. Define angular momentum about the CM
 .. math::
     :label: angular-momentum-cm
 
     \mathbf{h}_{b/c} = \mathbf{M}_{b/c} \, \boldsymbol{\omega}_{b/i}
+..
 
-One important subtlety: :math:`\mathbf{h}_{b/c}` is generally **not parallel** to
+Note that :math:`\mathbf{h}_{b/c}` is generally **not parallel** to
 :math:`\boldsymbol{\omega}_{b/i}` unless the rotation happens to be about a principal axis.
 
 For our axisymmetric spinning top (no bolt), the inertia matrix in the body frame is diagonal.
@@ -408,7 +476,7 @@ Spinning along the :math:`z`-axis therefore gives angular momentum exactly paral
 
 .. jupyter-execute::
 
-    omega = np.array([0.0, 0.0, 100.0])    # 100 rad/s about spin axis (z)
+    omega = np.array([0.0, 0.0, 100.0])
     h     = M_cone @ omega
 
     cos_angle = np.dot(h, omega) / (np.linalg.norm(h) * np.linalg.norm(omega))
@@ -420,16 +488,11 @@ Spinning along the :math:`z`-axis therefore gives angular momentum exactly paral
     print(f"Angle between h and omega: {angle_deg:.4f}°  (parallel: no wobble)")
 
 Now attach the bolt at the rim. The bolt's inertia contribution has off-diagonal terms because
-its position :math:`[R, 0, H_c]` is not on the spin axis:
+its position :math:`[R\_cone, 0, H\_cone]` is not on the spin axis:
 
 .. jupyter-execute::
 
     r_rel = r_bolt - r_cm_cone
-
-    def skew_np(v):
-        return np.array([[    0, -v[2],  v[1]],
-                         [ v[2],     0, -v[0]],
-                         [-v[1],  v[0],     0]])
 
     M_bolt = -m_bolt * skew_np(r_rel) @ skew_np(r_rel)
     M_unbalanced = M_cone + M_bolt
@@ -569,7 +632,7 @@ the correction :math:`-m[\mathbf{r}]^\times[\mathbf{r}]^\times` is positive semi
 
 The spinning top rests with its tip on a surface. Let us find the inertia matrix of the cone
 about the tip :math:`o` by shifting from the cone's CoM :math:`c` (located at
-:math:`z = \tfrac{3}{4}H_c` above the tip) down to the tip at :math:`z = 0`:
+:math:`z = \tfrac{3}{4}H_cone` above the tip) down to the tip at :math:`z = 0`:
 
 .. jupyter-execute::
 
@@ -582,7 +645,7 @@ about the tip :math:`o` by shifting from the cone's CoM :math:`c` (located at
     r_oc = sm.Matrix([0, 0, -sm.Rational(3, 4) * H])
 
     M_c = sm.diag(Ixx_c, Ixx_c, Izz_c)   # axisymmetric: Ixx = Iyy
-    M_o = M_c - m * skew(r_oc) * skew(r_oc)
+    M_o = M_c - m * skew_sm(r_oc) * skew_sm(r_oc)
     M_o
 
 :math:`I_{zz}` is unchanged because the shift is *along* the spin axis. The transverse moments
