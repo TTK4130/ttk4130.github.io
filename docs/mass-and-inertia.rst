@@ -4,6 +4,13 @@
 Mass and Inertia (WIP)
 ======================
 
+.. TODO
+    * Add a section about principle axis frame
+    * Maybe move parallel axis theorem section further up (and fix its example cause it sucks...)
+    * Simulate the spinning top with and without bolt and display using the animation function
+    * etc.
+..
+
 Learning Objectives
 ===================
 
@@ -260,9 +267,9 @@ mass located at its own center of mass.
         masses    = np.array([m_cone, m_stem, m_bolt])
         positions = np.array([r_cm_cone, r_cm_stem, r_bolt])
 
-        r_cm_top = np.average(positions, axis=0, weights=masses)
-        print(f"Center of mass: {r_cm_top}")
-        print(f"x-shift due to bolt: {r_cm_top[0]*1000:.3f} mm")
+        r_cm_boltedtop = np.average(positions, axis=0, weights=masses)
+        print(f"Center of mass: {r_cm_boltedtop}")
+        print(f"x-shift due to bolt: {r_cm_boltedtop[0]*1000:.3f} mm")
 ..
 
 
@@ -474,10 +481,11 @@ For our axisymmetric spinning top (no bolt), the inertia matrix in the body fram
 Spinning along the :math:`z`-axis therefore gives angular momentum exactly parallel to
 :math:`\boldsymbol{\omega}`:
 
+.. EXAMPLE: Angular momentum (no bolt)
 .. jupyter-execute::
 
     omega = np.array([0.0, 0.0, 100.0])
-    h     = M_cone @ omega
+    h     = M_top @ omega
 
     cos_angle = np.dot(h, omega) / (np.linalg.norm(h) * np.linalg.norm(omega))
     angle_deg = np.degrees(np.arccos(np.clip(cos_angle, -1.0, 1.0)))
@@ -485,29 +493,39 @@ Spinning along the :math:`z`-axis therefore gives angular momentum exactly paral
     print("--- Balanced cone (no bolt) ---")
     print(f"omega: {omega} rad/s")
     print(f"h:     {np.round(h, 6)} kg·m²/s")
-    print(f"Angle between h and omega: {angle_deg:.4f}°  (parallel: no wobble)")
+    print(f"Angle between h and omega: {angle_deg:.4f}°")
+..
 
 Now attach the bolt at the rim. The bolt's inertia contribution has off-diagonal terms because
 its position :math:`[R\_cone, 0, H\_cone]` is not on the spin axis:
 
+.. Example: Angular momentum (with bolt)
 .. jupyter-execute::
 
-    r_rel = r_bolt - r_cm_cone
+    # Vectors from the bolted top's cm to each component's cm
+    r_boltedtop_to_cone = r_cm_cone - r_cm_boltedtop
+    r_boltedtop_to_stem = r_cm_stem - r_cm_boltedtop
+    r_boltedtop_to_bolt = r_bolt - r_cm_boltedtop
 
-    M_bolt = -m_bolt * skew_np(r_rel) @ skew_np(r_rel)
-    M_unbalanced = M_cone + M_bolt
+    # Parallel axis theorem
+    M_boltedtop = (
+        M_cone + m_cone * skew_np(r_boltedtop_to_cone) @ skew_np(r_boltedtop_to_cone) +
+        M_stem + m_stem * skew_np(r_boltedtop_to_stem) @ skew_np(r_boltedtop_to_stem) + 
+        m_bolt * skew_np(r_boltedtop_to_bolt) @ skew_np(r_boltedtop_to_bolt)
+    )
 
-    h_unbal   = M_unbalanced @ omega
-    cos_angle = np.dot(h_unbal, omega) / (np.linalg.norm(h_unbal) * np.linalg.norm(omega))
+    h_bolted   = M_boltedtop @ omega
+    cos_angle = np.dot(h_bolted, omega) / (np.linalg.norm(h_bolted) * np.linalg.norm(omega))
     angle_deg = np.degrees(np.arccos(np.clip(cos_angle, -1.0, 1.0)))
 
     print("--- Unbalanced cone (with bolt) ---")
     print(f"omega: {omega} rad/s")
-    print(f"h:     {np.round(h_unbal, 6)} kg·m²/s")
-    print(f"Angle between h and omega: {angle_deg:.4f}°  ← bolt causes wobble!")
+    print(f"h:     {np.round(h_bolted, 6)} kg·m²/s")
+    print(f"Angle between h and omega: {angle_deg:.4f}°")
+..
 
-The bolt shifts the angular momentum away from the spin axis. This is why even a small
-imbalance in a rapidly spinning rotor causes vibration.
+The bolt shifts the angular momentum away from the spin axis. This causes a wobble
+when spinning the top with a bolt on its rim.
 
 
 About a Different Point
@@ -516,6 +534,7 @@ About a Different Point
 When computing angular momentum about a point :math:`o` that is *not* the center of mass, an extra
 term appears due to the translational motion of the center of mass:
 
+.. Define angular momentum around arbitrary point
 .. math::
     :label: angular-momentum-o
 
@@ -526,15 +545,36 @@ where :math:`\mathbf{r}_{c/o}` is the position of :math:`c` relative to :math:`o
 :math:`\mathbf{v}_{c/i}` is the velocity of the center of mass in the inertial frame.
 
 
+Time Derivative
+-----------------------------------------
+
+Taking the time derivative of angular momentum and setting it equal to the applied torque gives:
+
+.. Define derivative of angular momentum
+.. math::
+    :label: angular-momentum-deriv
+
+    \dot{\mathbf{h}}_{b/c}
+    = \mathbf{M}^i_{b/c} \, \boldsymbol{\alpha}^i_{b/i}
+    + \boldsymbol{\omega}^i_{b/i} \times \left(\mathbf{M}^i_{b/c} \, \boldsymbol{\omega}^i_{b/i}\right)
+    = \boldsymbol{\tau}_{b/c}
+
+The second term, :math:`\boldsymbol{\omega} \times (\mathbf{M}\boldsymbol{\omega})`,  vanishes when
+:math:`\boldsymbol{\omega}` is parallel to :math:`\mathbf{M}\boldsymbol{\omega}`. This is
+the case when spinning about a principal axis.
+..
+
+
 Newton-Euler Equations of Motion
 =================================
 
-We now have all the ingredients to write down the full equations of motion for a rigid body.
-There are two vector equations: one for translation and one for rotation.
+Now we can write down the full equations of motion for a rigid body.
+There are two vector equations. One for translation and one for rotation.
 
 About the Center of Mass
 -------------------------
 
+.. Define newton-euler about the CM
 .. admonition:: Newton-Euler Equations (About Center of Mass)
 
     .. math::
@@ -543,10 +583,12 @@ About the Center of Mass
         \sum \mathbf{F} &= m \, \mathbf{a}^i_{c/i} \\[4pt]
         \sum \boldsymbol{\tau} &= \mathbf{M}^i_{b/c} \, \boldsymbol{\alpha}^i_{b/i}
         + \boldsymbol{\omega}^i_{b/i} \times \left(\mathbf{M}^i_{b/c} \, \boldsymbol{\omega}^i_{b/i}\right)
+..
 
 The translational equation is simply :math:`F = ma` applied to the center of mass :math:`c`.
 In block matrix form both equations read:
 
+.. The newton-euler equations
 .. math::
 
     \begin{bmatrix} m\mathbf{I} & \mathbf{0} \\ \mathbf{0} & \mathbf{M}_{b/c} \end{bmatrix}
@@ -556,15 +598,16 @@ In block matrix form both equations read:
     \boldsymbol{\omega}_{b/i}) \end{bmatrix}
     =
     \begin{bmatrix} \mathbf{F}_{b} \\ \boldsymbol{\tau}_{b} \end{bmatrix}
-
+..
 
 About a Different Point *o*
 ----------------------------
 
-When the body is constrained to rotate about a fixed point :math:`o` that is not the center of mass
-(a door hinge, a robot joint, a pendulum pivot), the equations change because the offset
-:math:`\mathbf{r}^i_{c/o}` between the center of mass and the pivot couples translation and rotation:
+When the body is constrained to rotate about a fixed point :math:`o` that is not the center of mass, 
+the equations change because the offset :math:`\mathbf{r}^i_{c/o}` between the center of mass and 
+the pivot couples translation and rotation:
 
+.. Newton-euler force about arbitrary point
 .. math::
     :label: newton-euler-force-o
 
@@ -573,7 +616,9 @@ When the body is constrained to rotate about a fixed point :math:`o` that is not
         + \boldsymbol{\alpha}_{b/i} \times \mathbf{r}^i_{c/o}
         + \boldsymbol{\omega}_{b/i} \times \bigl(\boldsymbol{\omega}_{b/i} \times \mathbf{r}^i_{c/o}\bigr)
     \right)
+..
 
+.. Newton-euler torque about arbitrary point
 .. math::
     :label: newton-euler-torque-o
 
@@ -581,9 +626,11 @@ When the body is constrained to rotate about a fixed point :math:`o` that is not
         \mathbf{r}^i_{c/o} \times m\mathbf{a}_c
         + \mathbf{M}_{b/o} \cdot \boldsymbol{\alpha}_{b/i}
         + \boldsymbol{\omega}_{b/i} \times \left(\mathbf{M}_{b/o} \cdot \boldsymbol{\omega}_{b/i}\right)
+..
 
 In block matrix form:
 
+.. Newton-euler force and torque in block matrix form
 .. math::
 
     \begin{bmatrix}
@@ -598,15 +645,17 @@ In block matrix form:
     \end{bmatrix}
     =
     \begin{bmatrix} \mathbf{F}_{b/o} \\ \boldsymbol{\tau}_{b/o} \end{bmatrix}
-
+..
 
 The Parallel Axis Theorem
 ==========================
+.. Maybe move further up since it has already been used twice in the examples...
 
 You computed the inertia matrix about the center of mass, but you need it about the wheel hub,
 a joint, or the end of a rod. The **parallel axis theorem** lets you shift the reference point
 without re-integrating.
 
+.. Define the parallel axis theorem in 3D
 .. admonition:: Parallel Axis Theorem (3D)
 
     Given the inertia matrix :math:`\mathbf{M}_{b/c}` about the center of mass :math:`c`, the inertia
@@ -618,13 +667,16 @@ without re-integrating.
         \mathbf{M}_{b/o} = \mathbf{M}_{b/c} - m [\mathbf{r}_{o/c}]^\times [\mathbf{r}_{o/c}]^\times
 
     where :math:`\mathbf{r}_{o/c}` is the vector from :math:`c` to :math:`o`.
+..
 
 In 2D, rotating about a fixed axis, the theorem reduces to the scalar form:
 
+.. Define the parallel axis theorem in 2D
 .. math::
     :label: parallel-axis-2d
 
     I_o = I_c + m d^2
+..
 
 where :math:`d` is the perpendicular distance between the original axis (through :math:`c`) and the
 new axis (through :math:`o`). The inertia always *increases* when moving away from the center of mass, which means
@@ -632,8 +684,9 @@ the correction :math:`-m[\mathbf{r}]^\times[\mathbf{r}]^\times` is positive semi
 
 The spinning top rests with its tip on a surface. Let us find the inertia matrix of the cone
 about the tip :math:`o` by shifting from the cone's CoM :math:`c` (located at
-:math:`z = \tfrac{3}{4}H_cone` above the tip) down to the tip at :math:`z = 0`:
+:math:`z = \tfrac{3}{4}H\_cone` above the tip) down to the tip at :math:`z = 0`:
 
+.. EXAMPLE: parallel axis theorem (cone body)
 .. jupyter-execute::
 
     import sympy as sm
@@ -644,9 +697,9 @@ about the tip :math:`o` by shifting from the cone's CoM :math:`c` (located at
     # Shift vector from CoM to tip: r_{o/c} = [0, 0, -3H/4]
     r_oc = sm.Matrix([0, 0, -sm.Rational(3, 4) * H])
 
-    M_c = sm.diag(Ixx_c, Ixx_c, Izz_c)   # axisymmetric: Ixx = Iyy
+    M_c = sm.diag(Ixx_c, Ixx_c, Izz_c)
     M_o = M_c - m * skew_sm(r_oc) * skew_sm(r_oc)
     M_o
+..
 
-:math:`I_{zz}` is unchanged because the shift is *along* the spin axis. The transverse moments
-:math:`I_{xx}` and :math:`I_{yy}` each gain :math:`m\!\left(\tfrac{3H}{4}\right)^2`.
+:math:`I_{zz}` is unchanged because the shift is *along* the spin axis.
