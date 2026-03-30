@@ -67,10 +67,11 @@ build succeeded.
 
 The HTML pages are in _build/html.
 ```
-To view the built website locally this from the docs direcotry
+To view the built website, first launch a local http server with python at port 8000 in the docs directory
 ```
-open _build/html/index.html 
+python -m http.server 8000
 ```
+Then access the webserver at [http://0.0.0.0:8000/_build/html/](http://0.0.0.0:8000/_build/html/) to view the website.
  
 ### Windows
 To install Python follow [this guide](https://learn.microsoft.com/en-us/windows/python/beginners) (all steps may not be necessary) and follow the steps above for MacOS. Some syntax may vary. 
