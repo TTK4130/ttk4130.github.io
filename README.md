@@ -53,6 +53,7 @@ uv run make -C docs html
 ```
 
 Which should produce output similar to:
+
 ```
 Running Sphinx v8.1.3
 loading translations [en]... done
@@ -64,27 +65,25 @@ build succeeded.
 The HTML pages are in _build/html.
 ```
 
-To view the built website locally run:
+To view the built website, first launch a local http server with python at port 8000 in the docs directory
+
 ```bash
-open docs/_build/html/index.html
+python -m http.server 8000
 ```
+Then access the webserver at [http://0.0.0.0:8000/_build/html/](http://0.0.0.0:8000/_build/html/) to view the website.
 
 **Step 7 — Install pre-commit hooks**
 
 This project uses pre-commit hooks to automatically format and lint `.rst`
 files before each commit. Install them with:
+
 ```bash
 uv run pre-commit install
 ```
 
 You only need to do this once. After this, formatting and linting run
 automatically every time you run `git commit`.
-To view the built website, first launch a local http server with python at port 8000 in the docs directory
-```
-python -m http.server 8000
-```
-Then access the webserver at [http://0.0.0.0:8000/_build/html/](http://0.0.0.0:8000/_build/html/) to view the website.
- 
+
 ### Windows
 To install Python follow [this guide](https://learn.microsoft.com/en-us/windows/python/beginners) (all steps may not be necessary) and follow the steps above for MacOS. Some syntax may vary. 
 
