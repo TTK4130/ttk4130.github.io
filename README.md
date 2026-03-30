@@ -100,7 +100,21 @@ Tabs can easily be created by:
 
 ```
 
+## Documentation tooling
 
+The website uses three tools to keep the `.rst` source files consistent and correct. 
+
+### `docstrfmt` formatter
+
+[`docstrfmt`](https://github.com/LilSpazJoekp/docstrfmt?tab=readme-ov-file) is a tool for automatically formatting Sphinx flavored reStructuredText in files and Python docstrings. This makes it easier to collaborate, as each file is enforced to follow the same formatting, thereby reducing the cognitive load of editing. It fixes indentations, line lengths and spacing around directives and so on. It runs automatically on every `git commit` via pre-commit, so formatting differences never make it into version control.
+
+### `rstcheck` syntax linter
+
+[`rstcheck`](https://rstcheck.readthedocs.io/en/latest/) checks the `.rst` files and checks that the reStructuredText syntax is valid. This is to make sure we do not push something that would not build and deploy correctly. It reports problems such as malformed directives, broken code blocks or markup that Sphinx would fail to build. Like dosctrfmt, it runs on every commit. This is to filter unnecessary commits with "fix broken build" that litter the history.
+
+### (Optional) lextudio reStructuredText (VSCodeExtension)
+
+The [reStructuredText extension](https://docs.lextudio.com/restructuredtext/) is an optional extension you can use to improve the editing experience in VSCode. It supports syntax highlighting and reports linting errors from rstcheck and much more. It does not change your files, but reports any issues before you reach the commit stage. 
 
 ## How to build the site
 
