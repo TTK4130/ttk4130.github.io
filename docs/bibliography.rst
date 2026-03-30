@@ -1,6 +1,6 @@
-==================
-Bibliography
-==================
+##############
+ Bibliography
+##############
 
 .. bibliography::
     :all:

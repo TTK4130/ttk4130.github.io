@@ -31,7 +31,6 @@ dev = [
     "pre-commit",
     "docstrfmt",
     "rstcheck[sphinx]",
-    "doc8",
 ]
 
 [tool.docstrfmt]
