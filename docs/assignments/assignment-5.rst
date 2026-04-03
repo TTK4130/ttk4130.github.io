@@ -17,7 +17,7 @@ system. This topic is treated in :cite:t:`Egeland2002` from chapter 6.13 to 7.3.
     at https://github.com/TTK4130/code-handouts. The relevant notebook is
     `assignment-4-satellite.ipynb`.
 
-.. admonition:: Animation code
+.. dropdown:: Animation code
 
     .. jupyter-execute::
 

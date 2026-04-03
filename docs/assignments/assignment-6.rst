@@ -15,7 +15,7 @@ approach.
     at https://github.com/TTK4130/code-handouts. The relevant notebook is
     `assingment-5-ball-and-beam.ipynb`.
 
-.. admonition:: Animation code
+.. dropdown:: Animation code
 
     .. jupyter-execute::
 
