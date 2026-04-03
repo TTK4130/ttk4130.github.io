@@ -1,20 +1,21 @@
-=========================
-Assignment 6 - Lagrange
-=========================
+#########################
+ Assignment 6 - Lagrange
+#########################
 
-In this assignment we will study the modeling of complex mechanical systems based on the Lagrange approach.
+In this assignment we will study the modeling of complex mechanical systems based on the Lagrange
+approach.
 
-Problem 1 - Ball on a Beam
-==========================
+****************************
+ Problem 1 - Ball on a Beam
+****************************
 
 .. note::
 
-    This problem contains a programming exercise.
-    Template code is available as a Jupyter notebook at `<https://github.com/TTK4130/code-handouts>`_.
-    The relevant notebook is `assingment-5-ball-and-beam.ipynb`.
+    This problem contains a programming exercise. Template code is available as a Jupyter notebook
+    at https://github.com/TTK4130/code-handouts. The relevant notebook is
+    `assingment-5-ball-and-beam.ipynb`.
 
 .. admonition:: Animation code
-    :class: dropdown
 
     .. jupyter-execute::
 
@@ -108,8 +109,6 @@ Problem 1 - Ball on a Beam
         controls = pj.OrbitControls(controlling = camera)
         renderer = pj.Renderer(camera=camera, scene=scene, width=view_width, height=view_height, controls=[controls])
 
-
-
 .. jupyter-execute::
 
     renderer
@@ -118,16 +117,18 @@ Problem 1 - Ball on a Beam
 
     pivot_action
 
-We consider here a solid ball on a beam system as depicted in :numref:`bob`.
-The ball rolls without slipping (pure rotation) on a beam that is articulated without friction in the middle.
-A torque :math:`T` acts on the beam joint.
-We will use the following numerical values: The rotational inertia of the rail around its joint is :math:`J = 1\ \text{kg} \cdot \text{m}^2`, the mass of the ball is :math:`M = 10\ \text{kg}` and its radius is :math:`R = 0.25\ \text{m}`.
-The position of the ball with respect to the joint of the rail will be labeled by :math:`x`.
+We consider here a solid ball on a beam system as depicted in :numref:`bob`. The ball rolls without
+slipping (pure rotation) on a beam that is articulated without friction in the middle. A torque
+:math:`T` acts on the beam joint. We will use the following numerical values: The rotational inertia
+of the rail around its joint is :math:`J = 1\ \text{kg} \cdot \text{m}^2`, the mass of the ball is
+:math:`M = 10\ \text{kg}` and its radius is :math:`R = 0.25\ \text{m}`. The position of the ball
+with respect to the joint of the rail will be labeled by :math:`x`.
 
-A rotation with :math:`\dot{\theta}>0` obeys the right-hand rule for reference frames :math:`\mathbf{a}` and :math:`\mathbf{b}`, while a displacement with :math:`\dot{x}>0` moves the ball in the direction :math:`\mathbf{b}_1` (see :numref:`bob`).
+A rotation with :math:`\dot{\theta}>0` obeys the right-hand rule for reference frames
+:math:`\mathbf{a}` and :math:`\mathbf{b}`, while a displacement with :math:`\dot{x}>0` moves the
+ball in the direction :math:`\mathbf{b}_1` (see :numref:`bob`).
 
 Here, we will use the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T`.
-
 
 .. figure:: figures/BallOnBeam.svg
     :width: 80%
@@ -136,122 +137,110 @@ Here, we will use the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T
 
     Schematic of the ball on a beam.
 
-
 .. admonition:: Tasks
 
-    a.
+    a. What is the position of the ball's center as a function of the generalized coordinates?
+    b. The total movement of the ball is the result of its movement with respect to the beam, in
+       addition to the movement of the beam. What is then the angular velocity of the ball as a
+       function of the generalized coordinates?
+    c. The ball is a rigid body that both experiences translation and rotation. What is the
+       expression for the kinetic energy of the ball?
+    d. The beam is also a rigid body, but it only rotates. What is the expression for the kinetic
+       energy of the beam?
+    e. Complete the Jupyter notebook `assingment-5-ball-and-beam.ipynb` (found in the `code handout
+       repository <https://github.com/TTK4130/code-handouts>`_) by doing the following tasks:
 
-        What is the position of the ball's center as a function of the generalized coordinates?
+       - Define the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T` as a symbolic
+         variable.
+       - Define a symbolic variable for the derivative of the generalized coordinates.
+       - Write the expression for the position of the ball's center.
+       - Complete the expressions for the kinetic and potential energies.
+       - Write the expression for the Lagrangian function.
+       - Run the routine.
 
-    b.
+       Add the implemented code to your answer.
 
-        The total movement of the ball is the result of its movement with respect to the beam, in addition to the movement of the beam.
-        What is then the angular velocity of the ball as a function of the generalized coordinates?
+       The Lagrange equations can be written in state-space form as given by
 
-    c.
+       .. math::
+           :label: ODE
 
-        The ball is a rigid body that both experiences translation and rotation.
-        What is the expression for the kinetic energy of the ball?
+           \mathbf{x} = \begin{bmatrix} \mathbf{q} \\ \dot{\mathbf{q}} \end{bmatrix},\qquad \dot{\mathbf{x}} = \begin{bmatrix} \dot{\mathbf{q}} \\  \left(\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}\right)^{-1}\left(\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}} \right) \end{bmatrix}.
 
-    d.
+       The routine implemented in part (e) exports two Matlab functions. One that gives the position
+       of the ball's center, while the other returns the terms :math:`\frac{\partial^2
+       \mathcal{L}}{\partial \dot{\mathbf{q}}^2}` and :math:`\mathbf{Q} + \frac{\partial
+       \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}
+       \partial \mathbf{q}} \dot{\mathbf{q}}`.
 
-        The beam is also a rigid body, but it only rotates.
-        What is the expression for the kinetic energy of the beam?
+    f. Assume that the external torque :math:`T` is given by the PD control law:
 
-    e.
+       .. math::
 
-        Complete the Jupyter notebook `assingment-5-ball-and-beam.ipynb` (found in the `code handout repository <https://github.com/TTK4130/code-handouts>`_) by doing the following tasks:
+           T = 200 (x-\theta) + 70 (\dot{x} - \dot{\theta})
 
-        - Define the generalized coordinates :math:`\mathbf{q} = [x,\,\theta]^T` as a symbolic variable.
-        - Define a symbolic variable for the derivative of the generalized coordinates.
-        - Write the expression for the position of the ball's center.
-        - Complete the expressions for the kinetic and potential energies.
-        - Write the expression for the Lagrangian function.
-        - Run the routine.
+       Write a function that gives the dynamics of the state-space model :eq:`ODE` by using the
+       `get_W` and `get_RHS` functions and the PD control law. In other words, this function should
+       return the value of the right-hand side of :eq:`ODE` as a function of the states and the
+       parameters.
 
-        Add the implemented code to your answer.
+    g. **(Optional task)** Complete the delivered Jupyter notebook in order to make an animation of
+       the simulation results.
 
-        The Lagrange equations can be written in state-space form as given by
+       Simulate your system using e.g. :math:`x(0) = 1,\, \theta(0) = 0` as initial conditions with
+       initial velocities at rest.
 
-        .. math::
-            :label: ODE
+       Run the animation.
 
-            \mathbf{x} = \begin{bmatrix} \mathbf{q} \\ \dot{\mathbf{q}} \end{bmatrix},\qquad \dot{\mathbf{x}} = \begin{bmatrix} \dot{\mathbf{q}} \\  \left(\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}\right)^{-1}\left(\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}} \right) \end{bmatrix}.
+       What do you observe? Are these results reasonable? Explain.
 
-        The routine implemented in part (e) exports two Matlab functions.
-        One that gives the position of the ball's center, while the other returns the terms :math:`\frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}}^2}` and :math:`\mathbf{Q} + \frac{\partial \mathcal{L}}{\partial \mathbf{q}} - \frac{\partial^2 \mathcal{L}}{\partial \dot{\mathbf{q}} \partial \mathbf{q}} \dot{\mathbf{q}}`.
+       .. hint::
 
-    f.
+           The function that returns the position of the ball's center can come in handy here.
 
-        Assume that the external torque :math:`T` is given by the PD control law:
+***************************************
+ Problem 2 - Pendulum on an oscillator
+***************************************
 
-        .. math::
-
-                T = 200 (x-\theta) + 70 (\dot{x} - \dot{\theta})
-
-        Write a function that gives the dynamics of the state-space model :eq:`ODE` by using the `get_W` and `get_RHS` functions and the PD control law.
-        In other words, this function should return the value of the right-hand side of :eq:`ODE` as a function of the states and the parameters.
-
-    g.
-
-        **(Optional task)** Complete the delivered Jupyter notebook in order to make an animation of the simulation results.
-
-        Simulate your system using e.g. :math:`x(0) = 1,\, \theta(0) = 0` as initial conditions with initial velocities at rest.
-
-        Run the animation.
-
-        What do you observe? Are these results reasonable? Explain.
-
-        .. hint::
-            :class: dropdown
-
-            The function that returns the position of the ball's center can come in handy here.
-
-
-
-
-Problem 2 - Pendulum on an oscillator
-=====================================
-
-In this problem, we will derive equations of motion for the same system analyzed in :ref:`assignment-newton-euler`.
-Previously, we used the Newton-Euler approach; now, we will use the Lagrange method.
-Depending on your choice of generalized coordinates, you may obtain the same equations as before.
+In this problem, we will derive equations of motion for the same system analyzed in
+:ref:`assignment-newton-euler`. Previously, we used the Newton-Euler approach; now, we will use the
+Lagrange method. Depending on your choice of generalized coordinates, you may obtain the same
+equations as before.
 
 .. figure:: ./figures/pendulum_osc.svg
-   :width: 30%
-   :align: center
+    :width: 30%
+    :align: center
 
-   Pendulum on a vertical oscillator
+    Pendulum on a vertical oscillator
 
-Figure above shows a pendulum with a point mass :math:`m_2` attached to a mass :math:`m_1` that can oscillate along a vertical axis. The pendulum rod has a length :math:`L` and is considered massless (i.e., the pendulum can be modeled as a point mass at the end of a massless rod).
+Figure above shows a pendulum with a point mass :math:`m_2` attached to a mass :math:`m_1` that can
+oscillate along a vertical axis. The pendulum rod has a length :math:`L` and is considered massless
+(i.e., the pendulum can be modeled as a point mass at the end of a massless rod).
 
-The oscillating mass is connected to a stationary structure via a spring with stiffness :math:`k`. The vertical position :math:`z` of the mass is defined such that :math:`z_0` corresponds to the neutral position of the spring. The angular displacement of the pendulum rod is :math:`\theta`, as indicated in the figure. For simplicity, body one is constrained to move only along the vertical axis, with no motion along the :math:`y_0` or :math:`z_0` directions.
+The oscillating mass is connected to a stationary structure via a spring with stiffness :math:`k`.
+The vertical position :math:`z` of the mass is defined such that :math:`z_0` corresponds to the
+neutral position of the spring. The angular displacement of the pendulum rod is :math:`\theta`, as
+indicated in the figure. For simplicity, body one is constrained to move only along the vertical
+axis, with no motion along the :math:`y_0` or :math:`z_0` directions.
 
 .. admonition:: Tasks
 
-    a.
+    a. Select a set of generalized coordinates that uniquely describe the configuration of the
+       system. Ensure the number of coordinates corresponds to the degrees of freedom of the system.
+    b. Find the kinetic energy of the system and express it in terms of the generalized coordinates
+       and their time derivatives.
+    c. Find the potential energy of the system and express it in terms of the generalized
+       coordinates.
+    d. Derive the equations of motion for the system using the Lagrange method.
 
-        Select a set of generalized coordinates that uniquely describe the configuration of the system.
-        Ensure the number of coordinates corresponds to the degrees of freedom of the system.
+       .. hint::
 
-    b.
+           - Express the coordinates of both masses in terms of the generalized coordinates before
+             differentiating.
+           - Consider the contributions to the kinetic and potential energy separately for each
+             mass.
+           - Apply the Euler-Lagrange equation to derive the equations of motion:
 
-        Find the kinetic energy of the system and express it in terms of the generalized coordinates and their time derivatives.
+           .. math::
 
-    c.
-
-        Find the potential energy of the system and express it in terms of the generalized coordinates.
-
-    d.
-
-        Derive the equations of motion for the system using the Lagrange method.
-
-        .. hint::
-            :class: dropdown
-
-            - Express the coordinates of both masses in terms of the generalized coordinates before differentiating.
-            - Consider the contributions to the kinetic and potential energy separately for each mass.
-            - Apply the Euler-Lagrange equation to derive the equations of motion:
-
-            .. math::
-                \frac{d}{dt} \left( \frac{\partial T}{\partial \dot{q}_i} \right) - \frac{\partial T}{\partial q_i} + \frac{\partial V}{\partial q_i} = 0
+               \frac{d}{dt} \left( \frac{\partial T}{\partial \dot{q}_i} \right) - \frac{\partial T}{\partial q_i} + \frac{\partial V}{\partial q_i} = 0
