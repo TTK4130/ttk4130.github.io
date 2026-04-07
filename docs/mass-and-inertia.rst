@@ -568,6 +568,7 @@ term appears due to the translational motion of the center of mass:
 
     \mathbf{h}_{b/o} = \mathbf{M}_{b/o} \, \boldsymbol{\omega}_{b/i}
     + \mathbf{r}_{c/o} \times m \mathbf{v}_{c/i}
+..
 
 where :math:`\mathbf{r}_{c/o}` is the position of :math:`c` relative to :math:`o`, and
 :math:`\mathbf{v}_{c/i}` is the velocity of the center of mass in the inertial frame.
@@ -586,11 +587,11 @@ Taking the time derivative of angular momentum and setting it equal to the appli
     = \mathbf{M}^i_{b/c} \, \boldsymbol{\alpha}^i_{b/i}
     + \boldsymbol{\omega}^i_{b/i} \times \left(\mathbf{M}^i_{b/c} \, \boldsymbol{\omega}^i_{b/i}\right)
     = \boldsymbol{\tau}_{b/c}
+..
 
 The second term, :math:`\boldsymbol{\omega} \times (\mathbf{M}\boldsymbol{\omega})`,  vanishes when
 :math:`\boldsymbol{\omega}` is parallel to :math:`\mathbf{M}\boldsymbol{\omega}`. This is
 the case when spinning about a principal axis.
-..
 
 
 Newton-Euler Equations of Motion
@@ -690,11 +691,13 @@ from :eq:`newton-euler-torque-o` reduces to
     = \boldsymbol{\tau}_{b/o} - \boldsymbol{\omega} \times \bigl(\mathbf{M}_{b/o}\,\boldsymbol{\omega}\bigr)
 
 where the only applied torque is gravity acting at the center of mass:
+..
 
 .. Gravity torque about tip
 .. math::
 
     \boldsymbol{\tau}_{b/o} = \mathbf{r}_{c/o} \times m\mathbf{g}
+..
 
 To integrate this forward in time we track the orientation as a unit quaternion
 :math:`\mathbf{q} = [q_w,\, q_x,\, q_y,\, q_z]^\top` whose kinematics are
@@ -704,6 +707,7 @@ To integrate this forward in time we track the orientation as a unit quaternion
 
     \dot{\mathbf{q}} = \tfrac{1}{2}\,\mathbf{q} \otimes
     \begin{bmatrix} 0 \\ \boldsymbol{\omega} \end{bmatrix}
+..
 
 The ODE state is :math:`\mathbf{y} = [q_w,\, q_x,\, q_y,\, q_z,\, \omega_x,\, \omega_y,\, \omega_z]^\top`.
 We start from a 5° tilt and a 200 rad/s spin.
