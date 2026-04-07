@@ -330,7 +330,7 @@ Linear Velocity
 ~~~~~~~~~~~~~~~~
 This section introduces discusess linear velocity. Lets first discuss velocity before introducing the equations. 
 The two frames, intertial and moving(body) frame are defined. Our moving frame, in some cases a boat, a drone or a plane is moving with translational velocity.
-We want to find an analyze the kinematics of a point on these, say a moving person, a static sensor or platform.
+We want to find an analyze the kinematics of a point on these, say a moving person, a static sensor or heli platform.
 
 
 
@@ -354,6 +354,36 @@ The third term, :math:`\boldsymbol{\omega}_{b/i}^i \times \mathbf{r}_{P/b}`, acc
 
 Together, these terms provide a complete description of the velocity of a point attached to or moving within a rigid body. In many practical cases, one or more of the terms may vanish, which simplifies the expression.
 
+A note on the derivative
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The term :math:`\frac{d^b}{dt}\mathbf{r}_{P/b}` requires some care. The vector 
+:math:`\mathbf{r}_{P/b}` is expressed in the moving frame :math:`b`, whose basis 
+vectors are themselves rotating in time. As a result, the time derivative of a 
+vector depends on which frame the derivative is taken in.
+
+The notation :math:`\frac{d^b}{dt}` means that the derivative is taken while 
+observing the vector from frame :math:`b`, where the basis vectors are fixed. 
+In this frame, only changes in the coordinates of the vector contribute to the 
+derivative.
+
+If the point :math:`P` is fixed in the moving frame, then its coordinates in 
+:math:`b` are constant, and therefore
+
+.. math::
+
+   \frac{d^b}{dt}\mathbf{r}_{P/b} = \mathbf{0}
+
+However, when viewed from the inertial frame :math:`i`, the same vector may 
+still change due to the rotation of the frame. This effect is captured by the 
+additional term
+
+.. math::
+
+   \boldsymbol{\omega}_{b/i}^i \times \mathbf{r}_{P/b}
+
+This separation allows us to distinguish between motion relative to the body 
+and motion caused purely by the rotation of the reference frame.
 
 A Visual Interpretation of the Linear Velocity Equation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -984,3 +1014,17 @@ A Visual Interpretation of the Linear Velocity Equation (boat)
      requestAnimationFrame(animate);
    })();
    </script>
+
+
+
+.. admonition:: A modern cautionary tale
+   :class: note
+
+   In 2026, a French sailor reportedly revealed the position of the aircraft carrier
+   :math:`\textit{Charles de Gaulle}` by uploading a public Strava run recorded on the deck.
+
+.. figure:: images/strava_carrier_example.png
+   :width: 70%
+   :align: center
+
+   A recorded trajectory can reveal the motion of the entire reference frame.
