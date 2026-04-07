@@ -677,7 +677,7 @@ In block matrix form:
 ..
 
 
-Simulation: Precessing Top
+Simulation: Spnning Top
 ---------------------------
 
 The equations of motion are most instructive in motion.
@@ -710,7 +710,7 @@ To integrate this forward in time we track the orientation as a unit quaternion
 ..
 
 The ODE state is :math:`\mathbf{y} = [q_w,\, q_x,\, q_y,\, q_z,\, \omega_x,\, \omega_y,\, \omega_z]^\top`.
-We start from a 5° tilt and a 200 rad/s spin.
+We start from zero rotation (perfectly upright) and a 200 rad/s spin.
 
 .. SIMULATION: Precessing top (balanced)
 .. jupyter-execute::
@@ -748,9 +748,8 @@ We start from a 5° tilt and a 200 rad/s spin.
         dq = 0.5 * quat_mult(q, np.array([0.0, *omega]))
         return [*dq, *alpha]
 
-    # Initial conditions: 5° tilt about world-x, 200 rad/s spin about body-z
-    q0 = Rotation.from_euler('x', np.radians(5)).as_quat()  # [x, y, z, w]
-    y0 = [q0[3], q0[0], q0[1], q0[2], 0.0, 0.0, 200.0]
+    # Initial conditions: zero rotation, 200 rad/s spin about body-z
+    y0 = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 200.0]
 
     t_span = (0.0, 4.0)
     t_eval = np.linspace(0.0, 4.0, 480)
@@ -770,8 +769,14 @@ We start from a 5° tilt and a 200 rad/s spin.
     action_top
 ..
 
-Now attach the bolt. It breaks the axial symmetry: the angular momentum is no longer aligned
-with the spin axis, so the top not only precesses but also **wobbles**:
+With a perfectly balanced top starting from zero rotation, the spin axis is aligned with gravity
+and with the principal axis, and the top spins without any wobble.
+
+Now attach the bolt. The initial rotation is still zero (perfectly upright, 200 rad/s spin), but
+the bolt shifts the center of mass off the symmetry axis. Gravity now acts at a point that is no
+longer on the spin axis, immediately creating a torque. The result is visible wobble, 
+even though the starting orientation is identical to the balanced case. This
+is the signature of a broken principal axis:
 
 .. SIMULATION: Precessing top (with bolt)
 .. jupyter-execute::
