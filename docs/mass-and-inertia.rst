@@ -4,12 +4,6 @@
 Mass and Inertia (WIP)
 ======================
 
-.. TODO
-    * Add a section about principle axis frame
-    * Maybe move parallel axis theorem section further up (and fix its example cause it sucks...)
-    * Simulate the spinning top with and without bolt and display using the animation function
-    * etc.
-..
 
 Learning Objectives
 ===================
@@ -27,12 +21,11 @@ Introduction
 ============
 
 Picture a figure skater doing a spin. As they pull their arms in close to their body, they spin noticeably faster.
-Something about the *distribution of mass* is controlling how easy or hard it is to change the rotation.
-
-That "something" is the **inertia matrix** (also called the **inertia tensor**). Just as mass is the scalar
+The *distribution of mass* is controlling how easy or hard it is to change the rotation, 
+and that is represented by the **inertia matrix**. Just as mass is the scalar
 quantity that resists changes to linear velocity (:math:`F = ma`), the inertia matrix is the 3×3 tensor
 quantity that resists changes to angular velocity. When the skater pulls in their arms, the mass moves
-closer to the axis of rotation and the effective inertia decreases, so the angular velocity must increase
+closer to the axis of rotation and the inertia decreases, so the angular velocity must increase
 to conserve angular momentum.
 
 Given a rotating body, what inertia does it present to an applied torque? The answer to
@@ -214,7 +207,7 @@ integrals become sums:
     \mathbf{r}_c = \frac{1}{m} \sum_{k=1}^{N} m_k \mathbf{r}_k
 ..
 
-The center of mass is special: the Newton-Euler equations take their simplest form when we measure
+The center of mass is special. The Newton-Euler equations take their simplest form when we measure
 rotation relative to this point.
 
 Our spinning top is a solid cone (the body) with a short cylindrical stem (the handle).
@@ -235,7 +228,7 @@ mass located at its own center of mass.
     masses    = np.array([m_cone, m_stem])
     positions = np.array([r_cm_cone, r_cm_stem])
 
-    m_total = np.sum(masses)
+    m_total     = np.sum(masses)
     r_cm_top    = np.average(positions, axis=0, weights=masses)
     z_cm_top    = r_cm_top[2]
 
@@ -405,8 +398,8 @@ Let's ensure that this is the case for our spinning top:
     # Use the parallel axis theorem calculate the total top inertia matrix
     # The theorem will be discussed in greater detail later
     M_top = (
-        M_cone + m_cone * skew_np(r_top_to_cone) @ skew_np(r_top_to_cone) +
-        M_stem + m_stem * skew_np(r_top_to_stem) @ skew_np(r_top_to_stem)
+        M_cone - m_cone * skew_np(r_top_to_cone) @ skew_np(r_top_to_cone) +
+        M_stem - m_stem * skew_np(r_top_to_stem) @ skew_np(r_top_to_stem)
     )
 
     print("Top inertia in the body frame (kg·m²):")
@@ -456,6 +449,41 @@ tilted 30° about the y-axis:
     print(f"\nEigenvalues body frame:     {np.round(eigs_body*1e6, 4)} (×10⁻⁶)")
     print(f"Eigenvalues inertial frame: {np.round(eigs_inertial*1e6, 4)} (×10⁻⁶)")
 ..
+
+
+The Parallel Axis Theorem
+==========================
+
+You computed the inertia matrix about the center of mass, but you need it about the wheel hub,
+a joint, or the end of a rod. The **parallel axis theorem** lets you shift the reference point
+without re-integrating.
+
+.. Define the parallel axis theorem in 3D
+.. admonition:: Parallel Axis Theorem
+
+    Given the inertia matrix :math:`\mathbf{M}_{b/c}` about the center of mass :math:`c`, the inertia
+    matrix about a new point :math:`o` is
+
+    .. math::
+        :label: parallel-axis-3d
+
+        \mathbf{M}_{b/o} = \mathbf{M}_{b/c} - m [\mathbf{r}_{o/c}]^\times [\mathbf{r}_{o/c}]^\times
+
+    where :math:`\mathbf{r}_{o/c}` is the vector from :math:`c` to :math:`o`.
+..
+
+In 2D, rotating about a fixed axis, the theorem reduces to the scalar form:
+
+.. Define the parallel axis theorem in 2D
+.. math::
+    :label: parallel-axis-2d
+
+    I_o = I_c + m d^2
+..
+
+where :math:`d` is the perpendicular distance between the original axis (through :math:`c`) and the
+new axis (through :math:`o`). The inertia always *increases* when moving away from the center of mass, which means
+the correction :math:`-m[\mathbf{r}]^\times[\mathbf{r}]^\times` is positive semi-definite.
 
 
 Angular Momentum
@@ -509,8 +537,8 @@ its position :math:`[R\_cone, 0, H\_cone]` is not on the spin axis:
 
     # Parallel axis theorem
     M_boltedtop = (
-        M_cone + m_cone * skew_np(r_boltedtop_to_cone) @ skew_np(r_boltedtop_to_cone) +
-        M_stem + m_stem * skew_np(r_boltedtop_to_stem) @ skew_np(r_boltedtop_to_stem) + 
+        M_cone - m_cone * skew_np(r_boltedtop_to_cone) @ skew_np(r_boltedtop_to_cone) +
+        M_stem - m_stem * skew_np(r_boltedtop_to_stem) @ skew_np(r_boltedtop_to_stem) -
         m_bolt * skew_np(r_boltedtop_to_bolt) @ skew_np(r_boltedtop_to_bolt)
     )
 
@@ -647,59 +675,148 @@ In block matrix form:
     \begin{bmatrix} \mathbf{F}_{b/o} \\ \boldsymbol{\tau}_{b/o} \end{bmatrix}
 ..
 
-The Parallel Axis Theorem
-==========================
-.. Maybe move further up since it has already been used twice in the examples...
 
-You computed the inertia matrix about the center of mass, but you need it about the wheel hub,
-a joint, or the end of a rod. The **parallel axis theorem** lets you shift the reference point
-without re-integrating.
+Simulation: Precessing Top
+---------------------------
 
-.. Define the parallel axis theorem in 3D
-.. admonition:: Parallel Axis Theorem (3D)
+The equations of motion are most instructive in motion.
+With the tip fixed at the origin, :math:`\mathbf{a}_o = \mathbf{0}`, and the torque equation
+from :eq:`newton-euler-torque-o` reduces to
 
-    Given the inertia matrix :math:`\mathbf{M}_{b/c}` about the center of mass :math:`c`, the inertia
-    matrix about a new point :math:`o` is
-
-    .. math::
-        :label: parallel-axis-3d
-
-        \mathbf{M}_{b/o} = \mathbf{M}_{b/c} - m [\mathbf{r}_{o/c}]^\times [\mathbf{r}_{o/c}]^\times
-
-    where :math:`\mathbf{r}_{o/c}` is the vector from :math:`c` to :math:`o`.
-..
-
-In 2D, rotating about a fixed axis, the theorem reduces to the scalar form:
-
-.. Define the parallel axis theorem in 2D
+.. NE rotational equation about fixed tip
 .. math::
-    :label: parallel-axis-2d
 
-    I_o = I_c + m d^2
-..
+    \mathbf{M}_{b/o}\,\dot{\boldsymbol{\omega}}
+    = \boldsymbol{\tau}_{b/o} - \boldsymbol{\omega} \times \bigl(\mathbf{M}_{b/o}\,\boldsymbol{\omega}\bigr)
 
-where :math:`d` is the perpendicular distance between the original axis (through :math:`c`) and the
-new axis (through :math:`o`). The inertia always *increases* when moving away from the center of mass, which means
-the correction :math:`-m[\mathbf{r}]^\times[\mathbf{r}]^\times` is positive semi-definite.
+where the only applied torque is gravity acting at the center of mass:
 
-The spinning top rests with its tip on a surface. Let us find the inertia matrix of the cone
-about the tip :math:`o` by shifting from the cone's CoM :math:`c` (located at
-:math:`z = \tfrac{3}{4}H\_cone` above the tip) down to the tip at :math:`z = 0`:
+.. Gravity torque about tip
+.. math::
 
-.. EXAMPLE: parallel axis theorem (cone body)
+    \boldsymbol{\tau}_{b/o} = \mathbf{r}_{c/o} \times m\mathbf{g}
+
+To integrate this forward in time we track the orientation as a unit quaternion
+:math:`\mathbf{q} = [q_w,\, q_x,\, q_y,\, q_z]^\top` whose kinematics are
+
+.. Quaternion kinematics
+.. math::
+
+    \dot{\mathbf{q}} = \tfrac{1}{2}\,\mathbf{q} \otimes
+    \begin{bmatrix} 0 \\ \boldsymbol{\omega} \end{bmatrix}
+
+The ODE state is :math:`\mathbf{y} = [q_w,\, q_x,\, q_y,\, q_z,\, \omega_x,\, \omega_y,\, \omega_z]^\top`.
+We start from a 5° tilt and a 200 rad/s spin.
+
+.. SIMULATION: Precessing top (balanced)
 .. jupyter-execute::
 
-    import sympy as sm
-    sm.init_printing(use_latex='mathjax')
+    from scipy.integrate import solve_ivp
+    from scipy.spatial.transform import Rotation
 
-    Ixx_c, Izz_c, m, H = sm.symbols('I_xx I_zz m H', positive=True)
+    g       = 9.81
+    g_world = np.array([0.0, 0.0, -g])
 
-    # Shift vector from CoM to tip: r_{o/c} = [0, 0, -3H/4]
-    r_oc = sm.Matrix([0, 0, -sm.Rational(3, 4) * H])
+    # Inertia about tip using the parallel axis theorem
+    M_tip = (
+        M_cone - m_cone * skew_np(r_cm_cone) @ skew_np(r_cm_cone) +
+        M_stem - m_stem * skew_np(r_cm_stem) @ skew_np(r_cm_stem)
+    )
+    r_cm_body    = np.array([0.0, 0.0, z_cm_top])
 
-    M_c = sm.diag(Ixx_c, Ixx_c, Izz_c)
-    M_o = M_c - m * skew_sm(r_oc) * skew_sm(r_oc)
-    M_o
+    def quat_mult(p, r):
+        """Quaternion product of p and r, both in [w, x, y, z] format."""
+        pw, px, py, pz = p
+        rw, rx, ry, rz = r
+        return np.array([
+            pw*rw - px*rx - py*ry - pz*rz,
+            pw*rx + px*rw + py*rz - pz*ry,
+            pw*ry - px*rz + py*rw + pz*rx,
+            pw*rz + px*ry - py*rx + pz*rw,
+        ])
+
+    def top_ode(t, y, M, M_inv, r_cm, m):
+        q     = y[:4]
+        omega = y[4:]
+        R        = Rotation.from_quat([*q[1:], q[0]]).as_matrix()
+        tau_body = R.T @ np.cross(R @ r_cm, m * g_world)
+        alpha    = M_inv @ (tau_body - np.cross(omega, M @ omega))
+        dq = 0.5 * quat_mult(q, np.array([0.0, *omega]))
+        return [*dq, *alpha]
+
+    # Initial conditions: 5° tilt about world-x, 200 rad/s spin about body-z
+    q0 = Rotation.from_euler('x', np.radians(5)).as_quat()  # [x, y, z, w]
+    y0 = [q0[3], q0[0], q0[1], q0[2], 0.0, 0.0, 200.0]
+
+    t_span = (0.0, 4.0)
+    t_eval = np.linspace(0.0, 4.0, 480)
+
+    sol_top = solve_ivp(
+        top_ode, t_span, y0, t_eval=t_eval, method='RK45',
+        args=(M_tip, np.linalg.inv(M_tip), r_cm_body, m_total),
+        rtol=1e-8, atol=1e-10,
+    )
+    quats_top = sol_to_yup_quats(sol_top)
+    renderer_top, action_top = make_top_animation(quats_top, sol_top.t)
+    renderer_top
+
+.. jupyter-execute::
+    :hide-code:
+
+    action_top
 ..
 
-:math:`I_{zz}` is unchanged because the shift is *along* the spin axis.
+Now attach the bolt. It breaks the axial symmetry: the angular momentum is no longer aligned
+with the spin axis, so the top not only precesses but also **wobbles**:
+
+.. SIMULATION: Precessing top (with bolt)
+.. jupyter-execute::
+
+    # Bolt's point-mass inertia contribution about the tip
+    M_bolt_tip   = -m_bolt * skew_np(r_bolt) @ skew_np(r_bolt)
+    M_tip_bolted = M_tip + M_bolt_tip
+    m_bolted     = m_total + m_bolt
+
+    sol_bolted = solve_ivp(
+        top_ode, t_span, y0, t_eval=t_eval, method='RK45',
+        args=(M_tip_bolted, np.linalg.inv(M_tip_bolted), r_cm_boltedtop, m_bolted),
+        rtol=1e-8, atol=1e-10,
+    )
+    quats_bolted = sol_to_yup_quats(sol_bolted)
+    renderer_bolted, action_bolted = make_top_animation(quats_bolted, sol_bolted.t, show_bolt=True)
+    renderer_bolted
+
+.. jupyter-execute::
+    :hide-code:
+
+    action_bolted
+..
+
+
+Principal Axes
+==============
+
+The inertia matrix :math:`\mathbf{M}_{b/c}` is real and symmetric, so it has three orthogonal eigenvectors, 
+the **principal axes**, and three positive eigenvalues,
+the **principal moments of inertia**. Spinning about a principal axis is special. The angular
+momentum :math:`\mathbf{h} = \mathbf{M}\boldsymbol{\omega}` is then parallel to
+:math:`\boldsymbol{\omega}`, producing steady precession with no wobble.
+
+For the balanced top the spin axis :math:`z` is already a principal axis (the inertia matrix is
+diagonal in the body frame). Adding the bolt breaks this. :math:`\mathbf{M}_\text{bolted}` gains
+off-diagonal terms and its principal axes are tilted relative to the symmetry axis.
+
+.. EXAMPLE: Principal axes of the bolted top
+.. jupyter-execute::
+
+    eigenvalues, eigenvectors = np.linalg.eigh(M_boltedtop)
+
+    print("Principal moments of inertia (kg·m²):")
+    print(np.round(eigenvalues * 1e6, 4), "  (×10⁻⁶)")
+    print("\nPrincipal axes (columns of eigenvector matrix):")
+    print(np.round(eigenvectors, 4))
+    print()
+    for i, ev in enumerate(eigenvectors.T):
+        angle = np.degrees(np.arccos(np.clip(abs(np.dot(ev, [0, 0, 1])), 0.0, 1.0)))
+        print(f"Axis {i+1}: {np.round(ev, 4)} - {angle:.2f}° from z")
+..
