@@ -207,13 +207,10 @@ integrals become sums:
     \mathbf{r}_c = \frac{1}{m} \sum_{k=1}^{N} m_k \mathbf{r}_k
 ..
 
-The center of mass is special. The Newton-Euler equations take their simplest form when we measure
-rotation relative to this point.
-
 Our spinning top is a solid cone (the body) with a short cylindrical stem (the handle).
 The cone's tip rests on the surface at the origin, and the spin axis points along :math:`z`.
 Both components are axisymmetric, so their centers of mass lie on the :math:`z`-axis.
-We can therefore find the combined center of mass by treating each component as a point
+We can find the combined center of mass by treating each component as a point
 mass located at its own center of mass.
 
 .. EXAMPLE: Center of mass
@@ -350,9 +347,11 @@ We can verify this equals the skew-matrix formula:
     
 
     def skew_np(v):
-        return np.array([[    0, -v[2],  v[1]],
-                         [ v[2],     0, -v[0]],
-                         [-v[1],  v[0],     0]])
+        return np.array([
+            [    0, -v[2],  v[1]],
+            [ v[2],     0, -v[0]],
+            [-v[1],  v[0],     0]
+        ])
     
 
     r_cross     = skew_sm(r)
@@ -386,8 +385,7 @@ Let's ensure that this is the case for our spinning top:
     Izz_stem = m_stem * R_stem**2 / 2
     Ixx_stem = Iyy_stem = m_stem * (3*R_stem**2 + L_stem**2) / 12
 
-    # Define the body-frame inertia for the cone and stem, respectively
-    # Axisymmetric cone and stem -> All off-diagonal elements are zero
+    # Body-frame inertia for the cone and stem
     M_cone = np.diag([Ixx_cone, Iyy_cone, Izz_cone])
     M_stem = np.diag([Ixx_stem, Iyy_stem, Izz_stem])
 
@@ -395,7 +393,7 @@ Let's ensure that this is the case for our spinning top:
     r_top_to_cone = r_cm_cone - r_cm_top
     r_top_to_stem = r_cm_stem - r_cm_top
 
-    # Use the parallel axis theorem calculate the total top inertia matrix
+    # Parallel axis theorem to calculate the total top inertia matrix
     # The theorem will be discussed in greater detail later
     M_top = (
         M_cone - m_cone * skew_np(r_top_to_cone) @ skew_np(r_top_to_cone) +
@@ -408,7 +406,7 @@ Let's ensure that this is the case for our spinning top:
 
 
 Frame Transformations
-=====================
+---------------------
 
 The inertia matrix depends on which frame the position vectors :math:`\mathbf{r}^i` are expressed in.
 The body frame :math:`b` is usually the most convenient for computation (the geometry is fixed), but the
