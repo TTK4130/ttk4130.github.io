@@ -77,7 +77,7 @@ building up its inertia properties step by step.
         """Convert Z-up scipy integrator output to Y-up pythreejs [x,y,z,w] quaternions."""
         q = sol.y[:4].T                                    # (N,4) in [w,x,y,z]
         q /= np.linalg.norm(q, axis=1, keepdims=True)
-        r_phys = _Rotation.from_quat(q[:, [1, 2, 3, 0]])  # scipy uses [x,y,z,w]
+        r_phys = _Rotation.from_quat(q[:, [1, 2, 3, 0]])   # scipy uses [x,y,z,w]
         r_yup  = _R_zup_to_yup * r_phys * _R_zup_to_yup.inv()
         return r_yup.as_quat()                             # [x,y,z,w] for pythreejs
 
@@ -307,10 +307,10 @@ The skew-symmetric matrix of a vector :math:`\mathbf{r} = [x, y, z]^\top` is:
 Let us build this in SymPy and compute the inertia contribution of a single point mass at a
 general position :math:`(x, y, z)`:
 
-.. Degine single-point inertia contribution
+.. Define single-point inertia contribution
 .. math::
 
-    m \left[ (\mathbf{r})^\top \mathbf{r} \, \mathbf{I} - 
+    m \left[ (\mathbf{r})^\top \mathbf{r} \, \mathbf{I} -
     \mathbf{r} (\mathbf{r})^\top \right]
 ..
 
@@ -329,7 +329,7 @@ general position :math:`(x, y, z)`:
 
 We can verify this equals the skew-matrix formula:
 
-.. Degine single-point inertia contribution
+.. Define single-point inertia contribution
 .. math::
 
     -m [\mathbf{r}]^\times [\mathbf{r}]^\times
@@ -360,8 +360,8 @@ We can verify this equals the skew-matrix formula:
 ..
 
 
-Symmetry and Positive Definiteness
-------------------------------------
+General Properties
+------------------
 
 The inertia matrix is always **symmetric** (follows directly from the definition) and
 **positive definite**, meaning the rotational kinetic energy is always strictly positive:
@@ -408,19 +408,20 @@ Let's ensure that this is the case for our spinning top:
 Frame Transformations
 ---------------------
 
-The inertia matrix depends on which frame the position vectors :math:`\mathbf{r}^i` are expressed in.
+The inertia matrix depends on which frame the position vectors :math:`\mathbf{r}` are expressed in.
 The body frame :math:`b` is usually the most convenient for computation (the geometry is fixed), but the
 Newton-Euler equations are defined in the inertial frame :math:`i`. The transformation between the two is:
 
-.. Inertia fram transform
+.. Inertia frame transform
+.. WARNING: The rotation matrices as swapped in the formula sheet
 .. math::
     :label: inertia-frame-transform
 
-    \mathbf{M}^i_{b/c} = \mathbf{R}^b_i \, \mathbf{M}^b_{b/c} \, \mathbf{R}^i_b
+    \mathbf{M}^i_{b/c} = \mathbf{R}^i_b \, \mathbf{M}^b_{b/c} \, \mathbf{R}^b_i
 ..
 
-where :math:`\mathbf{R}^b_i` is the rotation matrix from frame :math:`i` to frame :math:`b`, and
-:math:`\mathbf{R}^i_b = (\mathbf{R}^b_i)^\top`.
+where :math:`\mathbf{R}^i_b` is the rotation matrix from frame :math:`b` to frame :math:`i`, and
+:math:`\mathbf{R}^b_i = (\mathbf{R}^i_b)^\top`.
 
 A rotation never changes the physical mass distribution, so the eigenvalues of the
 inertia matrix are frame-independent. Let us verify this by comparing the inertia of the 
@@ -438,7 +439,7 @@ tilted 30° about the y-axis:
         [-np.sin(theta), 0.0, np.cos(theta)],
     ])
 
-    M_top_inertial = Ry.T @ M_top @ Ry
+    M_top_inertial = Ry @ M_top @ Ry.T
     print("\nInertia in inertial frame after 30° tilt (kg·m²):")
     print(np.round(M_top_inertial * 1e6, 2), "  (×10⁻⁶)")
 
@@ -561,10 +562,11 @@ When computing angular momentum about a point :math:`o` that is *not* the center
 term appears due to the translational motion of the center of mass:
 
 .. Define angular momentum around arbitrary point
+.. WARNING: It says M_b/o in the formula sheet
 .. math::
     :label: angular-momentum-o
 
-    \mathbf{h}_{b/o} = \mathbf{M}_{b/o} \, \boldsymbol{\omega}_{b/i}
+    \mathbf{h}_{b/o} = \mathbf{M}_{b/c} \, \boldsymbol{\omega}_{b/i}
     + \mathbf{r}_{c/o} \times m \mathbf{v}_{c/i}
 ..
 
@@ -635,22 +637,24 @@ the equations change because the offset :math:`\mathbf{r}^i_{c/o}` between the c
 the pivot couples translation and rotation:
 
 .. Newton-euler force about arbitrary point
+.. WARNING: It says a_c in the formula sheet
 .. math::
     :label: newton-euler-force-o
 
     \mathbf{F}_{b/o} = m \left(
-        \mathbf{a}_c
+        \mathbf{a}_o
         + \boldsymbol{\alpha}_{b/i} \times \mathbf{r}^i_{c/o}
         + \boldsymbol{\omega}_{b/i} \times \bigl(\boldsymbol{\omega}_{b/i} \times \mathbf{r}^i_{c/o}\bigr)
     \right)
 ..
 
 .. Newton-euler torque about arbitrary point
+.. WARNING: It says a_c in the formula sheet
 .. math::
     :label: newton-euler-torque-o
 
     \boldsymbol{\tau}_{b/o} =
-        \mathbf{r}^i_{c/o} \times m\mathbf{a}_c
+        \mathbf{r}^i_{c/o} \times m\mathbf{a}_o
         + \mathbf{M}_{b/o} \cdot \boldsymbol{\alpha}_{b/i}
         + \boldsymbol{\omega}_{b/i} \times \left(\mathbf{M}_{b/o} \cdot \boldsymbol{\omega}_{b/i}\right)
 ..
@@ -675,7 +679,7 @@ In block matrix form:
 ..
 
 
-Simulation: Spnning Top
+Simulation: Spinning Top
 ---------------------------
 
 The equations of motion are most instructive in motion.
@@ -807,7 +811,7 @@ The inertia matrix :math:`\mathbf{M}_{b/c}` is real and symmetric, so it has thr
 the **principal axes**, and three positive eigenvalues,
 the **principal moments of inertia**. Spinning about a principal axis is special. The angular
 momentum :math:`\mathbf{h} = \mathbf{M}\boldsymbol{\omega}` is then parallel to
-:math:`\boldsymbol{\omega}`, producing steady precession with no wobble.
+:math:`\boldsymbol{\omega}`, producing a steady spin with no wobble.
 
 For the balanced top the spin axis :math:`z` is already a principal axis (the inertia matrix is
 diagonal in the body frame). Adding the bolt breaks this. :math:`\mathbf{M}_\text{bolted}` gains
@@ -822,8 +826,4 @@ off-diagonal terms and its principal axes are tilted relative to the symmetry ax
     print(np.round(eigenvalues * 1e6, 4), "  (×10⁻⁶)")
     print("\nPrincipal axes (columns of eigenvector matrix):")
     print(np.round(eigenvectors, 4))
-    print()
-    for i, ev in enumerate(eigenvectors.T):
-        angle = np.degrees(np.arccos(np.clip(abs(np.dot(ev, [0, 0, 1])), 0.0, 1.0)))
-        print(f"Axis {i+1}: {np.round(ev, 4)} - {angle:.2f}° from z")
 ..
