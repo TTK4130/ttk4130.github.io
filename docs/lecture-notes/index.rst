@@ -1,6 +1,6 @@
-==============
-Lecture Notes
-==============
+###############
+ Lecture Notes
+###############
 
 .. toctree::
     :maxdepth: 1

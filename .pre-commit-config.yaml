@@ -1,0 +1,16 @@
+repos:
+  - repo: local
+    hooks:
+      - id: docstrfmt
+        name: docstrfmt (RST formatter)
+        language: system
+        entry: uv run docstrfmt
+        types: [rst]
+        exclude: ^docs/(_build|_includes)/
+
+      - id: rstcheck
+        name: rstcheck (RST linter)
+        language: system
+        entry: uv run rstcheck --config .rstcheck.cfg
+        types: [rst]
+        exclude: ^docs/(_build|_includes)/|docs/project/example_project\.rst$
