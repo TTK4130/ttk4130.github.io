@@ -6,3 +6,4 @@ docs/doctree
 .ipynb_checkpoints/
 ttk4130-env/
 .venv/
+*.lock

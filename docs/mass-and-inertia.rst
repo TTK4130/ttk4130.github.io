@@ -1,47 +1,48 @@
 .. _mass-and-inertia:
 
-======================
-Mass and Inertia (WIP)
-======================
+##################
+ Mass and Inertia
+##################
 
-
-Learning Objectives
-===================
+*********************
+ Learning Objectives
+*********************
 
 After reading this chapter the reader should know:
 
 - What the inertia matrix is and how it is constructed from the mass distribution of a body.
 - How the inertia matrix transforms when changing reference frames or reference points.
 - What angular momentum is and how it relates to the inertia matrix and angular velocity.
-- The Newton-Euler equations of motion for a rigid body, both about the center of mass and about an arbitrary point.
+- The Newton-Euler equations of motion for a rigid body, both about the center of mass and about an
+  arbitrary point.
 - How to apply the parallel axis theorem.
 
+**************
+ Introduction
+**************
 
-Introduction
-============
+Picture a figure skater doing a spin. As they pull their arms in close to their body, they spin
+noticeably faster. The *distribution of mass* is controlling how easy or hard it is to change the
+rotation, and that is represented by the **inertia matrix**. Just as mass is the scalar quantity
+that resists changes to linear velocity (:math:`F = ma`), the inertia matrix is the 3×3 tensor
+quantity that resists changes to angular velocity. When the skater pulls in their arms, the mass
+moves closer to the axis of rotation and the inertia decreases, so the angular velocity must
+increase to conserve angular momentum.
 
-Picture a figure skater doing a spin. As they pull their arms in close to their body, they spin noticeably faster.
-The *distribution of mass* is controlling how easy or hard it is to change the rotation, 
-and that is represented by the **inertia matrix**. Just as mass is the scalar
-quantity that resists changes to linear velocity (:math:`F = ma`), the inertia matrix is the 3×3 tensor
-quantity that resists changes to angular velocity. When the skater pulls in their arms, the mass moves
-closer to the axis of rotation and the inertia decreases, so the angular velocity must increase
-to conserve angular momentum.
-
-Given a rotating body, what inertia does it present to an applied torque? The answer to
-this question is what drives the rotational equations of motion (Newton-Euler), which we also derive in
-this chapter. By the end of the page you will be able to write down and compute the full equations of
-motion for a rigid body in 3D.
-
+Given a rotating body, what inertia does it present to an applied torque? The answer to this
+question is what drives the rotational equations of motion (Newton-Euler), which we also derive in
+this chapter. By the end of the page you will be able to write down and compute the full equations
+of motion for a rigid body in 3D.
 
 A spinning top
---------------
+==============
 
-Throughout this chapter we use a **spinning top** (often just referred to as "top"), 
-a solid cone with a short cylindrical stem, as our running example, 
-building up its inertia properties step by step.
+Throughout this chapter we use a **spinning top** (often just referred to as "top"), a solid cone
+with a short cylindrical stem, as our running example, building up its inertia properties step by
+step.
 
 .. Define top dimensions
+
 .. jupyter-execute::
 
     import numpy as np
@@ -59,9 +60,11 @@ building up its inertia properties step by step.
     # Bolt (used in some examples to break symmetry)
     m_bolt  = 0.02                           # kg
     r_bolt  = np.array([R_cone, 0, H_cone])  # m
+
 ..
 
 .. Top animation help functions
+
 .. jupyter-execute::
     :hide-code:
 
@@ -154,9 +157,11 @@ building up its inertia properties step by step.
         action = pj.AnimationAction(pj.AnimationMixer(top), clip, top)
 
         return renderer, action
+
 ..
 
 .. Spinning top demonstration
+
 .. jupyter-execute::
     :hide-code:
 
@@ -174,46 +179,53 @@ building up its inertia properties step by step.
     :hide-code:
 
     action_demo
+
 ..
 
+*************************
+ Mass and Center of Mass
+*************************
 
-Mass and Center of Mass
-=======================
-
-Before tackling the full inertia matrix, let us recall the simpler scalar quantities.
-The total mass of a body is obtained by integrating the mass density over the body's volume:
+Before tackling the full inertia matrix, let us recall the simpler scalar quantities. The total mass
+of a body is obtained by integrating the mass density over the body's volume:
 
 .. Define mass
+
 .. math::
 
     m = \int dm
+
 ..
 
 The **center of mass** is the mass-weighted average position:
 
 .. Define center of mass
+
 .. math::
 
     \mathbf{r}_c = \frac{1}{m} \int \mathbf{r} \, dm
+
 ..
 
 For a system of :math:`N` discrete point masses :math:`m_k` at positions :math:`\mathbf{r}_k`, these
 integrals become sums:
 
 .. Discrete mass and center of mass
+
 .. math::
 
     m = \sum_{k=1}^{N} m_k, \qquad
     \mathbf{r}_c = \frac{1}{m} \sum_{k=1}^{N} m_k \mathbf{r}_k
+
 ..
 
-Our spinning top is a solid cone (the body) with a short cylindrical stem (the handle).
-The cone's tip rests on the surface at the origin, and the spin axis points along :math:`z`.
-Both components are axisymmetric, so their centers of mass lie on the :math:`z`-axis.
-We can find the combined center of mass by treating each component as a point
-mass located at its own center of mass.
+Our spinning top is a solid cone (the body) with a short cylindrical stem (the handle). The cone's
+tip rests on the surface at the origin, and the spin axis points along :math:`z`. Both components
+are axisymmetric, so their centers of mass lie on the :math:`z`-axis. We can find the combined
+center of mass by treating each component as a point mass located at its own center of mass.
 
 .. EXAMPLE: Center of mass
+
 .. jupyter-execute::
 
     # Centers of mass of each component
@@ -233,11 +245,12 @@ mass located at its own center of mass.
     print(f"Cone CoM (above tip):      z = {z_cm_cone:.4f} m")
     print(f"Stem CoM (above tip):      z = {z_cm_stem:.4f} m")
     print(f"Combined CoM (above tip):  z = {z_cm_top:.4f} m")
+
 ..
 
 .. EXERCISE: Center of mass
+
 .. admonition:: Exercise
-    :class: dropdown
 
     A small mounting bolt of mass is attached at the rim of the cone at its top.
 
@@ -246,8 +259,8 @@ mass located at its own center of mass.
         print(f"Bolt mass (kg):          {m_bolt}")
         print(f"Bolt position (m):       {r_bolt}")
 
-    Find the center of mass of the combined system (cone + stem + bolt).
-    By how many millimetres does the bolt shift the CoM in the :math:`x`-direction?
+    Find the center of mass of the combined system (cone + stem + bolt). By how many millimetres
+    does the bolt shift the CoM in the :math:`x`-direction?
 
 .. dropdown:: Solution
     :color: success
@@ -260,22 +273,25 @@ mass located at its own center of mass.
         r_cm_boltedtop = np.average(positions, axis=0, weights=masses)
         print(f"Center of mass: {r_cm_boltedtop}")
         print(f"x-shift due to bolt: {r_cm_boltedtop[0]*1000:.3f} mm")
+
 ..
 
-
-The Inertia Matrix
-==================
+********************
+ The Inertia Matrix
+********************
 
 Definition via Integral
------------------------
+=======================
 
 For rotation, the role of scalar mass is played by the **inertia matrix** :math:`\mathbf{M}_{b/c}`,
 which encodes how the mass of body :math:`b` is distributed around its center of mass :math:`c`.
 
 .. Define inertia matrix
+
 .. admonition:: Inertia Matrix
 
-    The inertia matrix of body :math:`b` about center of mass :math:`c`, expressed in frame :math:`i`, is
+    The inertia matrix of body :math:`b` about center of mass :math:`c`, expressed in frame
+    :math:`i`, is
 
     .. math::
         :label: inertia-def
@@ -285,15 +301,17 @@ which encodes how the mass of body :math:`b` is distributed around its center of
         = \int_b \left[ (\mathbf{r}^i)^\top \mathbf{r}^i \, \mathbf{I}
           - \mathbf{r}^i (\mathbf{r}^i)^\top \right] dm
 
-    where :math:`\mathbf{r}^i` is the position of the mass element relative to :math:`c` expressed in
-    frame :math:`i`, and :math:`[\mathbf{r}]^\times` is the skew-symmetric cross-product matrix such
-    that :math:`[\mathbf{r}]^\times \mathbf{v} = \mathbf{r} \times \mathbf{v}` for any vector
+    where :math:`\mathbf{r}^i` is the position of the mass element relative to :math:`c` expressed
+    in frame :math:`i`, and :math:`[\mathbf{r}]^\times` is the skew-symmetric cross-product matrix
+    such that :math:`[\mathbf{r}]^\times \mathbf{v} = \mathbf{r} \times \mathbf{v}` for any vector
     :math:`\mathbf{v}`.
+
 ..
 
 The skew-symmetric matrix of a vector :math:`\mathbf{r} = [x, y, z]^\top` is:
 
 .. Define skew symmetric matrix
+
 .. math::
 
     [\mathbf{r}]^\times =
@@ -302,19 +320,23 @@ The skew-symmetric matrix of a vector :math:`\mathbf{r} = [x, y, z]^\top` is:
          z &  0 & -x \\
         -y &  x &  0
     \end{bmatrix}
+
 ..
 
-Let us build this in SymPy and compute the inertia contribution of a single point mass at a
-general position :math:`(x, y, z)`:
+Let us build this in SymPy and compute the inertia contribution of a single point mass at a general
+position :math:`(x, y, z)`:
 
 .. Define single-point inertia contribution
+
 .. math::
 
     m \left[ (\mathbf{r})^\top \mathbf{r} \, \mathbf{I} -
     \mathbf{r} (\mathbf{r})^\top \right]
+
 ..
 
 .. Single-point inertia contribution
+
 .. jupyter-execute::
 
     import sympy as sm
@@ -325,17 +347,21 @@ general position :math:`(x, y, z)`:
 
     M_point = m * (r.dot(r) * sm.eye(3) - r * r.T)
     M_point
+
 ..
 
 We can verify this equals the skew-matrix formula:
 
 .. Define single-point inertia contribution
+
 .. math::
 
     -m [\mathbf{r}]^\times [\mathbf{r}]^\times
+
 ..
 
 .. Alternative single-point inertia contribution
+
 .. jupyter-execute::
 
     def skew_sm(v):
@@ -344,7 +370,7 @@ We can verify this equals the skew-matrix formula:
             [ v[2],     0, -v[0]],
             [-v[1],  v[0],     0],
         ])
-    
+
 
     def skew_np(v):
         return np.array([
@@ -352,31 +378,34 @@ We can verify this equals the skew-matrix formula:
             [ v[2],     0, -v[0]],
             [-v[1],  v[0],     0]
         ])
-    
+
 
     r_cross     = skew_sm(r)
     M_from_skew = -m * r_cross * r_cross
     sm.simplify(M_from_skew)
+
 ..
 
-
 General Properties
-------------------
+==================
 
-The inertia matrix is always **symmetric** (follows directly from the definition) and
-**positive definite**, meaning the rotational kinetic energy is always strictly positive:
+The inertia matrix is always **symmetric** (follows directly from the definition) and **positive
+definite**, meaning the rotational kinetic energy is always strictly positive:
 
 .. Rotational kinetic energy is always strictly positive
+
 .. math::
 
     T_\text{rot} = \frac{1}{2} \boldsymbol{\omega}^\top \mathbf{M}_{b/c} \, \boldsymbol{\omega} > 0
     \qquad \forall \, \boldsymbol{\omega} \neq \mathbf{0}
+
 ..
 
-Positive definiteness guarantees all eigenvalues of :math:`\mathbf{M}` are strictly positive.
-Let's ensure that this is the case for our spinning top:
+Positive definiteness guarantees all eigenvalues of :math:`\mathbf{M}` are strictly positive. Let's
+ensure that this is the case for our spinning top:
 
 .. EXAMPLE: Spinning top inertia matrix
+
 .. jupyter-execute::
 
     # Cone and stem inertia formulas
@@ -402,33 +431,37 @@ Let's ensure that this is the case for our spinning top:
 
     print("Top inertia in the body frame (kg·m²):")
     print(np.round(M_top * 1e6, 2), "  (×10⁻⁶)")
+
 ..
 
-
 Frame Transformations
----------------------
+=====================
 
 The inertia matrix depends on which frame the position vectors :math:`\mathbf{r}` are expressed in.
-The body frame :math:`b` is usually the most convenient for computation (the geometry is fixed), but the
-Newton-Euler equations are defined in the inertial frame :math:`i`. The transformation between the two is:
+The body frame :math:`b` is usually the most convenient for computation (the geometry is fixed), but
+the Newton-Euler equations are defined in the inertial frame :math:`i`. The transformation between
+the two is:
 
 .. Inertia frame transform
+
 .. WARNING: The rotation matrices as swapped in the formula sheet
+
 .. math::
     :label: inertia-frame-transform
 
     \mathbf{M}^i_{b/c} = \mathbf{R}^i_b \, \mathbf{M}^b_{b/c} \, \mathbf{R}^b_i
+
 ..
 
 where :math:`\mathbf{R}^i_b` is the rotation matrix from frame :math:`b` to frame :math:`i`, and
 :math:`\mathbf{R}^b_i = (\mathbf{R}^i_b)^\top`.
 
-A rotation never changes the physical mass distribution, so the eigenvalues of the
-inertia matrix are frame-independent. Let us verify this by comparing the inertia of the 
-spinning top's body in the body frame with its inertia in the inertial frame after being
-tilted 30° about the y-axis:
+A rotation never changes the physical mass distribution, so the eigenvalues of the inertia matrix
+are frame-independent. Let us verify this by comparing the inertia of the spinning top's body in the
+body frame with its inertia in the inertial frame after being tilted 30° about the y-axis:
 
 .. EXAMPLE: Spinning top rotated inertia matrix
+
 .. jupyter-execute::
 
     # Tilt the top 30° about the y-axis
@@ -447,21 +480,23 @@ tilted 30° about the y-axis:
     eigs_inertial = np.sort(np.linalg.eigvalsh(M_top_inertial))
     print(f"\nEigenvalues body frame:     {np.round(eigs_body*1e6, 4)} (×10⁻⁶)")
     print(f"Eigenvalues inertial frame: {np.round(eigs_inertial*1e6, 4)} (×10⁻⁶)")
+
 ..
 
+***************************
+ The Parallel Axis Theorem
+***************************
 
-The Parallel Axis Theorem
-==========================
-
-You computed the inertia matrix about the center of mass, but you need it about the wheel hub,
-a joint, or the end of a rod. The **parallel axis theorem** lets you shift the reference point
-without re-integrating.
+You computed the inertia matrix about the center of mass, but you need it about the wheel hub, a
+joint, or the end of a rod. The **parallel axis theorem** lets you shift the reference point without
+re-integrating.
 
 .. Define the parallel axis theorem in 3D
+
 .. admonition:: Parallel Axis Theorem
 
-    Given the inertia matrix :math:`\mathbf{M}_{b/c}` about the center of mass :math:`c`, the inertia
-    matrix about a new point :math:`o` is
+    Given the inertia matrix :math:`\mathbf{M}_{b/c}` about the center of mass :math:`c`, the
+    inertia matrix about a new point :math:`o` is
 
     .. math::
         :label: parallel-axis-3d
@@ -469,36 +504,42 @@ without re-integrating.
         \mathbf{M}_{b/o} = \mathbf{M}_{b/c} - m [\mathbf{r}_{o/c}]^\times [\mathbf{r}_{o/c}]^\times
 
     where :math:`\mathbf{r}_{o/c}` is the vector from :math:`c` to :math:`o`.
+
 ..
 
 In 2D, rotating about a fixed axis, the theorem reduces to the scalar form:
 
 .. Define the parallel axis theorem in 2D
+
 .. math::
     :label: parallel-axis-2d
 
     I_o = I_c + m d^2
+
 ..
 
 where :math:`d` is the perpendicular distance between the original axis (through :math:`c`) and the
-new axis (through :math:`o`). The inertia always *increases* when moving away from the center of mass, which means
-the correction :math:`-m[\mathbf{r}]^\times[\mathbf{r}]^\times` is positive semi-definite.
+new axis (through :math:`o`). The inertia always *increases* when moving away from the center of
+mass, which means the correction :math:`-m[\mathbf{r}]^\times[\mathbf{r}]^\times` is positive
+semi-definite.
 
-
-Angular Momentum
-================
+******************
+ Angular Momentum
+******************
 
 About the Center of Mass
--------------------------
+========================
 
-Angular momentum is the rotational analogue of linear momentum :math:`\mathbf{p} = m\mathbf{v}`.
-The angular momentum of body :math:`b` about its center of mass :math:`c` is:
+Angular momentum is the rotational analogue of linear momentum :math:`\mathbf{p} = m\mathbf{v}`. The
+angular momentum of body :math:`b` about its center of mass :math:`c` is:
 
 .. Define angular momentum about the CM
+
 .. math::
     :label: angular-momentum-cm
 
     \mathbf{h}_{b/c} = \mathbf{M}_{b/c} \, \boldsymbol{\omega}_{b/i}
+
 ..
 
 Note that :math:`\mathbf{h}_{b/c}` is generally **not parallel** to
@@ -509,6 +550,7 @@ Spinning along the :math:`z`-axis therefore gives angular momentum exactly paral
 :math:`\boldsymbol{\omega}`:
 
 .. EXAMPLE: Angular momentum (no bolt)
+
 .. jupyter-execute::
 
     omega = np.array([0.0, 0.0, 100.0])
@@ -521,12 +563,14 @@ Spinning along the :math:`z`-axis therefore gives angular momentum exactly paral
     print(f"omega: {omega} rad/s")
     print(f"h:     {np.round(h, 6)} kg·m²/s")
     print(f"Angle between h and omega: {angle_deg:.4f}°")
+
 ..
 
-Now attach the bolt at the rim. The bolt's inertia contribution has off-diagonal terms because
-its position :math:`[R\_cone, 0, H\_cone]` is not on the spin axis:
+Now attach the bolt at the rim. The bolt's inertia contribution has off-diagonal terms because its
+position :math:`[R\_cone, 0, H\_cone]` is not on the spin axis:
 
 .. Example: Angular momentum (with bolt)
+
 .. jupyter-execute::
 
     # Vectors from the bolted top's cm to each component's cm
@@ -549,37 +593,40 @@ its position :math:`[R\_cone, 0, H\_cone]` is not on the spin axis:
     print(f"omega: {omega} rad/s")
     print(f"h:     {np.round(h_bolted, 6)} kg·m²/s")
     print(f"Angle between h and omega: {angle_deg:.4f}°")
+
 ..
 
-The bolt shifts the angular momentum away from the spin axis. This causes a wobble
-when spinning the top with a bolt on its rim.
-
+The bolt shifts the angular momentum away from the spin axis. This causes a wobble when spinning the
+top with a bolt on its rim.
 
 About a Different Point
------------------------
+=======================
 
 When computing angular momentum about a point :math:`o` that is *not* the center of mass, an extra
 term appears due to the translational motion of the center of mass:
 
 .. Define angular momentum around arbitrary point
+
 .. WARNING: It says M_b/o in the formula sheet
+
 .. math::
     :label: angular-momentum-o
 
     \mathbf{h}_{b/o} = \mathbf{M}_{b/c} \, \boldsymbol{\omega}_{b/i}
     + \mathbf{r}_{c/o} \times m \mathbf{v}_{c/i}
+
 ..
 
 where :math:`\mathbf{r}_{c/o}` is the position of :math:`c` relative to :math:`o`, and
 :math:`\mathbf{v}_{c/i}` is the velocity of the center of mass in the inertial frame.
 
-
 Time Derivative
------------------------------------------
+===============
 
 Taking the time derivative of angular momentum and setting it equal to the applied torque gives:
 
 .. Define derivative of angular momentum
+
 .. math::
     :label: angular-momentum-deriv
 
@@ -587,23 +634,25 @@ Taking the time derivative of angular momentum and setting it equal to the appli
     = \mathbf{M}^i_{b/c} \, \boldsymbol{\alpha}^i_{b/i}
     + \boldsymbol{\omega}^i_{b/i} \times \left(\mathbf{M}^i_{b/c} \, \boldsymbol{\omega}^i_{b/i}\right)
     = \boldsymbol{\tau}_{b/c}
+
 ..
 
-The second term, :math:`\boldsymbol{\omega} \times (\mathbf{M}\boldsymbol{\omega})`,  vanishes when
-:math:`\boldsymbol{\omega}` is parallel to :math:`\mathbf{M}\boldsymbol{\omega}`. This is
-the case when spinning about a principal axis.
+The second term, :math:`\boldsymbol{\omega} \times (\mathbf{M}\boldsymbol{\omega})`, vanishes when
+:math:`\boldsymbol{\omega}` is parallel to :math:`\mathbf{M}\boldsymbol{\omega}`. This is the case
+when spinning about a principal axis.
 
+**********************************
+ Newton-Euler Equations of Motion
+**********************************
 
-Newton-Euler Equations of Motion
-=================================
-
-Now we can write down the full equations of motion for a rigid body.
-There are two vector equations. One for translation and one for rotation.
+Now we can write down the full equations of motion for a rigid body. There are two vector equations.
+One for translation and one for rotation.
 
 About the Center of Mass
--------------------------
+========================
 
 .. Define newton-euler about the CM
+
 .. admonition:: Newton-Euler Equations (About Center of Mass)
 
     .. math::
@@ -612,12 +661,14 @@ About the Center of Mass
         \sum \mathbf{F} &= m \, \mathbf{a}^i_{c/i} \\[4pt]
         \sum \boldsymbol{\tau} &= \mathbf{M}^i_{b/c} \, \boldsymbol{\alpha}^i_{b/i}
         + \boldsymbol{\omega}^i_{b/i} \times \left(\mathbf{M}^i_{b/c} \, \boldsymbol{\omega}^i_{b/i}\right)
+
 ..
 
-The translational equation is simply :math:`F = ma` applied to the center of mass :math:`c`.
-In block matrix form both equations read:
+The translational equation is simply :math:`F = ma` applied to the center of mass :math:`c`. In
+block matrix form both equations read:
 
 .. The newton-euler equations
+
 .. math::
 
     \begin{bmatrix} m\mathbf{I} & \mathbf{0} \\ \mathbf{0} & \mathbf{M}_{b/c} \end{bmatrix}
@@ -627,17 +678,20 @@ In block matrix form both equations read:
     \boldsymbol{\omega}_{b/i}) \end{bmatrix}
     =
     \begin{bmatrix} \mathbf{F}_{b} \\ \boldsymbol{\tau}_{b} \end{bmatrix}
+
 ..
 
 About a Different Point *o*
-----------------------------
+===========================
 
-When the body is constrained to rotate about a fixed point :math:`o` that is not the center of mass, 
-the equations change because the offset :math:`\mathbf{r}^i_{c/o}` between the center of mass and 
+When the body is constrained to rotate about a fixed point :math:`o` that is not the center of mass,
+the equations change because the offset :math:`\mathbf{r}^i_{c/o}` between the center of mass and
 the pivot couples translation and rotation:
 
 .. Newton-euler force about arbitrary point
+
 .. WARNING: It says a_c in the formula sheet
+
 .. math::
     :label: newton-euler-force-o
 
@@ -646,10 +700,13 @@ the pivot couples translation and rotation:
         + \boldsymbol{\alpha}_{b/i} \times \mathbf{r}^i_{c/o}
         + \boldsymbol{\omega}_{b/i} \times \bigl(\boldsymbol{\omega}_{b/i} \times \mathbf{r}^i_{c/o}\bigr)
     \right)
+
 ..
 
 .. Newton-euler torque about arbitrary point
+
 .. WARNING: It says a_c in the formula sheet
+
 .. math::
     :label: newton-euler-torque-o
 
@@ -657,11 +714,13 @@ the pivot couples translation and rotation:
         \mathbf{r}^i_{c/o} \times m\mathbf{a}_o
         + \mathbf{M}_{b/o} \cdot \boldsymbol{\alpha}_{b/i}
         + \boldsymbol{\omega}_{b/i} \times \left(\mathbf{M}_{b/o} \cdot \boldsymbol{\omega}_{b/i}\right)
+
 ..
 
 In block matrix form:
 
 .. Newton-euler force and torque in block matrix form
+
 .. math::
 
     \begin{bmatrix}
@@ -676,45 +735,50 @@ In block matrix form:
     \end{bmatrix}
     =
     \begin{bmatrix} \mathbf{F}_{b/o} \\ \boldsymbol{\tau}_{b/o} \end{bmatrix}
+
 ..
 
-
 Simulation: Spinning Top
----------------------------
+========================
 
-The equations of motion are most instructive in motion.
-With the tip fixed at the origin, :math:`\mathbf{a}_o = \mathbf{0}`, and the torque equation
-from :eq:`newton-euler-torque-o` reduces to
+The equations of motion are most instructive in motion. With the tip fixed at the origin,
+:math:`\mathbf{a}_o = \mathbf{0}`, and the torque equation from :eq:`newton-euler-torque-o` reduces
+to
 
 .. NE rotational equation about fixed tip
+
 .. math::
 
     \mathbf{M}_{b/o}\,\dot{\boldsymbol{\omega}}
     = \boldsymbol{\tau}_{b/o} - \boldsymbol{\omega} \times \bigl(\mathbf{M}_{b/o}\,\boldsymbol{\omega}\bigr)
 
-where the only applied torque is gravity acting at the center of mass:
-..
+where the only applied torque is gravity acting at the center of mass: ..
 
 .. Gravity torque about tip
+
 .. math::
 
     \boldsymbol{\tau}_{b/o} = \mathbf{r}_{c/o} \times m\mathbf{g}
+
 ..
 
-To integrate this forward in time we track the orientation as a unit quaternion
-:math:`\mathbf{q} = [q_w,\, q_x,\, q_y,\, q_z]^\top` whose kinematics are
+To integrate this forward in time we track the orientation as a unit quaternion :math:`\mathbf{q} =
+[q_w,\, q_x,\, q_y,\, q_z]^\top` whose kinematics are
 
 .. Quaternion kinematics
+
 .. math::
 
     \dot{\mathbf{q}} = \tfrac{1}{2}\,\mathbf{q} \otimes
     \begin{bmatrix} 0 \\ \boldsymbol{\omega} \end{bmatrix}
+
 ..
 
-The ODE state is :math:`\mathbf{y} = [q_w,\, q_x,\, q_y,\, q_z,\, \omega_x,\, \omega_y,\, \omega_z]^\top`.
-We start from zero rotation (perfectly upright) and a 200 rad/s spin.
+The ODE state is :math:`\mathbf{y} = [q_w,\, q_x,\, q_y,\, q_z,\, \omega_x,\, \omega_y,\,
+\omega_z]^\top`. We start from zero rotation (perfectly upright) and a 200 rad/s spin.
 
 .. SIMULATION: Precessing top (balanced)
+
 .. jupyter-execute::
 
     from scipy.integrate import solve_ivp
@@ -769,18 +833,20 @@ We start from zero rotation (perfectly upright) and a 200 rad/s spin.
     :hide-code:
 
     action_top
+
 ..
 
-With a perfectly balanced top starting from zero rotation, the spin axis is aligned with gravity
-and with the principal axis, and the top spins without any wobble.
+With a perfectly balanced top starting from zero rotation, the spin axis is aligned with gravity and
+with the principal axis, and the top spins without any wobble.
 
-Now attach the bolt. The initial rotation is still zero (perfectly upright, 200 rad/s spin), but
-the bolt shifts the center of mass off the symmetry axis. Gravity now acts at a point that is no
-longer on the spin axis, immediately creating a torque. The result is visible wobble, 
-even though the starting orientation is identical to the balanced case. This
-is the signature of a broken principal axis:
+Now attach the bolt. The initial rotation is still zero (perfectly upright, 200 rad/s spin), but the
+bolt shifts the center of mass off the symmetry axis. Gravity now acts at a point that is no longer
+on the spin axis, immediately creating a torque. The result is visible wobble, even though the
+starting orientation is identical to the balanced case. This is the signature of a broken principal
+axis:
 
 .. SIMULATION: Precessing top (with bolt)
+
 .. jupyter-execute::
 
     # Bolt's point-mass inertia contribution about the tip
@@ -801,23 +867,25 @@ is the signature of a broken principal axis:
     :hide-code:
 
     action_bolted
+
 ..
 
+****************
+ Principal Axes
+****************
 
-Principal Axes
-==============
-
-The inertia matrix :math:`\mathbf{M}_{b/c}` is real and symmetric, so it has three orthogonal eigenvectors, 
-the **principal axes**, and three positive eigenvalues,
-the **principal moments of inertia**. Spinning about a principal axis is special. The angular
-momentum :math:`\mathbf{h} = \mathbf{M}\boldsymbol{\omega}` is then parallel to
-:math:`\boldsymbol{\omega}`, producing a steady spin with no wobble.
+The inertia matrix :math:`\mathbf{M}_{b/c}` is real and symmetric, so it has three orthogonal
+eigenvectors, the **principal axes**, and three positive eigenvalues, the **principal moments of
+inertia**. Spinning about a principal axis is special. The angular momentum :math:`\mathbf{h} =
+\mathbf{M}\boldsymbol{\omega}` is then parallel to :math:`\boldsymbol{\omega}`, producing a steady
+spin with no wobble.
 
 For the balanced top the spin axis :math:`z` is already a principal axis (the inertia matrix is
 diagonal in the body frame). Adding the bolt breaks this. :math:`\mathbf{M}_\text{bolted}` gains
 off-diagonal terms and its principal axes are tilted relative to the symmetry axis.
 
 .. EXAMPLE: Principal axes of the bolted top
+
 .. jupyter-execute::
 
     eigenvalues, eigenvectors = np.linalg.eigh(M_boltedtop)
@@ -826,4 +894,5 @@ off-diagonal terms and its principal axes are tilted relative to the symmetry ax
     print(np.round(eigenvalues * 1e6, 4), "  (×10⁻⁶)")
     print("\nPrincipal axes (columns of eigenvector matrix):")
     print(np.round(eigenvectors, 4))
+
 ..

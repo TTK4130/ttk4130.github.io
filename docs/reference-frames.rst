@@ -153,7 +153,7 @@ R}_A^B(\theta)`, which means we can transform any vector in frame :math:`A` to i
 frame :math:`B` by means of matrix multiplication. This kind of transformation matrix belongs to a
 group we call rotation matrices. More specifically, it belongs to the `special orthogonal group 3
 (SO(3)) <https://en.wikipedia.org/wiki/3D_rotation_group>`_. This means that it has useful
-properties such that its inverse is equal to its transpose, meaning :math:`{{\bf R}_A^B}^T(\theta) =
+properties such that its inverse is equal to its transpose, meaning :math:`{{\bf R}_B^A}^T(\theta) =
 {{\bf R}_A^B}^{-1}(\theta) = {\bf R}_B^A(\theta)`, thus
 
 .. math::
