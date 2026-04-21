@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        // RST editor utilities — table editor, section navigation, document outline,
+        // snippets. Linter integration is disabled in settings.json (only supports
+        // rstcheck <=5); linting is handled by the pre-commit hooks instead.
+        "lextudio.restructuredtext",
+        // Up-to-date RST syntax highlighting (VSCode ships a bundled but older version)
+        "trond-snekvik.simple-rst",
+        // Run shell commands on save — invokes docstrfmt on .rst files
+        "emeraldwalk.runonsave"
+    ]
+}

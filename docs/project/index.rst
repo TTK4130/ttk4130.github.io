@@ -1,6 +1,6 @@
-==========
-Project
-==========
+#########
+ Project
+#########
 
 .. toctree::
     :maxdepth: 1

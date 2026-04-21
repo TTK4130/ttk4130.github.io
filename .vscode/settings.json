@@ -1,0 +1,26 @@
+{
+    // ── RST format on save (via emeraldwalk.runonsave) ───────────────────────
+    // VSCode has no native RST formatter slot, so we invoke docstrfmt via
+    // emeraldwalk.runonsave. runIn: "backend" runs silently without opening
+    // a terminal panel on every save.
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "\\.rst$",
+                "cmd": "uv run docstrfmt ${file}",
+                "runIn": "backend"
+            }
+        ]
+    },
+    // ── Editor behaviour for RST files ───────────────────────────────────────
+    "[restructuredtext]": {
+        // Disable VSCode's built-in format-on-save for RST (runonsave handles it)
+        "editor.formatOnSave": false,
+        // Visual guides matching the docstrfmt line_length = 100
+        "editor.wordWrapColumn": 100,
+        "editor.wordWrap": "wordWrapColumn",
+        "editor.rulers": [
+            100
+        ]
+    }
+}
