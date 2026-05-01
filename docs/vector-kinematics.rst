@@ -256,3 +256,181 @@ These ideas are fundamental in rigid-body mechanics, robotics, and vehicle dynam
     :align: center
 
     A recorded trajectory can reveal the motion of the entire reference frame.
+
+
+Exercise 1: Velocity of a Point on a Rotating Vessel
+=====================================================
+
+A ship (body frame :math:`b`) moves through calm water with a constant translational
+velocity :math:`\vec{v}_{b/i}^i = (3, 1, 0)^\top` m/s expressed in the inertial frame.
+The ship rotates at a constant yaw rate :math:`\dot\psi = 0.2` rad/s about the vertical axis,
+so the angular velocity is :math:`\vec{\omega}_{b/i}^i = (0, 0, 0.2)^\top` rad/s.
+
+A sensor is mounted on the bow, fixed to the ship at position
+:math:`\vec{r}_{P/b}^b = (5, 0, 0)^\top` m (5 m ahead of the ship's origin along the body
+x-axis).
+
+At the instant of interest the body frame coincides with the inertial frame
+(:math:`R^0_b = I`), so :math:`\vec{r}_{P/b}^i = (5, 0, 0)^\top` m.
+
+**Find** the velocity of the sensor relative to the inertial frame at this instant.
+
+.. admonition:: Solution
+   :class: dropdown
+
+   Because the sensor is fixed in the body frame, the relative velocity term vanishes:
+
+   .. math::
+
+       \frac{d^b}{dt}\vec{r}_{P/b} = \mathbf{0}
+
+   The velocity equation therefore reduces to
+
+   .. math::
+
+       \vec{v}_{P/i}^i
+       = \vec{v}_{b/i}^i + \vec{\omega}_{b/i}^i \times \vec{r}_{P/b}^i
+
+   Compute the cross product:
+
+   .. math::
+
+       \vec{\omega} \times \vec{r}_{P/b}
+       =
+       \begin{pmatrix} 0 \\ 0 \\ 0.2 \end{pmatrix}
+       \times
+       \begin{pmatrix} 5 \\ 0 \\ 0 \end{pmatrix}
+       =
+       \begin{pmatrix}
+         0 \cdot 0 - 0.2 \cdot 0 \\
+         0.2 \cdot 5 - 0 \cdot 0 \\
+         0 \cdot 0 - 0 \cdot 5
+       \end{pmatrix}
+       =
+       \begin{pmatrix} 0 \\ 1 \\ 0 \end{pmatrix}
+       \text{ m/s}
+
+   Adding the translational velocity:
+
+   .. math::
+
+       \vec{v}_{P/i}^i
+       =
+       \begin{pmatrix} 3 \\ 1 \\ 0 \end{pmatrix}
+       +
+       \begin{pmatrix} 0 \\ 1 \\ 0 \end{pmatrix}
+       =
+       \begin{pmatrix} 3 \\ 2 \\ 0 \end{pmatrix}
+       \text{ m/s}
+
+   The rotation adds 1 m/s in the :math:`y`-direction because the bow sweeps sideways
+   as the ship yaws.
+
+   Exercise 2: Coordinate Transformation Using a Rotation Matrix
+=============================================================
+
+A drone's body frame :math:`b` is obtained from the inertial frame by a pure yaw rotation
+of :math:`\psi = 90°` followed by a pure pitch rotation of :math:`\theta = 30°`.
+The combined rotation matrix is
+
+.. math::
+
+    R^0_b = R_z(90°)\,R_y(30°)
+
+A velocity vector is measured by an onboard sensor and expressed in the body frame as
+
+.. math::
+
+    \mathbf{v}^b =
+    \begin{pmatrix} 2 \\ 0 \\ -1 \end{pmatrix}
+    \text{ m/s}
+
+**Find** the same velocity expressed in the inertial frame :math:`\mathbf{v}^0`.
+
+.. admonition:: Solution
+   :class: dropdown
+
+   First, evaluate the two principal rotation matrices.
+
+   **Yaw** (:math:`\psi = 90°`, so :math:`\cos 90° = 0`,  :math:`\sin 90° = 1`):
+
+   .. math::
+
+       R_z(90°) =
+       \begin{pmatrix}
+         0 & -1 & 0 \\
+         1 &  0 & 0 \\
+         0 &  0 & 1
+       \end{pmatrix}
+
+   **Pitch** (:math:`\theta = 30°`, so :math:`\cos 30° = \tfrac{\sqrt{3}}{2}`,
+   :math:`\sin 30° = \tfrac{1}{2}`):
+
+   .. math::
+
+       R_y(30°) =
+       \begin{pmatrix}
+         \tfrac{\sqrt{3}}{2} & 0 & \tfrac{1}{2} \\
+         0                   & 1 & 0            \\
+        -\tfrac{1}{2}        & 0 & \tfrac{\sqrt{3}}{2}
+       \end{pmatrix}
+
+   **Combined rotation:**
+
+   .. math::
+
+       R^0_b
+       = R_z(90°)\,R_y(30°)
+       =
+       \begin{pmatrix}
+         0 & -1 & 0 \\
+         1 &  0 & 0 \\
+         0 &  0 & 1
+       \end{pmatrix}
+       \begin{pmatrix}
+         \tfrac{\sqrt{3}}{2} & 0 & \tfrac{1}{2} \\
+         0                   & 1 & 0            \\
+        -\tfrac{1}{2}        & 0 & \tfrac{\sqrt{3}}{2}
+       \end{pmatrix}
+       =
+       \begin{pmatrix}
+         0                   & -1 & 0            \\
+         \tfrac{\sqrt{3}}{2} &  0 & \tfrac{1}{2} \\
+        -\tfrac{1}{2}        &  0 & \tfrac{\sqrt{3}}{2}
+       \end{pmatrix}
+
+   **Transform the vector:**
+
+   .. math::
+
+       \mathbf{v}^0
+       = R^0_b\,\mathbf{v}^b
+       =
+       \begin{pmatrix}
+         0                   & -1 & 0            \\
+         \tfrac{\sqrt{3}}{2} &  0 & \tfrac{1}{2} \\
+        -\tfrac{1}{2}        &  0 & \tfrac{\sqrt{3}}{2}
+       \end{pmatrix}
+       \begin{pmatrix} 2 \\ 0 \\ -1 \end{pmatrix}
+       =
+       \begin{pmatrix}
+         0\cdot2 + (-1)\cdot0 + 0\cdot(-1) \\
+         \tfrac{\sqrt{3}}{2}\cdot2 + 0 + \tfrac{1}{2}\cdot(-1) \\
+         -\tfrac{1}{2}\cdot2 + 0 + \tfrac{\sqrt{3}}{2}\cdot(-1)
+       \end{pmatrix}
+       =
+       \begin{pmatrix}
+         0 \\
+         \sqrt{3} - \tfrac{1}{2} \\
+         -1 - \tfrac{\sqrt{3}}{2}
+       \end{pmatrix}
+       \approx
+       \begin{pmatrix}
+         0 \\
+         1.23 \\
+        -1.87
+       \end{pmatrix}
+       \text{ m/s}
+
+   Note that the rotation changes the direction of the velocity vector but not its
+   magnitude — :math:`\lVert\mathbf{v}\rVert = \sqrt{5}` m/s in both frames.
