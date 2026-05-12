@@ -12,6 +12,7 @@
     installation
     jupyter-notebook
     sympy-and-cas
+    context-for-AI
     animation
     reference-frames
     vector-kinematics
