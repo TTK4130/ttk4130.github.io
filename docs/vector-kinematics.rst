@@ -362,3 +362,74 @@ These ideas are fundamental in rigid-body mechanics, robotics, and vehicle dynam
     :align: center
 
     A recorded trajectory can reveal the motion of the entire reference frame.
+
+********************************************
+ Vector kinematics with SymPy ``mechanics``
+********************************************
+
+``sympy.physics.mechanics`` lets you work with symbolic reference frames, points, and vectors.
+Orientations between frames are declared once; SymPy then differentiates vectors in the correct
+frame when you ask for velocities and accelerations.
+
+Setting up frames and orientation
+=================================
+
+.. jupyter-execute::
+
+    import sympy as sm
+    from sympy.physics.mechanics import ReferenceFrame, Point, dynamicsymbols
+    sm.init_printing(use_latex='mathjax')
+
+    psi, v_x, v_y = dynamicsymbols("psi v_x v_y")
+
+    N = ReferenceFrame("N")  # inertial frame
+    B = N.orientnew("B", "Axis", [psi, N.z])  # body frame: yaw by psi about N.z
+
+    B.ang_vel_in(N)
+
+The prime denotes :math:`d/dt`, so the result is :math:`\vec\omega_{B/N} = \dot\psi\,\hat{N}_z`.
+
+Velocity via the two-point theorem
+==================================
+
+``v2pt_theory(Q, N, B)`` sets the velocity of a point using the transport theorem, given the
+velocity of a reference point ``Q`` and assuming both points are fixed in frame ``B``:
+
+.. jupyter-execute::
+
+    O = Point("O")  # inertial origin (fixed)
+    O_b = Point("O_b")  # ship origin
+
+    O.set_vel(N, 0)
+    O_b.set_vel(N, v_x * N.x + v_y * N.y)
+
+    P = O_b.locatenew("P", 5 * B.x)  # bow sensor, 5 m along body x-axis
+    P.v2pt_theory(O_b, N, B)
+
+    P.vel(N)
+
+Substituting :math:`\psi = 0`, :math:`\dot\psi = 0.2` rad/s, :math:`v_x = 3` m/s, :math:`v_y = 1`
+m/s recovers the result from the exercise above:
+
+.. jupyter-execute::
+
+    P.vel(N).subs({psi: 0, psi.diff(): 0.2, v_x: 3, v_y: 1}).to_matrix(N)
+
+Acceleration
+============
+
+``acc()`` differentiates the stored velocity, applying the transport theorem again to produce all
+five terms from the acceleration formula, including centripetal and Coriolis:
+
+.. jupyter-execute::
+
+    P.acc(N).express(N).simplify()
+
+Vectors can be expressed in any frame with ``.express()`` and converted to a column matrix with
+``.to_matrix()``.
+
+.. note::
+
+    For more examples of rolling discs, pendulums, multi-body systems, and full equations of motion
+    via Kane's and Lagrange's methods, see the `SymPy mechanics documentation
+    <https://docs.sympy.org/latest/modules/physics/mechanics/>`_.
