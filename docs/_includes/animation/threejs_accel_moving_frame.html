@@ -1,0 +1,336 @@
+<div id="accel-demo" style="width:100%; margin:1.5rem 0;">
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px;">
+
+    <!-- Panel 1: Centripetal -->
+    <div>
+      <div style="background:#1e1e1e; border:1px solid #555; border-bottom:none; padding:8px 14px;">
+        <span style="color:white; font-weight:600;">1. Centripetal acceleration</span>
+      </div>
+      <div style="position:relative; border-left:1px solid #555; border-right:1px solid #555; overflow:hidden;">
+        <canvas id="accel-c-canvas" style="display:block; width:100%; height:360px;"></canvas>
+        <div id="accel-c-labels" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
+        <div style="position:absolute; top:8px; right:8px; z-index:2; display:flex; gap:4px;">
+          <button id="accel-c-zoomin"  style="background:rgba(30,30,30,0.8); color:white; border:1px solid #888; width:28px; height:28px; cursor:pointer; border-radius:3px; font-size:16px; line-height:1;">+</button>
+          <button id="accel-c-zoomout" style="background:rgba(30,30,30,0.8); color:white; border:1px solid #888; width:28px; height:28px; cursor:pointer; border-radius:3px; font-size:16px; line-height:1;">−</button>
+        </div>
+      </div>
+      <div style="background:#1e1e1e; border:1px solid #555; border-top:none; padding:8px 14px; color:#c0c0c0; font-size:0.875rem; line-height:1.5;">
+        \(P\) is fixed in the rotating frame.
+        The centripetal term \(\boldsymbol{\omega}\times(\boldsymbol{\omega}\times\mathbf{r}_{P/b})\)
+        always points inward toward the rotation axis.
+      </div>
+    </div>
+
+    <!-- Panel 2: Coriolis -->
+    <div>
+      <div style="background:#1e1e1e; border:1px solid #555; border-bottom:none; padding:8px 14px;">
+        <span style="color:white; font-weight:600;">2. Coriolis acceleration</span>
+      </div>
+      <div style="position:relative; border-left:1px solid #555; border-right:1px solid #555; overflow:hidden;">
+        <canvas id="accel-cor-canvas" style="display:block; width:100%; height:360px;"></canvas>
+        <div id="accel-cor-labels" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
+        <div style="position:absolute; top:8px; right:8px; z-index:2; display:flex; gap:4px;">
+          <button id="accel-cor-zoomin"  style="background:rgba(30,30,30,0.8); color:white; border:1px solid #888; width:28px; height:28px; cursor:pointer; border-radius:3px; font-size:16px; line-height:1;">+</button>
+          <button id="accel-cor-zoomout" style="background:rgba(30,30,30,0.8); color:white; border:1px solid #888; width:28px; height:28px; cursor:pointer; border-radius:3px; font-size:16px; line-height:1;">−</button>
+        </div>
+      </div>
+      <div style="background:#1e1e1e; border:1px solid #555; border-top:none; padding:8px 14px; color:#c0c0c0; font-size:0.875rem; line-height:1.5;">
+        \(P\) slides along the rotating arm.
+        The Coriolis term \(2\boldsymbol{\omega}\times\tfrac{d^b}{dt}\mathbf{r}_{P/b}\)
+        acts perpendicular to the sliding motion.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+    /* ── canvas / label elements ── */
+    const cCanvas   = document.getElementById('accel-c-canvas');
+    const corCanvas = document.getElementById('accel-cor-canvas');
+    const cCtx      = cCanvas.getContext('2d');
+    const corCtx    = corCanvas.getContext('2d');
+    const cLabels   = document.getElementById('accel-c-labels');
+    const corLabels = document.getElementById('accel-cor-labels');
+
+    /* ── zoom state ── */
+    let cZoom   = 1;
+    let corZoom = 1;
+    const ZOOM_MIN = 0.3, ZOOM_MAX = 5;
+
+    function clampZoom(z) { return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z)); }
+
+    /* zoom buttons */
+    document.getElementById('accel-c-zoomin').onclick   = () => { cZoom   = clampZoom(cZoom   * 1.25); };
+    document.getElementById('accel-c-zoomout').onclick  = () => { cZoom   = clampZoom(cZoom   / 1.25); };
+    document.getElementById('accel-cor-zoomin').onclick  = () => { corZoom = clampZoom(corZoom * 1.25); };
+    document.getElementById('accel-cor-zoomout').onclick = () => { corZoom = clampZoom(corZoom / 1.25); };
+
+    /* mouse-wheel zoom */
+    cCanvas.addEventListener('wheel',   e => { e.preventDefault(); cZoom   = clampZoom(cZoom   * (e.deltaY < 0 ? 1.1 : 1/1.1)); }, { passive: false });
+    corCanvas.addEventListener('wheel', e => { e.preventDefault(); corZoom = clampZoom(corZoom * (e.deltaY < 0 ? 1.1 : 1/1.1)); }, { passive: false });
+
+    /* ── canvas resize ── */
+    function resizeCanvas(c) {
+        const dpr  = window.devicePixelRatio || 1;
+        const rect = c.getBoundingClientRect();
+        c.width  = rect.width  * dpr;
+        c.height = rect.height * dpr;
+    }
+    function resizeAll() { resizeCanvas(cCanvas); resizeCanvas(corCanvas); }
+    resizeAll();
+    window.addEventListener('resize', resizeAll);
+
+    /* ── geometry helpers ── */
+    function rot(x, y, a)  { return { x: x*Math.cos(a) - y*Math.sin(a), y: x*Math.sin(a) + y*Math.cos(a) }; }
+    function scale(a, s)   { return { x: a.x * s, y: a.y * s }; }
+    function perp(a)       { return { x: -a.y, y: a.x }; }   /* 90° in canvas (z-into-screen) */
+
+    function drawArrow(ctx, x1, y1, x2, y2, color, lw) {
+        lw = lw || 2.5;
+        const dx = x2-x1, dy = y2-y1, L = Math.hypot(dx, dy);
+        if (L < 2) return;
+        const ux = dx/L, uy = dy/L, h = 11;
+        ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - h*ux - 0.45*h*uy, y2 - h*uy + 0.45*h*ux);
+        ctx.lineTo(x2 - h*ux + 0.45*h*uy, y2 - h*uy - 0.45*h*ux);
+        ctx.closePath(); ctx.fill();
+    }
+
+    function drawDot(ctx, x, y, r, color) {
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.arc(x, y, r, 0, 2*Math.PI); ctx.fill();
+    }
+
+    function drawBodyAxes(ctx, cx, cy, theta) {
+        const len = 36;
+        const ex = rot(len, 0, theta), ey = rot(0, len, theta);
+        drawArrow(ctx, cx, cy, cx+ex.x, cy+ex.y, '#ff8a80', 1.5);
+        drawArrow(ctx, cx, cy, cx+ey.x, cy+ey.y, '#80e27e', 1.5);
+    }
+
+    function drawInertialAxes(ctx, ox, oy) {
+        drawArrow(ctx, ox, oy, ox+38, oy,    '#ff6b6b', 1.5);
+        drawArrow(ctx, ox, oy, ox,    oy-38, '#6bb7ff', 1.5);
+    }
+
+    /* ── label helpers ── */
+    function makeLabel(parent, latex, color) {
+        const el = document.createElement('span');
+        el.style.cssText = `position:absolute; color:${color}; font-size:14px; line-height:1; white-space:nowrap;`;
+        el.innerHTML = `\\(${latex}\\)`;
+        parent.appendChild(el);
+        return el;
+    }
+
+    function setPos(el, x, y) {
+        el.style.left = Math.round(x) + 'px';
+        el.style.top  = Math.round(y) + 'px';
+    }
+
+    /* zoom-aware label position: maps an unzoomed canvas point to CSS pixels */
+    function lp(x, y, cx, cy, zoom) {
+        return { x: cx + (x-cx)*zoom, y: cy + (y-cy)*zoom };
+    }
+
+    /* ── Panel 1 labels ── */
+    const lc = {
+        Ob: makeLabel(cLabels, 'O_b',              '#ffd54f'),
+        P:  makeLabel(cLabels, 'P',                'white'),
+        ac: makeLabel(cLabels, '\\mathbf{a}_c',    '#ff9800'),
+        xb: makeLabel(cLabels, 'x_b',              '#ff8a80'),
+        yb: makeLabel(cLabels, 'y_b',              '#80e27e'),
+        xi: makeLabel(cLabels, 'x_i',              '#ff6b6b'),
+        yi: makeLabel(cLabels, 'y_i',              '#6bb7ff'),
+        om: makeLabel(cLabels, '\\omega',           '#c8a0ff'),
+    };
+
+    /* ── Panel 2 labels ── */
+    const lcor = {
+        Ob:   makeLabel(corLabels, 'O_b',                          '#ffd54f'),
+        P:    makeLabel(corLabels, 'P',                            'white'),
+        ac:   makeLabel(corLabels, '\\mathbf{a}_c',                '#ff9800'),
+        aCor: makeLabel(corLabels, '\\mathbf{a}_{\\rm Cor}',       '#f06292'),
+        vrel: makeLabel(corLabels, '\\dot{\\mathbf{r}}_{P/b}',     '#4dd0e1'),
+        xb:   makeLabel(corLabels, 'x_b',                          '#ff8a80'),
+        yb:   makeLabel(corLabels, 'y_b',                          '#80e27e'),
+        xi:   makeLabel(corLabels, 'x_i',                          '#ff6b6b'),
+        yi:   makeLabel(corLabels, 'y_i',                          '#6bb7ff'),
+        om:   makeLabel(corLabels, '\\omega',                       '#c8a0ff'),
+    };
+
+    /* ── Panel 1: P fixed in rotating frame ── */
+    function panel1(t) {
+        const w    = cCanvas.getBoundingClientRect().width;
+        const h    = cCanvas.getBoundingClientRect().height;
+        const dpr  = window.devicePixelRatio || 1;
+        const cx   = w/2, cy = h/2;
+        const zoom = cZoom;
+
+        /* clear background (unzoomed) */
+        cCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        cCtx.fillStyle = '#1a1a2e'; cCtx.fillRect(0, 0, w, h);
+
+        /* apply zoom centred on canvas centre */
+        cCtx.setTransform(dpr*zoom, 0, 0, dpr*zoom, dpr*cx*(1-zoom), dpr*cy*(1-zoom));
+
+        const omega = 0.65;
+        const R     = Math.min(w, h) * 0.384;
+        const theta = omega * t;
+
+        /* ghost circle */
+        cCtx.strokeStyle = '#2a2a44'; cCtx.lineWidth = 1;
+        cCtx.setLineDash([5, 5]);
+        cCtx.beginPath(); cCtx.arc(cx, cy, R, 0, 2*Math.PI); cCtx.stroke();
+        cCtx.setLineDash([]);
+
+        /* arm */
+        const armDir = rot(1, 0, theta);
+        cCtx.strokeStyle = '#555577'; cCtx.lineWidth = 1.5;
+        cCtx.beginPath(); cCtx.moveTo(cx, cy); cCtx.lineTo(cx + armDir.x*R, cy + armDir.y*R); cCtx.stroke();
+
+        /* origin, body axes */
+        drawDot(cCtx, cx, cy, 5, '#ffd54f');
+        drawBodyAxes(cCtx, cx, cy, theta);
+
+        /* point P */
+        const Px = cx + armDir.x*R, Py = cy + armDir.y*R;
+        drawDot(cCtx, Px, Py, 7, '#ffffff');
+
+        /* centripetal arrow */
+        const ca = scale(armDir, -omega*omega * R * 1.1);
+        drawArrow(cCtx, Px, Py, Px+ca.x, Py+ca.y, '#ff9800', 2.8);
+
+        /* zoomed label positions */
+        let p;
+        p = lp(cx+8,        cy-20,       cx, cy, zoom); setPos(lc.Ob, p.x, p.y);
+        p = lp(cx+12,       cy+14,       cx, cy, zoom); setPos(lc.om, p.x, p.y);
+        p = lp(Px+10,       Py-14,       cx, cy, zoom); setPos(lc.P,  p.x, p.y);
+        p = lp(Px+ca.x+6,  Py+ca.y-6,  cx, cy, zoom); setPos(lc.ac, p.x, p.y);
+
+        const axLen = 36;
+        const ex = rot(axLen+12, 0, theta), ey = rot(0, axLen+12, theta);
+        p = lp(cx+ex.x-6, cy+ex.y+4, cx, cy, zoom); setPos(lc.xb, p.x, p.y);
+        p = lp(cx+ey.x-6, cy+ey.y+4, cx, cy, zoom); setPos(lc.yb, p.x, p.y);
+
+        /* inertial axes — fixed corner, not zoomed */
+        cCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        drawInertialAxes(cCtx, 20, h-22);
+        setPos(lc.xi, 60,  h-18);
+        setPos(lc.yi, 6,   h-64);
+    }
+
+    /* ── Panel 2: P slides along rotating arm ── */
+    function panel2(t) {
+        const w    = corCanvas.getBoundingClientRect().width;
+        const h    = corCanvas.getBoundingClientRect().height;
+        const dpr  = window.devicePixelRatio || 1;
+        const cx   = w/2, cy = h/2;
+        const zoom = corZoom;
+
+        /* clear background */
+        corCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        corCtx.fillStyle = '#1a1a2e'; corCtx.fillRect(0, 0, w, h);
+
+        /* apply zoom */
+        corCtx.setTransform(dpr*zoom, 0, 0, dpr*zoom, dpr*cx*(1-zoom), dpr*cy*(1-zoom));
+
+        const omega  = 0.65;
+        const theta  = omega * t;
+        const Rbase  = Math.min(w, h) * 0.192;
+        const Ramp   = Math.min(w, h) * 0.216;
+        const freq   = 0.45;
+
+        const r      = Rbase + Ramp * Math.sin(freq * t);
+        const r_dot  = Ramp * freq * Math.cos(freq * t);
+
+        const armDir  = rot(1, 0, theta);
+        const armPerp = perp(armDir);
+        const Rmax    = Rbase + Ramp;
+
+        /* arm track */
+        corCtx.strokeStyle = '#444466'; corCtx.lineWidth = 2;
+        corCtx.beginPath(); corCtx.moveTo(cx, cy); corCtx.lineTo(cx + armDir.x*Rmax, cy + armDir.y*Rmax); corCtx.stroke();
+
+        /* origin, body axes */
+        drawDot(corCtx, cx, cy, 5, '#ffd54f');
+        drawBodyAxes(corCtx, cx, cy, theta);
+
+        /* point P */
+        const Px = cx + armDir.x*r, Py = cy + armDir.y*r;
+        drawDot(corCtx, Px, Py, 7, '#ffffff');
+
+        const ds = 1.0;
+
+        /* centripetal */
+        const ca = scale(armDir, -omega*omega * r * ds);
+        drawArrow(corCtx, Px, Py, Px+ca.x, Py+ca.y, '#ff9800', 2.8);
+
+        const showKin = Math.abs(r_dot) > 2;
+
+        /* relative velocity */
+        const vr = scale(armDir, r_dot * ds * 1.5);
+        if (showKin) {
+            drawArrow(corCtx, Px, Py, Px+vr.x, Py+vr.y, '#4dd0e1', 2.5);
+            lcor.vrel.style.display = '';
+        } else {
+            lcor.vrel.style.display = 'none';
+        }
+
+        /* Coriolis */
+        const cor = scale(armPerp, 2 * omega * r_dot * ds);
+        if (showKin) {
+            drawArrow(corCtx, Px, Py, Px+cor.x, Py+cor.y, '#f06292', 2.8);
+            lcor.aCor.style.display = '';
+        } else {
+            lcor.aCor.style.display = 'none';
+        }
+
+        /* zoomed label positions */
+        let p;
+        p = lp(cx+8,         cy-20,       cx, cy, zoom); setPos(lcor.Ob, p.x, p.y);
+        p = lp(cx+12,        cy+14,       cx, cy, zoom); setPos(lcor.om, p.x, p.y);
+        p = lp(Px+10,        Py-14,       cx, cy, zoom); setPos(lcor.P,  p.x, p.y);
+        p = lp(Px+ca.x+6,   Py+ca.y-4,  cx, cy, zoom); setPos(lcor.ac, p.x, p.y);
+        if (showKin) {
+            p = lp(Px+vr.x+6,   Py+vr.y-4,  cx, cy, zoom); setPos(lcor.vrel, p.x, p.y);
+            p = lp(Px+cor.x+6,  Py+cor.y-4, cx, cy, zoom); setPos(lcor.aCor, p.x, p.y);
+        }
+
+        const axLen = 36;
+        const ex = rot(axLen+12, 0, theta), ey = rot(0, axLen+12, theta);
+        p = lp(cx+ex.x-6, cy+ex.y+4, cx, cy, zoom); setPos(lcor.xb, p.x, p.y);
+        p = lp(cx+ey.x-6, cy+ey.y+4, cx, cy, zoom); setPos(lcor.yb, p.x, p.y);
+
+        /* inertial axes — fixed corner, not zoomed */
+        corCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        drawInertialAxes(corCtx, 20, h-22);
+        setPos(lcor.xi, 60,  h-18);
+        setPos(lcor.yi, 6,   h-64);
+    }
+
+    /* ── animation loop ── */
+    let start = null;
+    function animate(ts) {
+        if (!start) start = ts;
+        const t = (ts - start) / 1000;
+        panel1(t);
+        panel2(t);
+        requestAnimationFrame(animate);
+    }
+
+    /* ── init: typeset MathJax labels then start ── */
+    async function init() {
+        const allLabels = [...cLabels.children, ...corLabels.children];
+        if (window.MathJax?.startup?.promise) await MathJax.startup.promise;
+        if (window.MathJax?.typesetPromise)   await MathJax.typesetPromise(allLabels);
+        requestAnimationFrame(animate);
+    }
+
+    init();
+})();
+</script>
