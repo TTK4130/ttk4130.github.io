@@ -33,6 +33,7 @@ master_doc = 'index'
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 bibtex_bibfiles = ['refs.bib']
+autosectionlabel_prefix_document = True
 
 jupyterlite_dir = "jupyterlite-deps/"
 jupyterlite_bind_ipynb_suffix = False

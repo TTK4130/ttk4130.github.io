@@ -30,7 +30,7 @@ equilibrium position of the spring (either side is OK), and the initial velocity
 
 .. hint::
 
-    Have you read the code examples in :ref:`Numerical Methods for ODEs`?
+    Have you read the code examples in :ref:`numerical-methods-for-odes`?
 
 .. admonition:: Tasks
 

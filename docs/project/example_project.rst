@@ -101,8 +101,8 @@ Conclude that we need a more complicated model
 
 .. note::
 
-    Please look at the animation page :ref:`3D Visualization and Animation` for an introduction to
-    how you make animations in Python.
+    Please look at the animation page :ref:`animation-page` for an introduction to how you make
+    animations in Python.
 
 **********************
  A Not So Simple Bike
@@ -112,7 +112,7 @@ Conclude that we need a more complicated model
 - Visualize
 
 .. raw:: html
-    :file: _includes/animation/threejs_simple_bike.html
+    :file: ../_includes/animation/threejs_simple_bike.html
 
 **************************************
  Testing different bicycle parameters
