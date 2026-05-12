@@ -128,8 +128,6 @@ The website uses three tools to keep the `.rst` source files consistent and corr
 
 The [reStructuredText extension](https://docs.lextudio.com/restructuredtext/) is an optional extension you can use to improve the editing experience in VSCode. It supports syntax highlighting and reports linting errors from rstcheck and much more. It does not change your files, but reports any issues before you reach the commit stage. 
 
-## How to build the site
-
 ## Acknowledgements
 
 This site is heavily inspired by the Jason K. Moore's book and course "Learn Multibody Dynamics" taught at TU Delft.

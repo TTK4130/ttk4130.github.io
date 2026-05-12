@@ -1,0 +1,285 @@
+<div id="frame-container" style="position:relative; width:100%; height:60vh; min-height:420px; border:1px solid #555; overflow:hidden;">
+  <div id="frame-legend" style="position:absolute; top:8px; left:8px; z-index:2; color:white; font-size:13px; pointer-events:none; background:rgba(0,0,0,0.6); padding:7px 12px; border-radius:4px; line-height:2;">
+    \(\mathbf{r}_{P/O} = \mathbf{r}_{O_b/O} + \mathbf{r}_{P/O_b}\)
+    <div style="display:flex; gap:14px; font-size:12px; margin-top:2px;">
+      <span style="color:#00ffff">\(\mathbf{r}_{O_b/O}\)</span>
+      <span style="color:#ff00ff">\(\mathbf{r}_{P/O_b}\)</span>
+      <span style="color:#ffff00">\(\mathbf{r}_{P/O}\)</span>
+    </div>
+  </div>
+  <button id="frame-pause" style="position:absolute; bottom:8px; right:8px; z-index:2; background:rgba(30,30,30,0.75); color:white; border:1px solid #888; padding:4px 14px; cursor:pointer; border-radius:3px; font-size:13px;">Pause</button>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls }   from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/renderers/CSS2DRenderer.js';
+import { Line2 }        from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/lines/Line2.js';
+import { LineGeometry } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/lines/LineGeometry.js';
+import { LineMaterial } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/lines/LineMaterial.js';
+
+const container = document.getElementById('frame-container');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1e1e1e);
+
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+camera.position.set(6, 4, 8);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.domElement.style.cssText = 'position:absolute; top:0; left:0;';
+container.appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.domElement.style.cssText = 'position:absolute; top:0; left:0; pointer-events:none;';
+container.appendChild(labelRenderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping  = true;
+controls.dampingFactor  = 0.05;
+controls.target.set(1.5, 1.0, 0);
+
+const lineMaterials = [];
+
+function onResize() {
+    const w = container.clientWidth, h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+    labelRenderer.setSize(w, h);
+    for (const m of lineMaterials) m.resolution.set(w, h);
+}
+onResize();
+window.addEventListener('resize', onResize);
+new ResizeObserver(onResize).observe(container);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+dirLight.position.set(5, 8, 6);
+scene.add(dirLight);
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+// Arrow geometry constants (cone 30% larger than original 0.18/0.1)
+const CONE_H  = 0.234;
+const CONE_R  = 0.065;
+const SHAFT_R = 0.022;
+const _up = new THREE.Vector3(0, 1, 0);
+
+function makeArrow(origin, dir, color, length) {
+    const mat   = new THREE.MeshPhongMaterial({ color, shininess: 60 });
+    // Shaft: unit-height cylinder scaled to fit; radius stays SHAFT_R
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(SHAFT_R, SHAFT_R, 1, 8), mat);
+    const cone  = new THREE.Mesh(new THREE.ConeGeometry(CONE_R, CONE_H, 12), mat);
+    const group = new THREE.Group();
+    group.add(shaft, cone);
+    scene.add(group);
+    const arrow = { shaft, cone, length };
+    _applyArrow(arrow, origin, dir.clone().normalize(), length);
+    return arrow;
+}
+
+function _applyArrow(arrow, origin, norm, length) {
+    const shaftLen = length - CONE_H;
+    const q = new THREE.Quaternion().setFromUnitVectors(_up, norm);
+    arrow.shaft.scale.y = shaftLen;
+    arrow.shaft.position.copy(origin).addScaledVector(norm, shaftLen / 2);
+    arrow.shaft.quaternion.copy(q);
+    arrow.cone.position.copy(origin).addScaledVector(norm, shaftLen + CONE_H / 2);
+    arrow.cone.quaternion.copy(q);
+}
+
+function setArrow(arrow, origin, dir, length) {
+    _applyArrow(arrow, origin, dir.clone().normalize(), length);
+}
+
+function makeSphere(radius, color) {
+    const m = new THREE.Mesh(
+        new THREE.SphereGeometry(radius, 24, 24),
+        new THREE.MeshPhongMaterial({ color, shininess: 80 })
+    );
+    return m;
+}
+
+function makeDashedLine(color, dashSize = 0.18, gapSize = 0.08) {
+    const mat = new LineMaterial({
+        color,
+        linewidth: 2,
+        dashed: true,
+        dashSize,
+        gapSize,
+        resolution: new THREE.Vector2(container.clientWidth, container.clientHeight),
+    });
+    lineMaterials.push(mat);
+    const geo = new LineGeometry();
+    geo.setPositions([0, 0, 0, 0.001, 0, 0]);
+    const line = new Line2(geo, mat);
+    line.computeLineDistances();
+    scene.add(line);
+    return line;
+}
+
+function updateLine(line, a, b) {
+    line.geometry.setPositions([a.x, a.y, a.z, b.x, b.y, b.z]);
+    line.computeLineDistances();
+}
+
+function makeLabel(latex, color = 'white', fontSize = '16px') {
+    const el = document.createElement('div');
+    el.style.color      = color;
+    el.style.fontSize   = fontSize;
+    el.style.lineHeight = '1';
+    el.innerHTML = `\\(${latex}\\)`;
+    const obj = new CSS2DObject(el);
+    scene.add(obj);
+    return obj;
+}
+
+// ── Fixed frame ───────────────────────────────────────────────────────────────
+
+const O = new THREE.Vector3();
+const FIXED_LEN  = 2.2;
+const MOVING_LEN = 1.5;
+
+makeArrow(O, new THREE.Vector3(1, 0, 0), 0xff5555, FIXED_LEN);
+makeArrow(O, new THREE.Vector3(0, 1, 0), 0x55ff55, FIXED_LEN);
+makeArrow(O, new THREE.Vector3(0, 0, 1), 0x5599ff, FIXED_LEN);
+
+const originDot = makeSphere(0.06, 0xffffff);
+originDot.position.copy(O);
+scene.add(originDot);
+
+scene.add(new THREE.GridHelper(10, 10, 0x444444, 0x333333));
+
+// ── Moving frame ──────────────────────────────────────────────────────────────
+
+const movingDot = makeSphere(0.07, 0xffcc66);
+scene.add(movingDot);
+const movingX = makeArrow(new THREE.Vector3(), new THREE.Vector3(1, 0, 0), 0xff8888, MOVING_LEN);
+const movingY = makeArrow(new THREE.Vector3(), new THREE.Vector3(0, 1, 0), 0x88ff88, MOVING_LEN);
+const movingZ = makeArrow(new THREE.Vector3(), new THREE.Vector3(0, 0, 1), 0x88bbff, MOVING_LEN);
+
+// ── Point P ───────────────────────────────────────────────────────────────────
+
+const Pdot   = makeSphere(0.08, 0xffd700);
+scene.add(Pdot);
+const pLocal = new THREE.Vector3(1.1, 0.7, 0.4);
+
+// ── Position vectors ──────────────────────────────────────────────────────────
+
+const lineObO = makeDashedLine(0x00ffff);
+const linePOb = makeDashedLine(0xff00ff);
+const linePO  = makeDashedLine(0xffff00);
+
+// ── Labels ────────────────────────────────────────────────────────────────────
+
+const labelO   = makeLabel('O');
+const labelX0  = makeLabel('x_0');
+const labelY0  = makeLabel('y_0');
+const labelZ0  = makeLabel('z_0');
+const labelOb  = makeLabel('O_b');
+const labelXb  = makeLabel('x_b');
+const labelYb  = makeLabel('y_b');
+const labelZb  = makeLabel('z_b');
+const labelP   = makeLabel('P');
+const labelr1  = makeLabel('\\mathbf{r}_{O_b/O}', '#00ffff', '18px');
+const labelr2  = makeLabel('\\mathbf{r}_{P/O_b}', '#ff00ff', '18px');
+const labelr3  = makeLabel('\\mathbf{r}_{P/O}',   '#ffff00', '18px');
+
+// Static label positions (fixed frame)
+labelO.position.set(-0.2, -0.2,  0);
+labelX0.position.set(FIXED_LEN + 0.3, 0, 0);
+labelY0.position.set(0, FIXED_LEN + 0.3, 0);
+labelZ0.position.set(0, 0, FIXED_LEN + 0.3);
+
+// ── Pause ─────────────────────────────────────────────────────────────────────
+
+let elapsed = 0;
+let running = true;
+const clock = new THREE.Clock();
+
+document.getElementById('frame-pause').addEventListener('click', function () {
+    running = !running;
+    this.textContent = running ? 'Pause' : 'Play';
+});
+
+// ── Animation loop ────────────────────────────────────────────────────────────
+
+function animate() {
+    requestAnimationFrame(animate);
+    const delta = clock.getDelta();
+    if (running) elapsed += delta * 0.5;
+
+    const t  = elapsed;
+    const Ob = new THREE.Vector3(
+        1.8 + 1.2 * Math.cos(0.6 * t),
+        1.0 + 0.5 * Math.sin(1.0 * t),
+        1.0 + 0.8 * Math.sin(0.7 * t)
+    );
+    const R  = new THREE.Matrix4().makeRotationFromEuler(
+        new THREE.Euler(0.45 * Math.sin(0.8 * t), 0.7 * t, 0.25 * Math.cos(0.9 * t))
+    );
+    const ex = new THREE.Vector3(1, 0, 0).applyMatrix4(R).normalize();
+    const ey = new THREE.Vector3(0, 1, 0).applyMatrix4(R).normalize();
+    const ez = new THREE.Vector3(0, 0, 1).applyMatrix4(R).normalize();
+    const pWorld = pLocal.clone().applyMatrix4(R).add(Ob);
+
+    movingDot.position.copy(Ob);
+    Pdot.position.copy(pWorld);
+
+    setArrow(movingX, Ob, ex, MOVING_LEN);
+    setArrow(movingY, Ob, ey, MOVING_LEN);
+    setArrow(movingZ, Ob, ez, MOVING_LEN);
+
+    labelOb.position.copy(Ob).add(new THREE.Vector3(-0.2, -0.3, 0));
+    labelXb.position.copy(Ob).addScaledVector(ex, MOVING_LEN + 0.35);
+    labelYb.position.copy(Ob).addScaledVector(ey, MOVING_LEN + 0.35);
+    labelZb.position.copy(Ob).addScaledVector(ez, MOVING_LEN + 0.35);
+    labelP.position.copy(pWorld).add(new THREE.Vector3(0.15, 0.2, 0.1));
+
+    updateLine(lineObO, O, Ob);
+    updateLine(linePOb, Ob, pWorld);
+    updateLine(linePO,  O, pWorld);
+
+    labelr1.position.copy(O).lerp(Ob,      0.5).add(new THREE.Vector3( 0.0,  0.3, 0));
+    labelr2.position.copy(Ob).lerp(pWorld,  0.5).add(new THREE.Vector3( 0.3,  0.2, 0));
+    labelr3.position.copy(O).lerp(pWorld,   0.5).add(new THREE.Vector3(-0.3,  0.3, 0));
+
+    controls.update();
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+}
+
+// ── Init: await MathJax, typeset, start ───────────────────────────────────────
+
+async function init() {
+    if (window.MathJax?.startup?.promise) await MathJax.startup.promise;
+
+    // Typeset HTML overlay
+    const legend = document.getElementById('frame-legend');
+    if (window.MathJax?.typesetPromise) await MathJax.typesetPromise([legend]);
+
+    // One silent render puts CSS2DObject elements into the DOM…
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+
+    // …so MathJax can now find and typeset them
+    if (window.MathJax?.typesetPromise) {
+        const els = [];
+        scene.traverse(o => { if (o.isCSS2DObject) els.push(o.element); });
+        await MathJax.typesetPromise(els);
+    }
+
+    animate();
+}
+
+init();
+</script>

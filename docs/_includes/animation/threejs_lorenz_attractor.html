@@ -1,195 +1,218 @@
-<div id="lorenz-container" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555;"></div>
+<div id="lorenz-container" style="width: 100%; height: 60vh; min-height: 400px; border: 1px solid #555; position: relative; cursor: crosshair;">
+  <div id="lorenz-hint" style="position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; color: rgba(255,255,255,0.45); font-size: 12px; pointer-events: none; font-family: sans-serif; user-select: none;">
+    Drag to orbit &nbsp;&middot;&nbsp; Scroll to zoom &nbsp;&middot;&nbsp; Click to spawn a trajectory &mdash; 10 remaining
+  </div>
+</div>
 
 <script type="importmap">
-   {
-     "imports": {
-       "three": "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js"
-     }
-   }
-   </script>
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js"
+    }
+  }
+</script>
 
 <script type="module">
     import * as THREE from 'three';
     import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js';
 
     const container = document.getElementById('lorenz-container');
+    const hint = document.getElementById('lorenz-hint');
+
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1e1e1e); // Dark modern gray
+    scene.background = new THREE.Color(0x1e1e1e);
 
-    // Get initial container dimensions
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-
-    const camera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(containerWidth, containerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio); // For high DPI displays
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    // Add controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.enableZoom = false;
+    controls.enableZoom = true;
+    controls.zoomSpeed = 0.6;
     controls.enablePan = false;
-    controls.enableRotate = false;
+    controls.enableRotate = true;
     controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.4;
 
-    // Handle window resize
-    function onWindowResize() {
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-
-        camera.aspect = width / height;
+    function onResize() {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        camera.aspect = w / h;
         camera.updateProjectionMatrix();
-
-        renderer.setSize(width, height);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(w, h);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     }
-
-    // Add resize listener
-    window.addEventListener('resize', onWindowResize, false);
-
-    // Also listen for container size changes (for responsive layouts)
+    window.addEventListener('resize', onResize, false);
     if (window.ResizeObserver) {
-        const resizeObserver = new ResizeObserver(entries => {
-            for (let entry of entries) {
-                if (entry.target === container) {
-                    onWindowResize();
-                }
+        new ResizeObserver(entries => {
+            for (const entry of entries) {
+                if (entry.target === container) onResize();
             }
-        });
-        resizeObserver.observe(container);
+        }).observe(container);
     }
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-    scene.add(ambientLight);
+    scene.add(new THREE.AmbientLight(0x404040, 0.6));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(10, 10, 10);
+    scene.add(dirLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(10, 10, 10);
-    scene.add(directionalLight);
+    const crossingPoint = new THREE.Vector3(0, 0, 1.4);
 
-    // Camera rotation parameters - focus on the crossing/transition region
-    let cameraAngle = 0;
-    const cameraRadius = 5; // Closer to see crossing detail
-    const cameraHeight = 1.2; // Positioned to see the transition region
-    const rotationSpeed = 0.0005; // Slow rotation speed
-
-    // Crossing point where trajectory switches between lobes (approximate center of transition)
-    const crossingPoint = new THREE.Vector3(0, 0, 1.4); // Elevated to capture transition region
-
-    // Lorenz attractor parameters
-    const sigma = 10;
-    const rho = 28;
-    const beta = 8 / 3;
-    const dt = 0.01;
-
-    // Generate Lorenz attractor trajectory
-    function generateLorenzTrajectory(steps = 100000) {
-        const points = [];
-        let x = 1, y = 1, z = 1; // Initial conditions
-
-        for (let i = 0; i < steps; i++) {
-            // Lorenz equations
-            const dx = sigma * (y - x);
-            const dy = x * (rho - z) - y;
-            const dz = x * y - beta * z;
-
-            // Euler integration
-            x += dx * dt;
-            y += dy * dt;
-            z += dz * dt;
-
-            // Scale for better visualization
-            points.push(new THREE.Vector3(x * 0.1, y * 0.1, z * 0.1));
-        }
-
-        return points;
-    }
-
-    const lorenzPoints = generateLorenzTrajectory();
-    const trajectoryGeometry = new THREE.BufferGeometry();
-    const trajectoryMaterial = new THREE.LineBasicMaterial({
-        color: 0xffd700,
-        transparent: true,
-        opacity: 0.8,
-        linewidth: 2
-    });
-    const trajectoryLine = new THREE.Line(trajectoryGeometry, trajectoryMaterial);
-    scene.add(trajectoryLine);
-
-    // Create a glowing sphere to show current position
-    const sphereGeometry = new THREE.SphereGeometry(0.05);
-    const sphereMaterial = new THREE.MeshPhongMaterial({
-        color: 0xffd700, // Match trajectory color
-        emissive: 0x664400,
-        shininess: 100
-    });
-    const currentPoint = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    scene.add(currentPoint);
-
-    // Animation variables
-    let currentFrame = 0;
-    let animatedPoints = [];
-    const animationSpeed = 3; // Points per frame
-
-    // Set initial camera position and target to the crossing point
+    // Initial camera position — same view as the old manual orbit start
+    camera.position.set(5, 1.2, 1.4);
     controls.target.copy(crossingPoint);
     controls.update();
 
-    function updateCameraPosition() {
-        // Update camera angle
-        cameraAngle += rotationSpeed;
+    // Lorenz parameters
+    const sigma = 10, rho = 28, beta = 8 / 3, dt = 0.01;
 
-        // Calculate new camera position in a circle around the crossing point
-        const x = crossingPoint.x + Math.cos(cameraAngle) * cameraRadius;
-        const z = crossingPoint.z + Math.sin(cameraAngle) * cameraRadius;
-        const y = crossingPoint.y + cameraHeight;
-
-        camera.position.set(x, y, z);
-        camera.lookAt(crossingPoint); // Look at the crossing/transition region
-
-        // Update controls target to maintain focus on crossing point
-        controls.target.copy(crossingPoint);
+    function generateLorenzTrajectory(x0, y0, z0, steps) {
+        const pts = [];
+        let x = x0, y = y0, z = z0;
+        for (let i = 0; i < steps; i++) {
+            const dx = sigma * (y - x);
+            const dy = x * (rho - z) - y;
+            const dz = x * y - beta * z;
+            x += dx * dt;
+            y += dy * dt;
+            z += dz * dt;
+            pts.push(new THREE.Vector3(x * 0.1, y * 0.1, z * 0.1));
+        }
+        return pts;
     }
 
-    function updateAnimation() {
-        // Add new points to the animated trajectory
-        for (let i = 0; i < animationSpeed && currentFrame < lorenzPoints.length; i++) {
-            animatedPoints.push(lorenzPoints[currentFrame]);
-            currentFrame++;
+    // First color is yellow (initial), rest for click-spawned trajectories
+    const COLORS = [
+        0xffd700, // yellow  — initial
+        0x00e5ff, // cyan
+        0xff6600, // orange
+        0x00ff88, // green
+        0xff0066, // pink
+        0xaa44ff, // purple
+        0xff3322, // red
+        0x44aaff, // sky blue
+        0xffffff, // white
+        0xaaff00, // lime
+        0xff88cc, // light pink
+    ];
+
+    const MAX_CLICK_TRAJECTORIES = 10;
+    const ANIMATION_SPEED = 3;
+
+    function createTrajectory(x0, y0, z0, color, steps = 100000) {
+        const lorenzPoints = generateLorenzTrajectory(x0, y0, z0, steps);
+        const geometry = new THREE.BufferGeometry();
+        const line = new THREE.Line(
+            geometry,
+            new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.8 })
+        );
+        scene.add(line);
+
+        const sphere = new THREE.Mesh(
+            new THREE.SphereGeometry(0.05),
+            new THREE.MeshPhongMaterial({
+                color,
+                emissive: new THREE.Color(color).multiplyScalar(0.25),
+                shininess: 100,
+            })
+        );
+        scene.add(sphere);
+
+        return { lorenzPoints, geometry, line, sphere, currentFrame: 0, animatedPoints: [] };
+    }
+
+    function disposeTrajectory(traj) {
+        scene.remove(traj.line);
+        scene.remove(traj.sphere);
+        traj.geometry.dispose();
+        traj.line.material.dispose();
+        traj.sphere.geometry.dispose();
+        traj.sphere.material.dispose();
+    }
+
+    function stepTrajectory(traj) {
+        for (let i = 0; i < ANIMATION_SPEED && traj.currentFrame < traj.lorenzPoints.length; i++) {
+            traj.animatedPoints.push(traj.lorenzPoints[traj.currentFrame++]);
         }
-
-        // Update the trajectory line
-        if (animatedPoints.length > 0) {
-            trajectoryGeometry.setFromPoints(animatedPoints);
-
-            // Update current position sphere
-            const lastPoint = animatedPoints[animatedPoints.length - 1];
-            currentPoint.position.copy(lastPoint);
+        if (traj.animatedPoints.length > 0) {
+            traj.geometry.setFromPoints(traj.animatedPoints);
+            traj.sphere.position.copy(traj.animatedPoints[traj.animatedPoints.length - 1]);
         }
-
-        // Reset when complete and start over
-        if (currentFrame >= lorenzPoints.length) {
-            currentFrame = 0;
-            animatedPoints = [];
+        if (traj.currentFrame >= traj.lorenzPoints.length) {
+            traj.currentFrame = 0;
+            traj.animatedPoints = [];
         }
     }
 
-    // Animation loop
+    // Initial yellow trajectory — always present
+    const initialTrajectory = createTrajectory(1, 1, 1, COLORS[0]);
+
+    // Click-spawned trajectories
+    const clickTrajectories = [];
+    let totalClicks = 0;
+
+    function updateHint() {
+        const remaining = MAX_CLICK_TRAJECTORIES - clickTrajectories.length;
+        const spawnText = remaining > 0
+            ? `Click to spawn a trajectory — ${remaining} remaining`
+            : 'Click to replace the oldest trajectory';
+        hint.innerHTML = `Drag to orbit &nbsp;&middot;&nbsp; Scroll to zoom &nbsp;&middot;&nbsp; ${spawnText}`;
+    }
+
+    // Distinguish click from drag using pointer events
+    let pointerDownPos = null;
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+        pointerDownPos = { x: e.clientX, y: e.clientY };
+    });
+
+    renderer.domElement.addEventListener('pointerup', (e) => {
+        if (!pointerDownPos) return;
+        const dx = e.clientX - pointerDownPos.x;
+        const dy = e.clientY - pointerDownPos.y;
+        pointerDownPos = null;
+        if (Math.sqrt(dx * dx + dy * dy) > 5) return; // drag — ignore
+
+        // Remove oldest click trajectory if at cap
+        if (clickTrajectories.length >= MAX_CLICK_TRAJECTORIES) {
+            disposeTrajectory(clickTrajectories.shift());
+        }
+
+        // Map 2-D click to 3-D world position on a plane facing the camera
+        const rect = renderer.domElement.getBoundingClientRect();
+        const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(nx, ny), camera);
+
+        const planeNormal = new THREE.Vector3();
+        camera.getWorldDirection(planeNormal);
+        const plane = new THREE.Plane(planeNormal, -planeNormal.dot(crossingPoint));
+        const worldPos = new THREE.Vector3();
+        if (!raycaster.ray.intersectPlane(plane, worldPos)) return;
+
+        // Convert Three.js scale back to Lorenz coordinates (scale factor 0.1)
+        const colorIndex = (totalClicks % (COLORS.length - 1)) + 1;
+        totalClicks++;
+
+        // Use fewer steps for click trajectories so computation stays fast
+        const traj = createTrajectory(worldPos.x * 10, worldPos.y * 10, worldPos.z * 10, COLORS[colorIndex], 50000);
+        clickTrajectories.push(traj);
+        updateHint();
+    });
+
     function animate() {
         requestAnimationFrame(animate);
 
-        updateCameraPosition(); // Update camera rotation around crossing point
         controls.update();
-        updateAnimation();
 
-        // Add some rotation for visual interest on the current point
-        if (animatedPoints.length > 0) {
-            currentPoint.rotation.x += 0.01;
-            currentPoint.rotation.y += 0.01;
-        }
+        stepTrajectory(initialTrajectory);
+        for (const traj of clickTrajectories) stepTrajectory(traj);
 
         renderer.render(scene, camera);
     }
