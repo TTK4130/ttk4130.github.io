@@ -1,3 +1,5 @@
+.. _animation-page:
+
 ################################
  3D Visualization and Animation
 ################################
@@ -695,7 +697,7 @@ Example: Sphere in bowl simulation
 
 In this example the idea is to simulate and animate a sphere rolling in a parabolic bowl assuming no
 slipping, as shown in :numref:`fig:lagrangebowl` :cite:`gros2011`. For convenience, we use SymPy to
-derive our equations of motion (see :ref:`Numerical Methods for ODEs`).
+derive our equations of motion (see :ref:`numerical-methods-for-odes`).
 
 .. dropdown:: Derivation with SymPy
 
@@ -783,7 +785,7 @@ From the derivation above we get the following equations of motion:
     sm.Matrix([x_ddot_expr.simplify(), y_ddot_expr.simplify()])
 
 Using Sympy's `lambdify()` function we convert our SymPy expressions to Python functions and create
-a system of ordinary differential equations on the standard SciPy format (see :ref:`SymPy and CAS`).
+a system of ordinary differential equations on the standard SciPy format (see :ref:`sympy-and-cas`).
 
 .. jupyter-execute::
 

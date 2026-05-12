@@ -53,6 +53,8 @@ respective unit vectors. We'll examine this in the next section.
     vectors. In an orthonormal reference frame, the basis vectors are both unit vectors and mutually
     perpendicular.
 
+.. _simple-rotation-example:
+
 *************************
  Simple Rotation Example
 *************************
@@ -260,7 +262,7 @@ We can easily implement this in SymPy
  SymPy Reference Frames
 ************************
 
-As you can see from section :ref:`Simple Rotation Example`, even simple examples can get quite
+As you can see from section :ref:`simple-rotation-example`, even simple examples can get quite
 tedious when working with reference frames. Luckily, the SymPy module
 :external:py:obj:`~sympy.physics.vector` implements reference frames with the
 :external:py:class:`~sympy.physics.vector.frame.ReferenceFrame` class.
@@ -527,4 +529,4 @@ incorrectly, so use it with caution.
 *****************
 
 There are many different ways of representing rotations. We'll take a closer look at the most
-commonly used way of representing orientation in the section :ref:`quaternions`.
+commonly used way of representing orientation in the section :ref:`Quaternions (WIP) <quaternions>`.

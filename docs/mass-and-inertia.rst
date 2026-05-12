@@ -648,8 +648,8 @@ when spinning about a principal axis.
 Now we can write down the full equations of motion for a rigid body. There are two vector equations.
 One for translation and one for rotation.
 
-About the Center of Mass
-========================
+Newton-Euler About the Center of Mass
+=====================================
 
 .. Define newton-euler about the CM
 

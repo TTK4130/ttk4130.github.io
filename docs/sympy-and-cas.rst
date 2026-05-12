@@ -1,20 +1,22 @@
+.. _sympy-and-cas:
+
 ###############
  SymPy and CAS
 ###############
 
 .. note::
 
-    If you don't have SymPy installed you can try it in your browser with the :ref:`SymPy Live` page
+    If you don't have SymPy installed you can try it in your browser with the :ref:`sympy-live` page
 
 ********************
  SymPy Introduction
 ********************
 
 This page aims to introduce you to the wonderful world of SymPy and CAS (Computer Algebra System).
-The code examples are based on the SciPy 2016 Conference SymPy tutorial (see :ref:`More resources on
-SymPy`) and the `official documentation for SymPy <https://docs.sympy.org/latest/index.html>`_. The
-page partly written as an interactive tutorial and you're encouraged to code along with the provide
-examples.
+The code examples are based on the SciPy 2016 Conference SymPy tutorial (see
+:ref:`more-resources-on-sympy`) and the `official documentation for SymPy
+<https://docs.sympy.org/latest/index.html>`_. The page partly written as an interactive tutorial and
+you're encouraged to code along with the provide examples.
 
 SymPy is a Python library for symbolic mathematics :cite:`Sympy2017`. Some of you may have worked
 with similar programs such as GeoGebra CAS, Maple, Matlab Symbolic Math Toolbox, Mathematica etc..
@@ -764,6 +766,8 @@ find a simpler trigonometric expression
     sm.trigsimp(sm.cos(t)**2 + sm.sin(t)**2)
 
 ----
+
+.. _more-resources-on-sympy:
 
 *************************
  More resources on SymPy
