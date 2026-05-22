@@ -77,7 +77,10 @@ drones is the ZYX (yaw, pitch, roll) sequence
 See :doc:`reference-frames` for the derivation of these matrices and a discussion of intrinsic
 versus extrinsic rotation conventions.
 
-.. dropdown:: Exercise: Coordinate transformation using a rotation matrix
+.. admonition:: Exercise
+    :class: dropdown
+    
+    **Coordinate transformation using a rotation matrix**
 
     A drone's body frame :math:`b` is obtained from the inertial frame by a pure yaw rotation of
     :math:`\psi = 90°` followed by a pure pitch rotation of :math:`\theta = 30°`. The combined
@@ -229,7 +232,10 @@ body and then for a ship.
 .. raw:: html
     :file: _includes/animation/threejs_viz_lin_vel_boat.html
 
-.. dropdown:: Exercise: Velocity of a point on a rotating vessel
+.. admonition:: Exercise
+    :class: dropdown
+
+    **Velocity of a point on a rotating vessel**
 
     A ship (body frame :math:`b`) moves through calm water with a constant translational velocity
     :math:`\vec{v}_{b/i}^i = (3, 1, 0)^\top` m/s expressed in the inertial frame. The ship rotates
@@ -355,7 +361,7 @@ These ideas are fundamental in rigid-body mechanics, robotics, and vehicle dynam
 .. admonition:: A modern cautionary tale
 
     In 2026, a French sailor reportedly revealed the position of the aircraft carrier
-    :math:`\textit{Charles de Gaulle}` by uploading a public Strava run recorded on the deck.
+    *Charles de Gaulle* by uploading a public Strava run recorded on the deck.
 
 .. figure:: figures/strava.jpg
     :width: 70%
