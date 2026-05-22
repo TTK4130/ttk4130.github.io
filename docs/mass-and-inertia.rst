@@ -280,9 +280,6 @@ center of mass by treating each component as a point mass located at its own cen
  The Inertia Matrix
 ********************
 
-Definition via Integral
-=======================
-
 For rotation, the role of scalar mass is played by the **inertia matrix** :math:`\mathbf{M}_{b/c}`,
 which encodes how the mass of body :math:`b` is distributed around its center of mass :math:`c`.
 
@@ -389,8 +386,13 @@ We can verify this equals the skew-matrix formula:
 General Properties
 ==================
 
-The inertia matrix is always **symmetric** (follows directly from the definition) and **positive
-definite**, meaning the rotational kinetic energy is always strictly positive:
+Two general properties are always true for the inertia matrix:
+
+1. It is **symmetric**
+2. It is **positive definite**
+
+The first follows directly from the definition, while the second is a consequence of the fact that
+rotational kinetic energy always has to be strictly positive (negative energy makes no sense):
 
 .. Rotational kinetic energy is always strictly positive
 
@@ -401,8 +403,8 @@ definite**, meaning the rotational kinetic energy is always strictly positive:
 
 ..
 
-Positive definiteness guarantees all eigenvalues of :math:`\mathbf{M}` are strictly positive. Let's
-ensure that this is the case for our spinning top:
+A positive definite matrix always has that all eigenvalues are strictly positive. This can serve as
+a criterion to check that the inertia matrix is reasonable. Let us ensure this is the case for our spinning top:
 
 .. EXAMPLE: Spinning top inertia matrix
 
