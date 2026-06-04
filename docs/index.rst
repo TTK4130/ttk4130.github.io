@@ -21,9 +21,9 @@
     quaternions
     numerical-methods-for-odes
     whats-next
-    project/index
     assignments/index
     lecture-notes/index
+    project
     sympy-live
     notation
     bibliography

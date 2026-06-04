@@ -15,9 +15,6 @@ might spark new ideas. The point is for you to be curious, inquisitive, creative
 **TL;DR**: Deepen your knowledge by modelling and analysing a system which you find interesting, and
 most of all exciting.
 
-For your convenience, we have provided you with an example project which details the process from
-picking a system all the way to delivering your final report. Please see :ref:`example_project`.
-
 Other example projects:
 
 - Car drivetrain
