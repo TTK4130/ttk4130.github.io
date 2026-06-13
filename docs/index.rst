@@ -93,9 +93,9 @@ Did you know Python can do symbolic math?
     b, t, phi = sm.symbols('b, t, phi')
     b, t, phi
 
-*****************************************************
- Learning Through Struggle: Why Shortcuts Don't Work
-*****************************************************
+**********************
+ No effort is wasted!
+**********************
 
 As our tools become more advanced, it's tempting to let them do all the heavy lifting. You might
 wonder: "Why not just modify existing code examples or ask ChatGPT when I'm stuck?" The answer is
